@@ -1453,7 +1453,9 @@ function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!
   const DANGER_R=120,STEPS=3,STEP_DIST=80;
   function offDanger(tx,ty){
     if(tx<250||tx>WORLD-250||ty<250||ty>WORLD-250)return 999;
-    // ПРОВЕРКА СТЕН ЛАБИРИНТА В АВТОПИЛОТЕif(gameMode==='maze'&&mazeState&&mazeState.walls&&checkMazeWallCollision(tx,ty,offlineGetR(me.score)))return 0;let minD=Infinity;for(const s of dangerSegs){const dx=tx-s.x,dy=ty-s.y,d=dx*dx+dy*dy;if(d<minD)minD=d;}
+    if(gameMode==='maze'&&mazeState&&mazeState.walls&&checkMazeWallCollision(tx,ty,offlineGetR(me.score)))return 0;
+    let minD=Infinity;
+    for(const s of dangerSegs){const dx=tx-s.x,dy=ty-s.y,d=dx*dx+dy*dy;if(d<minD)minD=d;}
     return Math.sqrt(minD);
   }
   function offPathSafe(angle){
