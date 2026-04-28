@@ -1420,7 +1420,7 @@ function buildSegsMap(world){const map={};if(!world||!world.players)return map;f
 
 // ══════ OFFLINE БОТЫ ══════
 const OFFLINE_BOTS_COUNT=14,OFFLINE_FOOD_COUNT=600;
-let offlineState=null,offlineTickInterval=null;
+let offlineState=null,offlineTickInterval=null,mazeBreakTimeout=null;
 const BOT_NAMES=['Cobra','Viper','Noodle','Slimy','Zigzag','Mamba','Python','Adder','Taipan','Boa','Asp','Racer','Krait','Sidewinder','Copperhead','Rattler','Anaconda','Diamondback'];
 
 function mkOfflineFood(){const rnd=Math.random();let size,r;if(rnd<0.75){size='small';r=3+Math.random()*2;}else if(rnd<0.95){size='medium';r=5+Math.random()*2;}else{size='big';r=8+Math.random()*2;}return{x:200+Math.random()*(WORLD-400),y:200+Math.random()*(WORLD-400),r,color:`hsl(${Math.floor(Math.random()*360)},90%,65%)`,size,p:Math.random()*Math.PI*2};}
