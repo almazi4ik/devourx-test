@@ -1798,8 +1798,52 @@ function runAutopilot(){
 
 function updHUD(){if(gameMode==='online'){if(ws&&ws.readyState===WebSocket.OPEN&&player&&running){if(!autopilotMode){player.tAngle=Math.atan2(my-H/2,mx-W/2);player.boosting=boosting&&player.score>MIN_LEN;}else runAutopilot();ws.send(JSON.stringify({type:'input',angle:player.tAngle,boost:player.boosting}));}}if(serverWorld){if(serverWorld.leaderboard){let h='';let meInTop=false;serverWorld.leaderboard.forEach((s,i)=>{const lv=s.isMe?(getLevel(playerXP)+1):Math.min(50,Math.max(1,Math.floor(s.score/80)+1));if(s.isMe)meInTop=true;h+=`<div class="lb-row${s.isMe?' me':''}"><span class="lb-rank">${i+1}</span><span class="lb-lvl">${lv}</span><span class="lb-name">${s.name}</span><span class="lb-score">${s.score}</span></div>`;});if(!meInTop&&serverWorld.players){const me=serverWorld.players.find(p=>p.isMe);if(me){const allSorted=[...serverWorld.players].filter(p=>p.score!==undefined).sort((a,b)=>b.score-a.score);const myPos=allSorted.findIndex(p=>p.isMe)+1;const lv=getLevel(playerXP)+1;h+=`<div class="lb-sep"></div><div class="lb-row me"><span class="lb-rank">${myPos||'?'}</span><span class="lb-lvl">${lv}</span><span class="lb-name">${me.name}</span><span class="lb-score">${me.score}</span></div>`;}}document.getElementById('lbList').innerHTML=h;}const me=serverWorld.players?serverWorld.players.find(p=>p.isMe):null;const myScore=me?me.score:(player?player.score:0);const myRank=serverWorld.leaderboard?(serverWorld.leaderboard.findIndex(s=>s.isMe)+1||'?'):'?';document.getElementById('hudLen').textContent=myScore;document.getElementById('hudRank').textContent=myRank==='?'?'#?':'#'+myRank;if(me&&gameMode==='online'){const r=serverWorld.leaderboard?serverWorld.leaderboard.findIndex(s=>s.isMe)+1:99;if(r>=1&&r<=3&&serverWorld.leaderboard&&serverWorld.leaderboard.length>=4)trackQuest('top3',1);}}}
 
-function drawMM(){mctx.clearRect(0,0,108,108);const sc=108/WORLD;const heads=(serverWorld&&serverWorld.allHeads)||(serverWorld&&serverWorld.players||[]).map(p=>({x:p.segs&&p.segs[0]&&p.segs[0].x,y:p.segs&&p.segs[0]&&p.segs[0].y,isMe:p.isMe}));for(const h of heads){if(h.x==null)continue;mctx.beginPath();mctx.arc(h.x*sc,h.y*sc,h.isMe?5:3,0,Math.PI*2);mctx.fillStyle=h.isMe?'#ff4e4e':'rgba(255,255,255,0.6)';mctx.fill();}}
-
+function drawMM(){
+  mctx.clearRect(0,0,108,108);
+  
+  // Фон миникарты (тёмный)
+  mctx.fillStyle='rgba(0,0,0,0.6)';
+  mctx.fillRect(0,0,108,108);
+  
+  // Отрисовка стен лабиринта на миникарте
+  if(gameMode==='maze'&&mazeState&&mazeState.walls){
+    const sc=108/WORLD;
+    mctx.fillStyle='rgba(128,128,128,0.8)'; // Серый цвет стен
+    for(const wall of mazeState.walls){
+      const mx=wall.x*sc;
+      const my=wall.y*sc;
+      const mw=Math.max(1,wall.w*sc);
+      const mh=Math.max(1,wall.h*sc);
+      mctx.fillRect(mx,my,mw,mh);
+    }
+    // Обводка стен поярче
+    mctx.strokeStyle='rgba(180,180,180,0.6)';
+    mctx.lineWidth=0.5;
+    for(const wall of mazeState.walls){
+      const mx=wall.x*sc;
+      const my=wall.y*sc;
+      const mw=Math.max(1,wall.w*sc);
+      const mh=Math.max(1,wall.h*sc);
+      mctx.strokeRect(mx,my,mw,mh);
+    }
+  }
+  
+  // Отрисовка голов змеек
+  const sc=108/WORLD;
+  const heads=(serverWorld&&serverWorld.allHeads)||(serverWorld&&serverWorld.players||[]).map(p=>({x:p.segs&&p.segs[0]&&p.segs[0].x,y:p.segs&&p.segs[0]&&p.segs[0].y,isMe:p.isMe}));
+  for(const h of heads){
+    if(h.x==null)continue;
+    mctx.beginPath();
+    mctx.arc(h.x*sc,h.y*sc,h.isMe?5:3,0,Math.PI*2);
+    mctx.fillStyle=h.isMe?'#ff4e4e':'rgba(255,255,255,0.6)';
+    mctx.fill();
+  }
+  
+  // Рамка миникарты
+  mctx.strokeStyle='rgba(46,204,113,0.3)';
+  mctx.lineWidth=1;
+  mctx.strokeRect(0,0,108,108);
+}
 function drawBackground(cx,cy){if(!running){if(currentBG==='space')drawSpaceBackground();else if(currentBG==='water')drawWaterBackground();else{ctx.fillStyle='#0d2b15';ctx.fillRect(0,0,W,H);}return;}const bgColors={'classic':'#0d2b15','space':'#03020d','water':'#020e1a'};ctx.fillStyle=bgColors[currentBG]||'#0d2b15';ctx.fillRect(0,0,W,H);const gridColors={'classic':'rgba(46,204,113,0.055)','space':'rgba(120,100,255,0.06)','water':'rgba(0,160,220,0.055)'};ctx.strokeStyle=gridColors[currentBG]||gridColors.classic;ctx.lineWidth=1;for(let x=Math.floor(cx/CELL)*CELL;x<cx+W+CELL;x+=CELL){ctx.beginPath();ctx.moveTo(x-cx,0);ctx.lineTo(x-cx,H);ctx.stroke();}for(let y=Math.floor(cy/CELL)*CELL;y<cy+H+CELL;y+=CELL){ctx.beginPath();ctx.moveTo(0,y-cy);ctx.lineTo(W,y-cy);ctx.stroke();}ctx.strokeStyle='rgba(231,76,60,0.5)';ctx.lineWidth=8;ctx.strokeRect(-cx,-cy,WORLD,WORLD);}
 
 function drawFoodList(fl,cx,cy){for(const f of fl){const fx=f.x-cx,fy=f.y-cy;if(fx<-20||fx>W+20||fy<-20||fy>H+20)continue;if(f.p!==undefined)f.p+=.05;const pr=f.r*(f.size==='big'?1:.85+.15*Math.sin(f.p||0));ctx.beginPath();ctx.arc(fx,fy,pr,0,Math.PI*2);ctx.fillStyle=f.color||'#2ecc71';ctx.fill();ctx.beginPath();ctx.arc(fx-pr*.3,fy-pr*.3,pr*.27,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fill();}}
