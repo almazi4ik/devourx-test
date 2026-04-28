@@ -1560,30 +1560,63 @@ function drawWalls(cx,cy){
     const wx=wall.x-cx,wy=wall.y-cy;
     if(wx>W+100||wx+wall.w<-100||wy>H+100||wy+wall.h<-100)continue;
     
-    // Свечение вокруг стен
-    ctx.shadowColor='#6c5ce7';
-    ctx.shadowBlur=15;
+    // Тень от стены
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.fillRect(wx+3,wy+3,wall.w,wall.h);
     
-    // Основной градиент
+    // Основной серый бетон
     const grad=ctx.createLinearGradient(wx,wy,wx+wall.w,wy+wall.h);
-    grad.addColorStop(0,'#5a4fcf');
-    grad.addColorStop(1,'#8b7cf0');
+    grad.addColorStop(0,'#6b6b6b');
+    grad.addColorStop(0.3,'#808080');
+    grad.addColorStop(0.6,'#757575');
+    grad.addColorStop(1,'#5a5a5a');
     ctx.fillStyle=grad;
     ctx.fillRect(wx,wy,wall.w,wall.h);
     
-    // Светлая обводка
-    ctx.shadowBlur=0;
-    ctx.strokeStyle='rgba(255,255,255,0.5)';
+    // Внешняя обводка
+    ctx.strokeStyle='#4a4a4a';
     ctx.lineWidth=2;
     ctx.strokeRect(wx,wy,wall.w,wall.h);
     
-    // Внутренняя линия для объёма
-    ctx.strokeStyle='rgba(255,255,255,0.2)';
+    // Трещины/текстура бетона
+    ctx.strokeStyle='rgba(0,0,0,0.15)';
     ctx.lineWidth=1;
-    ctx.strokeRect(wx+2,wy+2,wall.w-4,wall.h-4);
+    // Горизонтальные трещины
+    ctx.beginPath();
+    ctx.moveTo(wx+4,wy+wall.h*0.3);
+    ctx.lineTo(wx+wall.w*0.6,wy+wall.h*0.3);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(wx+wall.w*0.2,wy+wall.h*0.7);
+    ctx.lineTo(wx+wall.w-4,wy+wall.h*0.7);
+    ctx.stroke();
+    // Вертикальные трещины
+    ctx.beginPath();
+    ctx.moveTo(wx+wall.w*0.3,wy+4);
+    ctx.lineTo(wx+wall.w*0.3,wy+wall.h*0.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(wx+wall.w*0.7,wy+wall.h*0.4);
+    ctx.lineTo(wx+wall.w*0.7,wy+wall.h-4);
+    ctx.stroke();
+    
+    // Маленькие сколы (точки)
+    ctx.fillStyle='rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.arc(wx+wall.w*0.15,wy+wall.h*0.25,1.5,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(wx+wall.w*0.8,wy+wall.h*0.6,1.2,0,Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(wx+wall.w*0.5,wy+wall.h*0.8,1,0,Math.PI*2);
+    ctx.fill();
+    
+    // Блик сверху
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.fillRect(wx+2,wy+1,wall.w-4,2);
   }
 }
-
 function startMazeMode(){
   gameMode='maze';
   if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}
