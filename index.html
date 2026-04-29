@@ -1150,6 +1150,8 @@ function applyLang(){
   const lbBtn=document.getElementById('lbMenuBtn');if(lbBtn)lbBtn.textContent=L.rating||'🏆 RATING';
   const lbPT=document.getElementById('lbPanelTitle');if(lbPT)lbPT.textContent=L.global_rating||'🏆 GLOBAL RATING';
   const bmL=document.getElementById('bmLabel');if(bmL)bmL.textContent=L.best_mass||'Best Mass';
+  const mazeEl=document.querySelector('[data-i18n="maze"]');if(mazeEl)mazeEl.textContent=L.maze||'MAZE';
+  const mazeDescEl=document.querySelector('[data-i18n="maze_desc"]');if(mazeDescEl)mazeDescEl.innerHTML=L.maze_desc||'Narrow corridors<br>and dead ends';
   TIPS.length=0;L.tips.forEach(tip=>TIPS.push(tip));
   renderLangPanel();
 }
