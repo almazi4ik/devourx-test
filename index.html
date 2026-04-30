@@ -2259,22 +2259,60 @@ function openLbPanel(){
   document.getElementById('lbPanelList').innerHTML='<div class="lb-panel-loading">Загрузка...</div>';
   document.getElementById('lbOverlay').classList.add('open');
   document.getElementById('lbPanel').classList.add('open');
+  
+  // Вкладки
+  const tabsContainer = document.createElement('div');
+  tabsContainer.style.cssText = 'display:flex;gap:6px;margin-bottom:14px;';
+  tabsContainer.innerHTML = `
+    <button class="lb-tab active" data-tab="daily" style="flex:1;padding:10px 8px;border-radius:12px;border:2px solid rgba(249,202,36,0.3);background:rgba(249,202,36,0.15);color:#f9ca24;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;">🥇 ДЕНЬ</button>
+    <button class="lb-tab" data-tab="weekly" style="flex:1;padding:10px 8px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;">🏆 НЕДЕЛЯ</button>
+    <button class="lb-tab" data-tab="alltime" style="flex:1;padding:10px 8px;border-radius:12px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;">👑 ВСЁ ВРЕМЯ</button>
+  `;
+  
+  const contentDiv = document.createElement('div');
+  contentDiv.id = 'lbTabContent';
+  
+  const lbHeader = document.querySelector('.lb-panel-header');
+  const panel = document.getElementById('lbPanelList');
+  panel.innerHTML = '';
+  panel.appendChild(tabsContainer);
+  panel.appendChild(contentDiv);
+  
+  let allData = { daily: [], weekly: [], alltime: [] };
+  
   Promise.all([lbLoad(getDailyKey()),lbLoad(getWeeklyKey()),lbLoad(LB_ALLTIME)]).then(([daily,weekly,alltime])=>{
-    const panel=document.getElementById('lbPanelList');
-    const tabs=[
-      ['🥇 ЕЖЕДНЕВНЫЙ',daily],
-      ['🏆 НЕДЕЛЬНЫЙ',weekly],
-      ['👑 ЗА ВСЁ ВРЕМЯ',alltime]
-    ];
-    panel.innerHTML=tabs.map(([t,s])=>`<div style="margin-bottom:16px;">
-      <div style="font-family:'Fredoka One',cursive;font-size:15px;color:#f9ca24;margin-bottom:6px;">${t}</div>
-      ${s.slice(0,10).map((r,i)=>{
-        const m=['🥇','🥈','🥉'];const rk=i<3?m[i]:String(i+1);
-        const me=r.pid===_playerId;
-        return`<div class="lb-panel-row${me?' me':''}"><span class="lb-panel-rank">${rk}</span><span class="lb-panel-name">${r.name}</span><span class="lb-panel-score">${r.score}</span></div>`;
-      }).join('')}
-    </div>`).join('');
+    allData = { daily, weekly, alltime };
+    showLbTab('daily', daily);
+    
+    // Обработчики вкладок
+    document.querySelectorAll('.lb-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lb-tab').forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'rgba(255,255,255,0.05)';
+          b.style.color = 'rgba(255,255,255,0.6)';
+          b.style.borderColor = 'rgba(255,255,255,0.15)';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'rgba(249,202,36,0.15)';
+        btn.style.color = '#f9ca24';
+        btn.style.borderColor = 'rgba(249,202,36,0.3)';
+        showLbTab(btn.dataset.tab, allData[btn.dataset.tab]);
+      });
+    });
   });
+  
+  function showLbTab(name, scores) {
+    const s = Array.isArray(scores) ? scores : [];
+    const titles = { daily: '🥇 ЕЖЕДНЕВНЫЙ', weekly: '🏆 НЕДЕЛЬНЫЙ', alltime: '👑 ЗА ВСЁ ВРЕМЯ' };
+    document.getElementById('lbTabContent').innerHTML = s.length === 0 
+      ? '<div style="text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-family:\'Fredoka One\',cursive;">Пока никого нет — будь первым!</div>'
+      : s.slice(0,50).map((r,i)=>{
+          const m=['🥇','🥈','🥉'];const rk=i<3?m[i]:String(i+1);
+          const me=r.pid===_playerId;
+          return`<div class="lb-panel-row${me?' me':''}"><span class="lb-panel-rank">${rk}</span><span class="lb-panel-name">${r.name}</span><span class="lb-panel-score">${r.score}</span></div>`;
+        }).join('');
+  }
 }
   
 function closeLbPanel(){document.getElementById('lbOverlay').classList.remove('open');document.getElementById('lbPanel').classList.remove('open');}
