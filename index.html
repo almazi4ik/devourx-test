@@ -2180,7 +2180,9 @@ async function lbLoad(key){
   try{
     const res=await fetch(`${UPSTASH_URL}/get/${key}`,{headers:{'Authorization':`Bearer ${UPSTASH_TOKEN}`}});
     const data=await res.json();
-    return JSON.parse(data.result||'[]');
+    const parsed = JSON.parse(data.result||'[]');
+    // Если это строка — парсим ещё раз (двойная упаковка)
+    return Array.isArray(parsed) ? parsed : JSON.parse(parsed||'[]');
   }catch(e){return[];}
 }
 async function lbSave(key,scores){
