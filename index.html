@@ -2152,31 +2152,64 @@ function renderAccPanel() {
   } catch(e) { /* offline — оставляем сессию */ }
 })();
 
-// ══════ JSONBIN РЕКОРДЫ ══════
-const JB_KEY = '$2a$10$X7AxR.ZEZnOBJmq/N124WOu7jwbEUAUzKnwkPq.PlaAGhPx4fVNl6';
-const JB_URL_CREATE = 'https://api.jsonbin.io/v3/b';
-let jbBinId = localStorage.getItem('dvx_binid') || '69b5ba00c3097a1dd525dce7';
+async function jbLoadScores() {
+  try {
+    const res = await fetch(`${UPSTASH_URL}/get/scores`, {
+      headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const data = await res.json();
+    return JSON.parse(data.result || '[]');
+  } catch(e) { return []; }
+}
 
-async function jbEnsureBin(){if(jbBinId)return jbBinId;const res=await fetch(JB_URL_CREATE,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY,'X-Bin-Name':'devourx-scores','X-Bin-Private':'false'},body:JSON.stringify({scores:[]})});const data=await res.json();jbBinId=data.metadata.id;localStorage.setItem('dvx_binid',jbBinId);return jbBinId;}
-async function jbLoadScores(){try{const id=await jbEnsureBin();const res=await fetch(`https://api.jsonbin.io/v3/b/${id}/latest`,{headers:{'X-Master-Key':JB_KEY}});const data=await res.json();return data.record.scores||[];}catch(e){return[];}}
-async function jbSaveScore(name,score){try{const id=await jbEnsureBin();const scores=await jbLoadScores();const existing=scores.findIndex(s=>s.pid===_playerId);if(existing>=0){if(score<=scores[existing].score)return;scores[existing].score=score;scores[existing].date=Date.now();}else{scores.push({name,score,date:Date.now(),pid:_playerId});}scores.sort((a,b)=>b.score-a.score);const top=scores.slice(0,100);await fetch(`https://api.jsonbin.io/v3/b/${id}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},body:JSON.stringify({scores:top})});updateBestMassWidget(top);}catch(e){console.warn('jbSaveScore error',e);}}
-
+async function jbSaveScore(name, score) {
+  try {
+    const scores = await jbLoadScores();
+    const existing = scores.findIndex(s => s.pid === _playerId);
+    if (existing >= 0) {
+      if (score <= scores[existing].score) return;
+      scores[existing].score = score;
+      scores[existing].date = Date.now();
+    } else {
+      scores.push({ name, score, date: Date.now(), pid: _playerId });
+    }
+    scores.sort((a, b) => b.score - a.score);
+    const top = scores.slice(0, 100);
+    
+    await fetch(`${UPSTASH_URL}/set/scores`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(JSON.stringify(top))
+    });
+    updateBestMassWidget(top);
+  } catch(e) { console.warn('jbSaveScore error', e); }
+}
+  
 // Обновляем имя в глобальном рейтинге без изменения счёта
 let _nameUpdateTimer = null;
 async function jbUpdateName(name) {
   if(_nameUpdateTimer) clearTimeout(_nameUpdateTimer);
   _nameUpdateTimer = setTimeout(async () => {
     try {
-      const id = await jbEnsureBin();
       const scores = await jbLoadScores();
       const existing = scores.findIndex(s => s.pid === _playerId);
       if(existing >= 0 && scores[existing].name !== name) {
         scores[existing].name = name;
-        await fetch(`https://api.jsonbin.io/v3/b/${id}`, {method:'PUT', headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY}, body:JSON.stringify({scores})});
+        await fetch(`${UPSTASH_URL}/set/scores`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(JSON.stringify(scores))
+        });
         updateBestMassWidget(scores);
       }
     } catch(e) {}
-  }, 1500); // дебаунс 1.5 сек — не спамим запросами при каждом символе
+  }, 1500);
 }
 
 // Обновляем имя в клане
@@ -2245,7 +2278,8 @@ function playIrisOpen(onMidpoint,onDone){const W2=irisCv.width,H2=irisCv.height;
 // ══════════════════════════════════════════
 // СИСТЕМА КЛАНОВ
 // ══════════════════════════════════════════
-const CLAN_BIN_ID = '69b5642eb7ec241ddc6a17ab'; // отдельный бин для кланов
+const UPSTASH_URL = 'https://topical-crappie-109649.upstash.io';
+const UPSTASH_TOKEN = 'gQAAAAAAAaxRAAIgcDEyYTQ2OWEzNmVmMWI0MTZjYWZmZWI1ZGQyODljYzJmZg';
 const CLAN_MAX_MEMBERS = 25;
 const CLAN_CREATE_COST = 5000;
 
@@ -2254,25 +2288,30 @@ let myClanId = localStorage.getItem('dvx_clan_id') || null;
 let myClanRole = localStorage.getItem('dvx_clan_role') || null; // 'leader','officer','member'
 let _clanCache = null; // кэш всех кланов
 
-// ── JSONBin helpers ──
 async function clanLoadAll() {
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${CLAN_BIN_ID}/latest`, {
-      headers: { 'X-Master-Key': JB_KEY }
+    const res = await fetch(`${UPSTASH_URL}/get/clans`, {
+      headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
     });
     const data = await res.json();
-    _clanCache = data.record.clans || [];
-    return _clanCache;
+    const clans = JSON.parse(data.result || '[]');
+    _clanCache = clans;
+    return clans;
   } catch(e) { return _clanCache || []; }
 }
 
 async function clanSaveAll(clans) {
-  await fetch(`https://api.jsonbin.io/v3/b/${CLAN_BIN_ID}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': JB_KEY },
-    body: JSON.stringify({ clans })
-  });
-  _clanCache = clans;
+  try {
+    await fetch(`${UPSTASH_URL}/set/clans`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(JSON.stringify(clans))
+    });
+    _clanCache = clans;
+  } catch(e) { console.warn('Clan save failed', e); }
 }
 
 function getMyClan(clans) {
