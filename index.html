@@ -996,6 +996,14 @@ let essence=parseInt(localStorage.getItem('dvx_coins')||'18'),curCat='all';
 const MIN_LEN=10,MAX_BODY=750;
 let musicEnabled=localStorage.getItem('dvx_music')!=='off';
 
+  // ══════ КРИСТАЛЛЫ ══════
+let crystals=parseInt(localStorage.getItem('dvx_crystals')||'0');
+function syncCrystals(){
+  localStorage.setItem('dvx_crystals', crystals);
+  const el=document.getElementById('crystalsCnt');
+  if(el) el.textContent=crystals;
+}
+  
 // ══════ BACKGROUND THEME ══════
 let currentBG = localStorage.getItem('dvx_bg') || 'classic';
 
