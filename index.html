@@ -2253,18 +2253,24 @@ function openLbPanel(){
   document.getElementById('lbPanelList').innerHTML='<div class="lb-panel-loading">Загрузка...</div>';
   document.getElementById('lbOverlay').classList.add('open');
   document.getElementById('lbPanel').classList.add('open');
-  jbLoadScores().then(scores=>{
-    const medals=['🥇','🥈','🥉'];
-    if(!scores.length){document.getElementById('lbPanelList').innerHTML='<div class="lb-panel-loading">Рекордов пока нет!</div>';return;}
-    document.getElementById('lbPanelList').innerHTML=scores.slice(0,50).map((s,i)=>{
-      const isMe=s.pid===_playerId;
-      const rank=i<3?medals[i]:`${i+1}`;
-      return `<div class="lb-panel-row${isMe?' me':''}"><span class="lb-panel-rank">${rank}</span><span class="lb-panel-name">${s.name}</span><span class="lb-panel-score">${s.score}</span></div>`;
-    }).join('');
-    const myIdx=scores.slice(0,50).findIndex(s=>s.pid===_playerId);
-    if(myIdx>5){const rows=document.querySelectorAll('.lb-panel-row');if(rows[myIdx])rows[myIdx].scrollIntoView({block:'center'});}
+  Promise.all([lbLoad(getDailyKey()),lbLoad(getWeeklyKey()),lbLoad(LB_ALLTIME)]).then(([daily,weekly,alltime])=>{
+    const panel=document.getElementById('lbPanelList');
+    const tabs=[
+      ['🥇 ЕЖЕДНЕВНЫЙ',daily],
+      ['🏆 НЕДЕЛЬНЫЙ',weekly],
+      ['👑 ЗА ВСЁ ВРЕМЯ',alltime]
+    ];
+    panel.innerHTML=tabs.map(([t,s])=>`<div style="margin-bottom:16px;">
+      <div style="font-family:'Fredoka One',cursive;font-size:15px;color:#f9ca24;margin-bottom:6px;">${t}</div>
+      ${s.slice(0,10).map((r,i)=>{
+        const m=['🥇','🥈','🥉'];const rk=i<3?m[i]:String(i+1);
+        const me=r.pid===_playerId;
+        return`<div class="lb-panel-row${me?' me':''}"><span class="lb-panel-rank">${rk}</span><span class="lb-panel-name">${r.name}</span><span class="lb-panel-score">${r.score}</span></div>`;
+      }).join('')}
+    </div>`).join('');
   });
 }
+  
 function closeLbPanel(){document.getElementById('lbOverlay').classList.remove('open');document.getElementById('lbPanel').classList.remove('open');}
 document.getElementById('lbMenuBtn').onclick=openLbPanel;
 document.getElementById('lbPanelClose').onclick=closeLbPanel;
