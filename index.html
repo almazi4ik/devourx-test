@@ -2180,9 +2180,13 @@ async function lbLoad(key){
   try{
     const res=await fetch(`${UPSTASH_URL}/get/${key}`,{headers:{'Authorization':`Bearer ${UPSTASH_TOKEN}`}});
     const data=await res.json();
-    const parsed = JSON.parse(data.result||'[]');
-    // Если это строка — парсим ещё раз (двойная упаковка)
-    return Array.isArray(parsed) ? parsed : JSON.parse(parsed||'[]');
+    let result = data.result || '[]';
+    // Если результат — JSON-строка, парсим
+    if (typeof result === 'string') result = JSON.parse(result);
+    // Если всё ещё строка — ещё раз парсим
+    if (typeof result === 'string') result = JSON.parse(result);
+    // Убеждаемся что это массив
+    return Array.isArray(result) ? result : [];
   }catch(e){return[];}
 }
 async function lbSave(key,scores){
