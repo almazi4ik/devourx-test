@@ -1073,6 +1073,49 @@ function syncCrystals(){
   const el=document.getElementById('crystalsCnt');
   if(el) el.textContent=crystals;
 }
+
+// ══════ МАГАЗИН КРИСТАЛЛОВ ══════ ← ВОТ СЮДА ВСТАВЛЯЙ
+function toggleCrystalShop(){
+  const overlay = document.getElementById('crystalShopOverlay');
+  const panel = document.getElementById('crystalShopPanel');
+  if (!overlay || !panel) return;
+  
+  const isOpen = panel.style.opacity === '1';
+  
+  if (isOpen) {
+    overlay.style.background = 'rgba(0,0,0,0)';
+    overlay.style.pointerEvents = 'none';
+    panel.style.opacity = '0';
+    panel.style.transform = 'scale(0.9)';
+    panel.style.pointerEvents = 'none';
+  } else {
+    document.getElementById('shopCrystals').textContent = crystals;
+    document.getElementById('shopCoins').textContent = essence;
+    overlay.style.background = 'rgba(0,0,0,0.7)';
+    overlay.style.pointerEvents = 'all';
+    overlay.style.backdropFilter = 'blur(6px)';
+    panel.style.opacity = '1';
+    panel.style.transform = 'scale(1)';
+    panel.style.pointerEvents = 'all';
+  }
+}
+
+function buyCrystals(amount, price) {
+  if (essence < price) {
+    showToast(`Недостаточно монет! Нужно ${price} 💰`, '#ff6b6b');
+    return;
+  }
+  essence -= price;
+  crystals += amount;
+  syncEss();
+  syncCrystals();
+  showToast(`Куплено ${amount} 💎 за ${price} 💰!`, '#a29bfe');
+  
+  const sc = document.getElementById('shopCrystals');
+  const sco = document.getElementById('shopCoins');
+  if (sc) sc.textContent = crystals;
+  if (sco) sco.textContent = essence;
+}
   
 // ══════ BACKGROUND THEME ══════
 let currentBG = localStorage.getItem('dvx_bg') || 'classic';
