@@ -1057,15 +1057,10 @@ function toggleCrystalShop(){
   
   if (isOpen) {
     overlay.style.display = 'none';
-    overlay.style.background = 'rgba(0,0,0,0)';
-    overlay.style.pointerEvents = 'none';
   } else {
     document.getElementById('shopCrystals').textContent = crystals;
     document.getElementById('shopCoins').textContent = essence;
     overlay.style.display = 'flex';
-    overlay.style.background = 'rgba(0,0,0,0.7)';
-    overlay.style.pointerEvents = 'all';
-    overlay.style.backdropFilter = 'blur(6px)';
   }
 }
 
