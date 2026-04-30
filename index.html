@@ -947,62 +947,35 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 <canvas id="irisCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:99999;"></canvas>
 
   <!-- МАГАЗИН КРИСТАЛЛОВ -->
-<div id="crystalShopOverlay" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0);pointer-events:none;transition:background 0.3s;display:flex;align-items:center;justify-content:center;" onclick="toggleCrystalShop()">
-  <div id="crystalShopPanel" style="background:linear-gradient(160deg,#1a1a3e,#0f0f2a);border:2px solid rgba(162,155,254,0.4);border-radius:20px;padding:24px;width:min(340px,90vw);transform:scale(0.9);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.1,0.64,1);pointer-events:none;" onclick="event.stopPropagation()">
+<div id="crystalShopOverlay" onclick="toggleCrystalShop()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div id="crystalShopPanel" onclick="event.stopPropagation()" style="background:linear-gradient(160deg,#1a1a3e,#0f0f2a);border:2px solid rgba(162,155,254,0.4);border-radius:20px;padding:24px;width:min(340px,90vw);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <span style="font-family:'Fredoka One',cursive;font-size:22px;color:#a29bfe;">💎 МАГАЗИН</span>
       <button onclick="toggleCrystalShop()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:50%;width:32px;height:32px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
     </div>
-    
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(0,0,0,0.3);border-radius:14px;padding:12px;">
       <span style="font-size:28px">💎</span>
       <div>
-        <div style="font-family:'Fredoka One',cursive;font-size:18px;color:#a29bfe;">Твой баланс: <span id="shopCrystals">0</span> 💎</div>
+        <div style="font-family:'Fredoka One',cursive;font-size:18px;color:#a29bfe;">Баланс: <span id="shopCrystals">0</span> 💎</div>
         <div style="font-family:'Nunito',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);">Монет: <span id="shopCoins">0</span> 💰</div>
       </div>
     </div>
-    
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div class="crystal-deal" onclick="buyCrystals(1,1500)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);border:1px solid rgba(162,155,254,0.2);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.15s;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:24px">💎</span>
-          <span style="font-family:'Fredoka One',cursive;font-size:18px;color:#e8f5e9;">1 Кристалл</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;font-family:'Fredoka One',cursive;font-size:16px;color:#f9ca24;">
-          <span style="font-size:14px">💰</span> 1 500
-        </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div onclick="buyCrystals(1,1500)" style="padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;">
+        <span style="font-family:'Fredoka One',cursive;color:#e8f5e9;">💎 1 Кристалл</span>
+        <span style="font-family:'Fredoka One',cursive;color:#f9ca24;">💰 1 500</span>
       </div>
-      
-      <div class="crystal-deal" onclick="buyCrystals(5,4500)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);border:1px solid rgba(162,155,254,0.2);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.15s;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:24px">💎💎</span>
-          <span style="font-family:'Fredoka One',cursive;font-size:18px;color:#e8f5e9;">5 Кристаллов</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;font-family:'Fredoka One',cursive;font-size:16px;color:#f9ca24;">
-          <span style="font-size:14px">💰</span> 4 500
-        </div>
+      <div onclick="buyCrystals(5,4500)" style="padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;">
+        <span style="font-family:'Fredoka One',cursive;color:#e8f5e9;">💎💎 5 Кристаллов</span>
+        <span style="font-family:'Fredoka One',cursive;color:#f9ca24;">💰 4 500</span>
       </div>
-      
-      <div class="crystal-deal" onclick="buyCrystals(15,12000)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);border:1px solid rgba(162,155,254,0.3);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.15s;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:24px">💎💎💎</span>
-          <span style="font-family:'Fredoka One',cursive;font-size:18px;color:#e8f5e9;">15 Кристаллов</span>
-          <span style="background:rgba(249,202,36,0.2);color:#f9ca24;font-size:10px;font-weight:900;padding:2px 8px;border-radius:10px;">ВЫГОДА</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;font-family:'Fredoka One',cursive;font-size:16px;color:#f9ca24;">
-          <span style="font-size:14px">💰</span> 12 000
-        </div>
+      <div onclick="buyCrystals(15,12000)" style="padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;">
+        <span style="font-family:'Fredoka One',cursive;color:#e8f5e9;">💎💎💎 15 Кристаллов</span>
+        <span style="font-family:'Fredoka One',cursive;color:#f9ca24;">💰 12 000</span>
       </div>
-      
-      <div class="crystal-deal" onclick="buyCrystals(50,35000)" style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(162,155,254,0.1),rgba(108,92,231,0.1));border:2px solid rgba(162,155,254,0.4);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all 0.15s;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:24px">💎✨</span>
-          <span style="font-family:'Fredoka One',cursive;font-size:18px;color:#a29bfe;">50 Кристаллов</span>
-          <span style="background:rgba(162,155,254,0.3);color:#a29bfe;font-size:10px;font-weight:900;padding:2px 8px;border-radius:10px;">ТОП</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px;font-family:'Fredoka One',cursive;font-size:16px;color:#f9ca24;">
-          <span style="font-size:14px">💰</span> 35 000
-        </div>
+      <div onclick="buyCrystals(50,35000)" style="padding:12px;background:linear-gradient(135deg,rgba(162,155,254,0.1),rgba(108,92,231,0.1));border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;">
+        <span style="font-family:'Fredoka One',cursive;color:#a29bfe;">💎✨ 50 Кристаллов</span>
+        <span style="font-family:'Fredoka One',cursive;color:#f9ca24;">💰 35 000</span>
       </div>
     </div>
   </div>
