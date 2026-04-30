@@ -1084,6 +1084,7 @@ function toggleCrystalShop(){
   
   if (isOpen) {
     overlay.style.background = 'rgba(0,0,0,0)';
+    overlay.style.backdropFilter = 'none';
     overlay.style.pointerEvents = 'none';
     panel.style.opacity = '0';
     panel.style.transform = 'scale(0.9)';
