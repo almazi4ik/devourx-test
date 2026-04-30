@@ -1185,9 +1185,38 @@ function renderSkins(){
     const animStyle=s.rarity==='legendary'?'animation:skinShimmer 2s ease-in-out infinite':'';
     card.innerHTML=`${locked?'<span class="lock-ico">🔒</span>':''}<div class="skin-preview" style="background:${(FLAG_PREVIEW&&FLAG_PREVIEW[s.id])?('linear-gradient(180deg,'+FLAG_PREVIEW[s.id].join(',')+')'):('linear-gradient(135deg,'+s.b[0]+','+s.b[1]+')')};${glowStyle};${animStyle}"></div><div class="sk-name" style="color:${rc}">${t(s.key)}</div>${locked?`<div class="sk-cost">${coinHTML(22)} ${s.cost}</div>`:(s.id===selSkin?`<div class="sk-equip">${t('equipped')}</div>`:`<div class="sk-equip" style="color:#888">${t('equip')}</div>`)}<div class="rarity-bar" style="background:${rc}55"></div>`;
     card.onclick=()=>{
-      if(locked){if(essence>=s.cost){essence-=s.cost;s.owned=true;selSkin=s.id;syncEss();saveSkins();renderSkins();}else alert(t('need_coins')+' '+s.cost+' '+t('coins'));return;}
-      selSkin=s.id;saveSkins();renderSkins();
-    };
+card.onclick=()=>{
+  if(locked){
+    if(s.currency==='crystals'){
+      if(crystals>=s.cost){
+        crystals-=s.cost;
+        s.owned=true;
+        selSkin=s.id;
+        syncCrystals();
+        saveSkins();
+        renderSkins();
+        showToast('🔮 Скин куплен за '+s.cost+' 💎!','#a78bfa');
+      } else {
+        showToast('Нужно '+s.cost+' 💎! У тебя '+crystals+' 💎','#ff6b6b');
+      }
+      return;
+    }
+    if(essence>=s.cost){
+      essence-=s.cost;
+      s.owned=true;
+      selSkin=s.id;
+      syncEss();
+      saveSkins();
+      renderSkins();
+    } else {
+      alert(t('need_coins')+' '+s.cost+' '+t('coins'));
+    }
+    return;
+  }
+  selSkin=s.id;
+  saveSkins();
+  renderSkins();
+};
     grid.appendChild(card);
   });
 }
