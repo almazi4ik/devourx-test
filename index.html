@@ -1075,30 +1075,24 @@ function syncCrystals(){
   if(el) el.textContent=crystals;
 }
 
-// ══════ МАГАЗИН КРИСТАЛЛОВ ══════ ← ВОТ СЮДА ВСТАВЛЯЙ
+// ══════ МАГАЗИН КРИСТАЛЛОВ ══════ 
 function toggleCrystalShop(){
   const overlay = document.getElementById('crystalShopOverlay');
-  const panel = document.getElementById('crystalShopPanel');
-  if (!overlay || !panel) return;
+  if (!overlay) return;
   
-  const isOpen = panel.style.opacity === '1';
+  const isOpen = overlay.style.display === 'flex';
   
   if (isOpen) {
+    overlay.style.display = 'none';
     overlay.style.background = 'rgba(0,0,0,0)';
-    overlay.style.backdropFilter = 'none';
     overlay.style.pointerEvents = 'none';
-    panel.style.opacity = '0';
-    panel.style.transform = 'scale(0.9)';
-    panel.style.pointerEvents = 'none';
   } else {
     document.getElementById('shopCrystals').textContent = crystals;
     document.getElementById('shopCoins').textContent = essence;
+    overlay.style.display = 'flex';
     overlay.style.background = 'rgba(0,0,0,0.7)';
     overlay.style.pointerEvents = 'all';
     overlay.style.backdropFilter = 'blur(6px)';
-    panel.style.opacity = '1';
-    panel.style.transform = 'scale(1)';
-    panel.style.pointerEvents = 'all';
   }
 }
 
