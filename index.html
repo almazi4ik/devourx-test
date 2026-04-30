@@ -2168,40 +2168,41 @@ function renderAccPanel() {
   } catch(e) { /* offline — оставляем сессию */ }
 })();
 
-async function jbLoadScores() {
-  try {
-    const res = await fetch(`${UPSTASH_URL}/get/scores`, {
-      headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
-    });
-    const data = await res.json();
-    return JSON.parse(data.result || '[]');
-  } catch(e) { return []; }
+// ══════ ЛИДЕРБОРДЫ (Daily, Weekly, All-Time) ══════
+function getDailyKey(){return'lb_daily_'+new Date().toISOString().slice(0,10);}
+function getWeeklyKey(){
+  const d=new Date();d.setDate(d.getDate()-d.getDay()+(d.getDay()===0?-6:1));
+  return'lb_weekly_'+d.toISOString().slice(0,10);
+}
+const LB_ALLTIME='lb_alltime';
+
+async function lbLoad(key){
+  try{
+    const res=await fetch(`${UPSTASH_URL}/get/${key}`,{headers:{'Authorization':`Bearer ${UPSTASH_TOKEN}`}});
+    const data=await res.json();
+    return JSON.parse(data.result||'[]');
+  }catch(e){return[];}
+}
+async function lbSave(key,scores){
+  await fetch(`${UPSTASH_URL}/set/${key}`,{method:'POST',
+    headers:{'Authorization':`Bearer ${UPSTASH_TOKEN}`,'Content-Type':'application/json'},
+    body:JSON.stringify(JSON.stringify(scores))
+  });
 }
 
-async function jbSaveScore(name, score) {
-  try {
-    const scores = await jbLoadScores();
-    const existing = scores.findIndex(s => s.pid === _playerId);
-    if (existing >= 0) {
-      if (score <= scores[existing].score) return;
-      scores[existing].score = score;
-      scores[existing].date = Date.now();
-    } else {
-      scores.push({ name, score, date: Date.now(), pid: _playerId });
+async function jbLoadScores(){return lbLoad(LB_ALLTIME);}
+async function jbSaveScore(name,score){
+  try{
+    for(const key of[getDailyKey(),getWeeklyKey(),LB_ALLTIME]){
+      const scores=await lbLoad(key);
+      const idx=scores.findIndex(s=>s.pid===_playerId);
+      if(idx>=0){if(score>scores[idx].score)scores[idx].score=score;}
+      else{scores.push({name,score,pid:_playerId});}
+      scores.sort((a,b)=>b.score-a.score);
+      await lbSave(key,scores.slice(0,100));
     }
-    scores.sort((a, b) => b.score - a.score);
-    const top = scores.slice(0, 100);
-    
-    await fetch(`${UPSTASH_URL}/set/scores`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${UPSTASH_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(JSON.stringify(top))
-    });
-    updateBestMassWidget(top);
-  } catch(e) { console.warn('jbSaveScore error', e); }
+    const all=await lbLoad(LB_ALLTIME);updateBestMassWidget(all);
+  }catch(e){console.warn('lb save error',e);}
 }
   
 // Обновляем имя в глобальном рейтинге без изменения счёта
