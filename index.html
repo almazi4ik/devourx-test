@@ -1057,6 +1057,7 @@ function syncEss(){
 }
 function saveSkins(){localStorage.setItem('dvx_skins',JSON.stringify(SKINS_DATA.map(s=>({id:s.id,owned:s.owned}))));localStorage.setItem('dvx_selSkin',selSkin);}
 syncEss();
+syncCrystals(); // ← добавить эту строку
 
 function renderSkins(){
   const grid=document.getElementById('skinsGrid');grid.innerHTML='';
