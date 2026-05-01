@@ -625,6 +625,229 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 #clanChatSend { background:linear-gradient(135deg,#a29bfe,#6c63ff); border:none; border-radius:10px; color:#fff; font-size:16px; padding:0 14px; cursor:pointer; transition:transform .15s; }
 #clanChatSend:hover { transform:scale(1.08); }
 #clanChatNoMember { text-align:center; padding:40px 20px; color:rgba(255,255,255,0.3); font-size:13px; font-weight:800; }
+/* ═══ ДЛЯ ТЕЛЕФОНОВ (ВЕРТИКАЛЬНО) ═══ */
+@media (max-width: 767px) {
+  /* Главное меню — всё по центру экрана */
+  #menuScreen { 
+    justify-content: center !important; 
+    align-items: center !important;
+    padding: 0 !important; 
+  }
+  .top-bar { 
+    padding-top: 2vh !important; 
+  }
+  .logo { 
+    font-size: 7vw !important; 
+  }
+  .logo .lio { 
+    font-size: 4.5vw !important; 
+  }
+  .tip { 
+    font-size: 2.5vw !important; 
+    margin-top: 0.5vh !important; 
+  }
+
+  /* Контейнер кнопок — по центру, на всю высоту */
+  .menu-center { 
+    margin-top: 3vh !important; 
+    gap: 1.5vh !important; 
+    width: 90vw !important;
+    max-width: 450px !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-evenly !important;
+  }
+  
+  /* Кнопки — адаптивные, на всю ширину */
+  .btn-play { 
+    font-size: 5vw !important; 
+    padding: 2vh 0 !important; 
+    width: 100% !important;
+  }
+  .btn-skins { 
+    font-size: 4vw !important; 
+    padding: 1.8vh 0 !important; 
+    width: 100% !important;
+  }
+  .btn-quests-menu, .btn-leaderboard { 
+    font-size: 3.5vw !important; 
+    padding: 1.5vh 0 !important; 
+    width: 100% !important;
+  }
+  .btn-music { 
+    font-size: 3vw !important; 
+    padding: 1.2vh 0 !important; 
+    width: 100% !important;
+  }
+  .name-row { 
+    width: 90vw !important; 
+    max-width: 450px !important; 
+  }
+  .name-input { 
+    font-size: 3.5vw !important; 
+    padding: 1.5vh 4vw !important; 
+  }
+
+  /* Карточки режимов — вертикально по центру */
+  .mode-btns { 
+    flex-direction: column !important; 
+    align-items: center !important; 
+    gap: 2vh !important; 
+  }
+  .mode-card { 
+    width: 85vw !important; 
+    max-width: 380px !important;
+    padding: 2.5vh 5vw !important; 
+  }
+  .mode-icon { font-size: 8vw !important; }
+  .mode-label { font-size: 5vw !important; }
+  .mode-desc { font-size: 3vw !important; }
+  .mode-back { 
+    font-size: 3.5vw !important; 
+    padding: 1.5vh 6vw !important; 
+    margin-top: 2vh !important; 
+  }
+
+  /* Монеты и кристаллы */
+  .coins-fixed { 
+    top: 1vh !important; 
+    right: 2vw !important; 
+    padding: 0.5vh 3vw 0.5vh 0.5vh !important; 
+  }
+  .coins-fixed .ess-cnt, #crystalsCnt { 
+    font-size: 3.5vw !important; 
+  }
+  .crystals-fixed { 
+    top: 7vh !important; 
+    right: 2vw !important; 
+    padding: 0.5vh 3vw 0.5vh 0.5vh !important; 
+  }
+
+  /* Кнопки снизу */
+  #clanBtn { 
+    bottom: 8vh !important; 
+    right: 3vw !important; 
+    width: 10vw !important; 
+    height: 10vw !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+  #gearBtn { 
+    bottom: 2vh !important; 
+    left: 3vw !important; 
+    width: 9vw !important; 
+    height: 9vw !important;
+    min-width: 30px !important; 
+    min-height: 30px !important;
+  }
+
+  /* Скины */
+  .skins-grid { 
+    grid-template-columns: repeat(3,1fr) !important; 
+    gap: 1.5vw !important; 
+  }
+  .skin-card { padding: 2vw 1.5vw !important; }
+  .skin-preview { 
+    width: 12vw !important; 
+    height: 12vw !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+  .sk-name { font-size: 2.5vw !important; }
+
+  /* Джойстик */
+  #joystickBase { 
+    width: 28vw !important; 
+    height: 28vw !important;
+    min-width: 110px !important;
+    min-height: 110px !important;
+  }
+  #joystickKnob { 
+    width: 13vw !important; 
+    height: 13vw !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+  #boostBtn { 
+    width: 22vw !important; 
+    height: 22vw !important;
+    min-width: 85px !important;
+    min-height: 85px !important;
+    font-size: 3.5vw !important; 
+  }
+  #joystickWrap { bottom: 12vh !important; left: 3vw !important; }
+  #boostBtn { bottom: 12vh !important; right: 3vw !important; }
+
+  /* HUD */
+  .ap-btn { bottom: 2vh !important; left: 3vw !important; padding: 1vh 2vw !important; }
+  .minimap-c { 
+    width: 16vw !important; 
+    height: 16vw !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    bottom: 12vh !important; 
+  }
+  .hud-bottom { bottom: 12vh !important; }
+  .leaderboard { top: 1vh !important; right: 2vw !important; padding: 1vh 2vw !important; }
+  
+  /* Смерть */
+  .death-title { font-size: 10vw !important; }
+  .death-score { font-size: 6vw !important; }
+  .btn-restart { font-size: 5vw !important; padding: 2vh 8vw !important; }
+  .btn-back-menu { font-size: 4vw !important; padding: 1.5vh 6vw !important; }
+}
+
+/* ═══ ДЛЯ ПЛАНШЕТОВ ═══ */
+@media (min-width: 768px) and (max-width: 1200px) {
+  .logo { font-size: 5vw !important; }
+  .logo .lio { font-size: 3vw !important; }
+  .top-bar { padding-top: 4vh !important; }
+  
+  .menu-center { 
+    margin-top: 4vh !important; 
+    gap: 1.5vh !important; 
+    width: 70vw !important;
+    max-width: 550px !important;
+  }
+  
+  .btn-play { font-size: 3vw !important; padding: 2vh 0 !important; }
+  .btn-skins { font-size: 2.5vw !important; padding: 1.8vh 0 !important; }
+  .btn-quests-menu, .btn-leaderboard { font-size: 2vw !important; padding: 1.5vh 0 !important; }
+  .btn-music { font-size: 1.5vw !important; padding: 1.2vh 0 !important; }
+  
+  .name-row { width: 70vw !important; max-width: 550px !important; }
+  .name-input { font-size: 2vw !important; padding: 1.5vh 3vw !important; }
+
+  .mode-card { width: 22vw !important; padding: 3vh 2vw !important; }
+  .mode-icon { font-size: 5vw !important; }
+  .mode-label { font-size: 3vw !important; }
+  .mode-desc { font-size: 1.5vw !important; }
+  
+  .skins-grid { grid-template-columns: repeat(4,1fr) !important; gap: 1.5vw !important; }
+  .skin-card { padding: 2vw 1.5vw !important; }
+  .skin-preview { width: 8vw !important; height: 8vw !important; }
+  .sk-name { font-size: 1.5vw !important; }
+  
+  #joystickBase { width: 18vw !important; height: 18vw !important; }
+  #joystickKnob { width: 8vw !important; height: 8vw !important; }
+  #boostBtn { width: 14vw !important; height: 14vw !important; font-size: 2vw !important; }
+  #joystickWrap { bottom: 13vh !important; left: 2vw !important; }
+  #boostBtn { bottom: 13vh !important; right: 2vw !important; }
+  
+  .minimap-c { width: 10vw !important; height: 10vw !important; bottom: 10vh !important; }
+  .hud-bottom { bottom: 10vh !important; gap: 1vw !important; }
+  
+  .coins-fixed { top: 1.5vh !important; right: 2vw !important; }
+  .crystals-fixed { top: 7vh !important; right: 2vw !important; }
+  #clanBtn { bottom: 10vh !important; right: 2vw !important; width: 6vw !important; height: 6vw !important; }
+  #gearBtn { bottom: 2vh !important; left: 2vw !important; width: 5vw !important; height: 5vw !important; }
+  
+  .death-title { font-size: 6vw !important; }
+  .death-score { font-size: 4vw !important; }
+  .btn-restart { font-size: 3vw !important; padding: 2vh 6vw !important; }
+  .btn-back-menu { font-size: 2.5vw !important; padding: 1.5vh 5vw !important; }
+}
 </style>
 </head>
 <body>
@@ -1453,11 +1676,39 @@ const mc=document.getElementById('minimap');
 const mctx=mc.getContext('2d');
 mc.width=108;mc.height=108;
 let W,H;
-function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-
+function resize(){
+  const isMobileDevice = isMobile();
+  
+  if (isMobileDevice) {
+    // На телефонах уменьшаем разрешение канваса для производительности
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  } else {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  
+  W = window.innerWidth;
+  H = window.innerHeight;
+  
+  // Пересоздаём частицы с новыми размерами
+  if (typeof initParticles === 'function') {
+    initParticles();
+  }
+  if (currentBG === 'water' && typeof initWaterFish === 'function') {
+    initWaterFish();
+  }
+  if (currentBG === 'space' && typeof initSpaceNebula === 'function') {
+    initSpaceNebula();
+  }
+}
+  
 // ══════ PARTICLES ══════
-const PARTICLE_COUNT=38;
+const PARTICLE_COUNT = isMobile() ? 12 : 38; // Меньше частиц на телефонах
 let particles=[];
 const CLASSIC_SHAPES=['leaf','leaf','leaf','leaf','star'];
 const CLASSIC_COLORS=['rgba(46,204,113,VAL)','rgba(57,255,20,VAL)','rgba(39,174,96,VAL)','rgba(0,229,204,VAL)','rgba(249,202,36,VAL)','rgba(162,155,254,VAL)','rgba(168,230,192,VAL)'];
@@ -1482,7 +1733,14 @@ function mkParticle(fromTop){
   return{x,y,size,color,shape,speed:0.4+Math.random()*0.9,drift:(Math.random()-.5)*0.5,spin:(Math.random()-.5)*0.025,wobbleSpeed:0.008+Math.random()*0.018,wobbleAmp:0.5+Math.random()*1.2,angle:Math.random()*Math.PI*2,wobblePhase:Math.random()*Math.PI*2};
 }
 
-function initParticles(){particles=[];for(let i=0;i<PARTICLE_COUNT;i++)particles.push(mkParticle(false));if(currentBG==='space')initSpaceNebula();}
+function initParticles(){
+  W = window.innerWidth;
+  H = window.innerHeight;
+  particles=[];
+  for(let i=0;i<PARTICLE_COUNT;i++)particles.push(mkParticle(false));
+  if(currentBG==='space' && typeof initSpaceNebula==='function')initSpaceNebula();
+  if(currentBG==='water' && typeof initWaterFish==='function')initWaterFish();
+}
 
 function drawLeaf(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,-size);ctx.bezierCurveTo(size*0.8,-size*0.5,size*0.8,size*0.5,0,size);ctx.bezierCurveTo(-size*0.8,size*0.5,-size*0.8,-size*0.5,0,-size);ctx.fill();ctx.beginPath();ctx.moveTo(0,-size*0.8);ctx.lineTo(0,size*0.8);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=0.7;ctx.stroke();ctx.restore();}
 function drawStar(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,b=a+Math.PI/5;i===0?ctx.moveTo(Math.cos(a)*size,Math.sin(a)*size):ctx.lineTo(Math.cos(a)*size,Math.sin(a)*size);ctx.lineTo(Math.cos(b)*size*0.4,Math.sin(b)*size*0.4);}ctx.closePath();ctx.fill();ctx.restore();}
@@ -1522,8 +1780,8 @@ function drawBGIconWater(cv){if(!cv)return;const c=cv.getContext('2d');const W=c
 
 function initBGIcons(){drawBGIconClassic(document.getElementById('bgIconClassic'));drawBGIconSpace(document.getElementById('bgIconSpace'));drawBGIconWater(document.getElementById('bgIconWater'));}
 window.addEventListener('load',initBGIcons);
-initParticles();
 applyBGTheme(currentBG);
+initParticles();
 
 const WORLD=4000,CELL=22;
 let serverWorld=null,player=null,running=false;
@@ -2061,8 +2319,18 @@ function drawServerSnake(p,cx,cy){
   ctx.fillStyle=p.isMe?'#f9ca24':'#fff';ctx.fillText(p.name,hx,hy-r-8);
 }
   
-function draw(cx,cy){drawBackground(cx,cy);if(!running){updateParticles();drawParticles();return;}if(gameMode==='maze'){drawWalls(cx,cy);}if(serverWorld){drawFoodList(serverWorld.foods||[],cx,cy);for(const p of(serverWorld.players||[]))drawServerSnake(p,cx,cy);}}
-
+function draw(cx,cy){
+  drawBackground(cx,cy);
+  if(!running){
+    if (particles.length === 0) initParticles();
+    updateParticles();
+    drawParticles();
+    return;
+  }
+  if(gameMode==='maze'){drawWalls(cx,cy);}
+  if(serverWorld){drawFoodList(serverWorld.foods||[],cx,cy);for(const p of(serverWorld.players||[]))drawServerSnake(p,cx,cy);}
+}
+  
 let lastT=0;
 function loop(ts){const dt=Math.min((ts-lastT)/16,3);lastT=ts;if(running)updHUD();draw(camX,camY);if(running)drawMM();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
@@ -2214,7 +2482,8 @@ const irisCv=document.getElementById('irisCanvas');
 const irisCx=irisCv.getContext('2d');
 function resizeIris(){irisCv.width=window.innerWidth;irisCv.height=window.innerHeight;}
 resizeIris();window.addEventListener('resize',resizeIris);
-
+window.addEventListener('orientationchange', () => setTimeout(resizeFX, 200));
+window.addEventListener('orientationchange', () => setTimeout(resizeIris, 200));
 const LEAF_COLORS_CLASSIC=['#4af078','#2ecc71','#00e5cc','#a8ff78','#f9ca24','#a29bfe','#7bed9f'];
 const STAR_COLORS_SPACE=['#ffffff','#ffe066','#a29bfe','#7bf1ff','#ffcc88','#d4b4ff'];
 const BUBBLE_COLORS_WATER=['#00e5cc','#00b4dc','#5af0ff','#a0e4ff','#60c8ff','#b0f0ff'];
@@ -2500,8 +2769,12 @@ window.addEventListener('load',()=>{
   // Загружаем сохранённый ник
   const savedName = localStorage.getItem('dvx_name');
   if(savedName) document.getElementById('nameInput').value = savedName;
+  resize();          // ← ВОТ ТУТ ДОБАВЬ! Прямо перед initParticles()
+  initParticles();
+  if (currentBG==='water') initWaterFish();
+  if (currentBG==='space') initSpaceNebula();
 });
-
+  
 // Live обновление ника
 document.getElementById('nameInput').addEventListener('input', () => {
   const name = document.getElementById('nameInput').value.trim() || 'Player';
