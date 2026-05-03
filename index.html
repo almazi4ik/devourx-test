@@ -1953,7 +1953,16 @@ function offlineCheckCollisions(){const state=(gameMode==='maze'&&mazeState)?maz
 
 function offlineRespawnBots(){const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;if(!state)return;for(let i=0;i<state.bots.length;i++){if(!state.bots[i].alive){const name=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];state.bots[i]=mkBot(name,Math.floor(Math.random()*3));}}}
 
-function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!offlineState)return;const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const me=state.player;if(!me.alive){if(!me._deathHandled){me._deathHandled=true;if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}running=false;const score=me.score||0;const deathMsg=gameMode==='maze'?'🧱 Вы врезались в стену лабиринта!':'';document.getElementById('deathCauseMsg').textContent=deathMsg;document.getElementById('deathScore').textContent=t('mass')+': '+score;jbSaveScore(pname,score);clanUpdateScore(score);document.getElementById('hud').style.display='none';switchScreen('deathScreen',()=>{renderRecords(score);trackAch('mass',score);trackAch('survive',surviveTimer);});}return;}if(!autopilotMode){me.tAngle=Math.atan2(my-H/2,mx-W/2);me.boosting=boosting&&me.score>MIN_LEN;}else{
+function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!offlineState)return;
+  // Очищаем просроченную еду (дроп из убитых змеек)
+  const now=Date.now();
+  const allFood=(gameMode==='maze'&&mazeState)?mazeState.foods:offlineState.foods;
+  for(let i=allFood.length-1;i>=0;i--){
+    if(allFood[i].expireAt && now>allFood[i].expireAt){
+      allFood.splice(i,1);
+    }
+  }
+  const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const me=state.player;if(!me.alive){if(!me._deathHandled){me._deathHandled=true;if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}running=false;const score=me.score||0;const deathMsg=gameMode==='maze'?'🧱 Вы врезались в стену лабиринта!':'';document.getElementById('deathCauseMsg').textContent=deathMsg;document.getElementById('deathScore').textContent=t('mass')+': '+score;jbSaveScore(pname,score);clanUpdateScore(score);document.getElementById('hud').style.display='none';switchScreen('deathScreen',()=>{renderRecords(score);trackAch('mass',score);trackAch('survive',surviveTimer);});}return;}if(!autopilotMode){me.tAngle=Math.atan2(my-H/2,mx-W/2);me.boosting=boosting&&me.score>MIN_LEN;}else{
   const h=me.segs[0];
   const allSnakes=state.bots.filter(b=>b.alive);
   const dangerSegs=[];
