@@ -2514,7 +2514,85 @@ function drawMM(){
 }
 function drawBackground(cx,cy){if(!running){if(currentBG==='space')drawSpaceBackground();else if(currentBG==='water')drawWaterBackground();else{ctx.fillStyle='#0d2b15';ctx.fillRect(0,0,W,H);}return;}const bgColors={'classic':'#0d2b15','space':'#03020d','water':'#020e1a'};ctx.fillStyle=bgColors[currentBG]||'#0d2b15';ctx.fillRect(0,0,W,H);const gridColors={'classic':'rgba(46,204,113,0.055)','space':'rgba(120,100,255,0.06)','water':'rgba(0,160,220,0.055)'};ctx.strokeStyle=gridColors[currentBG]||gridColors.classic;ctx.lineWidth=1;for(let x=Math.floor(cx/CELL)*CELL;x<cx+W+CELL;x+=CELL){ctx.beginPath();ctx.moveTo(x-cx,0);ctx.lineTo(x-cx,H);ctx.stroke();}for(let y=Math.floor(cy/CELL)*CELL;y<cy+H+CELL;y+=CELL){ctx.beginPath();ctx.moveTo(0,y-cy);ctx.lineTo(W,y-cy);ctx.stroke();}ctx.strokeStyle='rgba(231,76,60,0.5)';ctx.lineWidth=8;ctx.strokeRect(-cx,-cy,WORLD,WORLD);}
 
-function drawFoodList(fl,cx,cy){for(const f of fl){const fx=f.x-cx,fy=f.y-cy;if(fx<-20||fx>W+20||fy<-20||fy>H+20)continue;if(f.p!==undefined)f.p+=.05;const pr=f.r*(f.size==='big'?1:.85+.15*Math.sin(f.p||0));ctx.beginPath();ctx.arc(fx,fy,pr,0,Math.PI*2);ctx.fillStyle=f.color||'#2ecc71';ctx.fill();ctx.beginPath();ctx.arc(fx-pr*.3,fy-pr*.3,pr*.27,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fill();}}
+// ══════ ОПТИМИЗИРОВАННАЯ ЕДА (ФИНАЛ) ══════
+let _foodSprites = {};
+
+const FOOD_PALETTE = [
+  '#ff4444','#ff8800','#ffdd00','#44ff44','#00ff88',
+  '#00ddff','#4488ff','#aa44ff','#ff44aa','#ffaa00',
+  '#88ff00','#00ffcc'
+];
+
+function snapColor(colorStr) {
+  if (colorStr && colorStr.startsWith('hsl')) {
+    const hue = parseInt(colorStr.match(/\d+/)[0]) || 0;
+    const idx = Math.floor(hue / 30) % FOOD_PALETTE.length;
+    return FOOD_PALETTE[idx];
+  }
+  return colorStr || '#2ecc71';
+}
+
+function getFoodSprite(r, baseColor) {
+  const safeColor = snapColor(baseColor);
+  const safeR = Math.round(r);
+  const key = `${safeR}_${safeColor}`;
+  
+  if (!_foodSprites[key]) {
+    const size = safeR * 2 + 20;
+    const cv = document.createElement('canvas');
+    cv.width = size;
+    cv.height = size;
+    const c = cv.getContext('2d');
+    const cx = size / 2;
+    const cy = size / 2;
+    
+    const glow = c.createRadialGradient(cx, cy, safeR * 0.5, cx, cy, safeR * 1.8);
+    glow.addColorStop(0, safeColor);
+    glow.addColorStop(0.5, safeColor);
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    
+    c.beginPath();
+    c.arc(cx, cy, safeR * 1.8, 0, Math.PI * 2);
+    c.fillStyle = glow;
+    c.fill();
+    
+    c.beginPath();
+    c.arc(cx, cy, safeR, 0, Math.PI * 2);
+    c.fillStyle = safeColor;
+    c.fill();
+    
+    const shine = c.createRadialGradient(cx - safeR * 0.3, cy - safeR * 0.35, 0, cx, cy, safeR);
+    shine.addColorStop(0, 'rgba(255,255,255,0.55)');
+    shine.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+    shine.addColorStop(1, 'rgba(255,255,255,0)');
+    
+    c.beginPath();
+    c.arc(cx, cy, safeR, 0, Math.PI * 2);
+    c.fillStyle = shine;
+    c.fill();
+    
+    _foodSprites[key] = { canvas: cv, size };
+  }
+  return _foodSprites[key];
+}
+
+function drawFoodList(fl, cx, cy) {
+  for (const f of fl) {
+    const fx = f.x - cx;
+    const fy = f.y - cy;
+    if (fx < -40 || fx > W + 40 || fy < -40 || fy > H + 40) continue;
+    
+    if (f.p === undefined) f.p = Math.random() * Math.PI * 2;
+    f.p += 0.04;
+    const pulse = 1 + Math.sin(f.p) * 0.1;
+    
+    const sprite = getFoodSprite(f.r, f.color);
+    const sw = sprite.size * pulse;
+    const sh = sprite.size * pulse;
+    
+    ctx.drawImage(sprite.canvas, fx - sw/2, fy - sh/2, sw, sh);
+  }
+}
 
 const FLAG_SKINS={
   36:['#ffd700','#0057b7'],
