@@ -151,6 +151,31 @@ body { background:#0d2b15; overflow:hidden; font-family:'Nunito',sans-serif; use
   position:absolute; top:12px; right:12px; border-radius:20px;
   font-size:10px; font-weight:900; padding:3px 9px; letter-spacing:1px;
 }
+
+/* ═══ НОВЫЕ СТИЛИ (ДОБАВЬ СЮДА, НЕ ЗАМЕНЯЙ!) ═══ */
+.mode-card-online.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(40%);
+  position: relative;
+}
+.mode-card-online.disabled::after {
+  content: 'СКОРО';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: rgba(255,255,255,0.7);
+  background: rgba(231,76,60,0.85);
+  padding: 6px 24px;
+  border-radius: 8px;
+  letter-spacing: 3px;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
 .mode-badge-bot  { background:rgba(249,202,36,0.15); color:#f9ca24; border:1px solid rgba(249,202,36,0.4); }
 .mode-badge-live { background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.4); }
 .live-dot { display:inline-block; width:7px; height:7px; background:#2ecc71; border-radius:50%; margin-right:4px; animation:livepulse 1.2s infinite; vertical-align:middle; }
@@ -628,11 +653,12 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 /* ═══ ДЛЯ ТЕЛЕФОНОВ (ВЕРТИКАЛЬНО) ═══ */
 @media (max-width: 767px) {
   /* Главное меню — всё по центру экрана */
-  #menuScreen { 
-    justify-content: center !important; 
-    align-items: center !important;
-    padding: 0 !important; 
-  }
+#menuScreen { 
+  justify-content: flex-start !important; 
+  align-items: center !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
   .top-bar { 
     padding-top: 2vh !important; 
   }
@@ -647,17 +673,13 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
     margin-top: 0.5vh !important; 
   }
 
-  /* Контейнер кнопок — по центру, на всю высоту */
-  .menu-center { 
-    margin-top: 3vh !important; 
-    gap: 1.5vh !important; 
-    width: 90vw !important;
-    max-width: 450px !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-evenly !important;
-  }
+/* Контейнер кнопок — по центру */
+.menu-center { 
+  margin-top: 2vh !important; 
+  gap: 1.5vh !important; 
+  width: 88vw !important;
+  max-width: 400px !important;
+}
   
   /* Кнопки — адаптивные, на всю ширину */
   .btn-play { 
@@ -725,22 +747,18 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   }
 
   /* Кнопки снизу */
-  #clanBtn { 
-    bottom: 8vh !important; 
-    right: 3vw !important; 
-    width: 10vw !important; 
-    height: 10vw !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-  }
-  #gearBtn { 
-    bottom: 2vh !important; 
-    left: 3vw !important; 
-    width: 9vw !important; 
-    height: 9vw !important;
-    min-width: 30px !important; 
-    min-height: 30px !important;
-  }
+#clanBtn { 
+  bottom: 80px !important; 
+  right: 10px !important;
+  width: 42px !important; 
+  height: 42px !important;
+  z-index: 999 !important;
+}
+#gearBtn { 
+  bottom: 20px !important; 
+  left: 10px !important;
+  z-index: 999 !important;
+}
 
   /* Скины */
   .skins-grid { 
@@ -786,7 +804,10 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
     height: 16vw !important;
     min-width: 60px !important;
     min-height: 60px !important;
-    bottom: 12vh !important; 
+    top: 10px !important;
+    left: 10px !important;
+    bottom: auto !important;
+    right: auto !important;
   }
   .hud-bottom { bottom: 12vh !important; }
   .leaderboard { top: 1vh !important; right: 2vw !important; padding: 1vh 2vw !important; }
@@ -805,6 +826,15 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   .skin-preview { box-shadow: none !important; }
   .ripple-host { pointer-events: none !important; }
   @keyframes skinShimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.1); } }
+
+  #bestMassWidget { 
+  bottom: 80px !important; 
+  right: 8px !important;
+  padding: 4px 8px !important;
+}
+#bestMassWidget .bm-label { font-size: 8px !important; }
+#bestMassWidget .bm-name { font-size: 10px !important; }
+#bestMassWidget .bm-score { font-size: 16px !important; }
 }
   
 /* ═══ ДЛЯ ПЛАНШЕТОВ ═══ */
@@ -813,12 +843,12 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   .logo .lio { font-size: 3vw !important; }
   .top-bar { padding-top: 4vh !important; }
   
-  .menu-center { 
-    margin-top: 4vh !important; 
-    gap: 1.5vh !important; 
-    width: 70vw !important;
-    max-width: 550px !important;
-  }
+.menu-center { 
+  margin-top: 3vh !important; 
+  gap: 1.5vh !important; 
+  width: 65vw !important;
+  max-width: 500px !important;
+}
   
   .btn-play { font-size: 3vw !important; padding: 2vh 0 !important; }
   .btn-skins { font-size: 2.5vw !important; padding: 1.8vh 0 !important; }
@@ -844,13 +874,30 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   #joystickWrap { bottom: 13vh !important; left: 2vw !important; }
   #boostBtn { bottom: 13vh !important; right: 2vw !important; }
   
-  .minimap-c { width: 10vw !important; height: 10vw !important; bottom: 10vh !important; }
+  .minimap-c { 
+  width: 10vw !important; 
+  height: 10vw !important;
+  top: 10px !important;
+  left: 10px !important;
+  bottom: auto !important;
+  right: auto !important;
+}
   .hud-bottom { bottom: 10vh !important; gap: 1vw !important; }
   
   .coins-fixed { top: 1.5vh !important; right: 2vw !important; }
   .crystals-fixed { top: 7vh !important; right: 2vw !important; }
-  #clanBtn { bottom: 10vh !important; right: 2vw !important; width: 6vw !important; height: 6vw !important; }
-  #gearBtn { bottom: 2vh !important; left: 2vw !important; width: 5vw !important; height: 5vw !important; }
+  #clanBtn { 
+  bottom: 20px !important; 
+  right: 16px !important;
+  width: 48px !important; 
+  height: 48px !important;
+  z-index: 999 !important;
+}
+  #gearBtn { 
+  bottom: 20px !important; 
+  left: 16px !important;
+  z-index: 999 !important;
+}
   
   .death-title { font-size: 6vw !important; }
   .death-score { font-size: 4vw !important; }
@@ -860,6 +907,18 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   /* ═══ ОПТИМИЗАЦИЯ ДЛЯ ПЛАНШЕТОВ ═══ */
   .skin-card { box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
   .skin-preview { box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+  
+#clanBtn { 
+  bottom: 60px !important; 
+  right: 12px !important;
+  z-index: 999 !important;
+  position: fixed !important;
+}
+#gearBtn { 
+  bottom: 20px !important; 
+  left: 12px !important;
+  z-index: 999 !important;
+  position: fixed !important;
 }
 </style>
 </head>
@@ -897,7 +956,7 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
       <div class="mode-label" data-i18n="offline">ОФЛАЙН</div>
       <div class="mode-desc" data-i18n="offline_desc">Играй против ботов<br>без интернета</div>
     </div>
-    <div class="mode-card mode-card-online" id="onlineBtn">
+    <div class="mode-card mode-card-online disabled" id="onlineBtn">
       <span class="mode-badge mode-badge-live"><span class="live-dot"></span><span data-i18n="live">LIVE</span></span>
       <div class="mode-icon">🌐</div>
       <div class="mode-label" data-i18n="online_btn">ОНЛАЙН</div>
@@ -1026,6 +1085,37 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 <button id="clanBtn">
   <canvas id="clanShieldCanvas" width="44" height="44"></canvas>
 </button>
+
+<!-- ГЛОБАЛЬНЫЙ ЧАТ -->
+<button id="globalChatBtn" style="
+  position: fixed; bottom: 200px; right: 16px; z-index: 200;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(0,0,0,0.65); border: 2px solid rgba(0,229,204,0.55);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(6px); font-size: 22px;
+" onclick="toggleGlobalChat()">💬</button>
+
+<div id="globalChatOverlay" style="
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
+  align-items:center; justify-content:center;
+" onclick="toggleGlobalChat()">
+  <div id="globalChatPanel" style="
+    background:#0d2b15; border:2px solid #2ecc71; border-radius:16px;
+    width:min(400px, 90vw); height:70vh; display:flex; flex-direction:column;
+    overflow:hidden;
+  " onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:rgba(0,0,0,0.5);">
+      <span style="font-family:'Fredoka One',cursive; color:#2ecc71;">💬 ГЛОБАЛЬНЫЙ ЧАТ</span>
+      <button onclick="toggleGlobalChat()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">✕</button>
+    </div>
+    <div id="globalChatMessages" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:6px;"></div>
+    <div style="display:flex; gap:8px; padding:10px; background:rgba(0,0,0,0.3);">
+      <input id="globalChatInput" maxlength="120" placeholder="Написать сообщение..." style="flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(46,204,113,0.3); border-radius:10px; padding:8px 12px; color:#fff; font-size:13px; font-family:'Nunito',sans-serif; outline:none;">
+      <button id="globalChatSend" style="background:linear-gradient(135deg,#2ecc71,#27ae60); border:none; border-radius:10px; color:#fff; font-size:18px; padding:0 14px; cursor:pointer;">➤</button>
+    </div>
+  </div>
+</div>
 
 <!-- КЛАНЫ ОВЕРЛЕЙ + ПАНЕЛЬ -->
 <div id="clanOverlay"></div>
@@ -1656,7 +1746,10 @@ function showMenu(){
     document.getElementById('achBtn').style.display='none';
     document.getElementById('gearBtn').style.display='flex';
     document.querySelector('.coins-fixed').style.display='flex';
+    document.querySelector('.crystals-fixed').style.display='flex';
+    document.getElementById('clanBtn').style.display='flex';
     showJoystick(false);updateXPBar();
+    jbLoadScores().then(scores => updateBestMassWidget(scores));
   });
 }
 function showModeSelect(){
@@ -1873,8 +1966,9 @@ function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!
   me.tAngle=angle;me.boosting=false;
 }if(me.boosting&&me.length>MIN_LEN&&Math.random()<0.05){me.length=Math.max(MIN_LEN,me.length-1);me.score=Math.max(MIN_LEN,me.score-1);}offlineUpdateSnake(me,0.18);offlineEatFood(me);if(me.segs.length>0){camX+=(me.segs[0].x-W/2-camX)*0.12;camY+=(me.segs[0].y-H/2-camY)*0.12;}const now=performance.now();if(now-lastSurviveTick>=1000){surviveTimer++;lastSurviveTick=now;trackQuest('survive_time',1);}for(const bot of state.bots){if(!bot.alive)continue;offlineBotAI(bot);if(bot.boosting&&bot.length>MIN_LEN&&Math.random()<0.05){bot.length=Math.max(MIN_LEN,bot.length-1);bot.score=Math.max(MIN_LEN,bot.score-1);}offlineUpdateSnake(bot,0.13);offlineEatFood(bot);}offlineCheckCollisions();offlineRespawnBots();const allPlayers=[me,...state.bots].filter(p=>p.alive).map(p=>({name:p.name,skinId:p.skinId,score:p.score,segs:p.segs.slice(0,750),boosting:p.boosting,isMe:p.isMe}));const lb=[...allPlayers].sort((a,b)=>b.score-a.score).slice(0,10).map(p=>({name:p.name,score:p.score,isMe:p.isMe}));serverWorld={players:allPlayers,foods:state.foods,leaderboard:lb};}
 
-function startOffline(){gameMode='offline';if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}mazeState=null;serverWorld=null;_prevWorld=null;playIrisOpen(()=>{const{spawnX,spawnY}=initOffline();camX=spawnX-W/2;camY=spawnY-H/2;player=offlineState.player;document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});document.getElementById('gearBtn').style.display='none';document.getElementById('hud').style.display='block';document.getElementById('xpBarWrap').style.display='none';document.getElementById('bestMassWidget').style.display='none';document.getElementById('achBtn').style.display='none';document.getElementById('achPanel').classList.remove('open');const _sbOff=document.getElementById('serverPickBtn');if(_sbOff)_sbOff.style.display='none';achOpen=false;autopilotMode=false;document.getElementById('apBtn').classList.remove('active');running=true;surviveTimer=0;lastSurviveTick=performance.now();_xpFoodCounter=0;_foodCoinCounter=0;if(isMobile())showJoystick(true);offlineTickInterval=setInterval(offlineTick,33);trackAch('games',1);},null);}
-
+function startOffline(){gameMode='offline';if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}mazeState=null;serverWorld=null;_prevWorld=null;playIrisOpen(()=>{const{spawnX,spawnY}=initOffline();camX=spawnX-W/2;camY=spawnY-H/2;player=offlineState.player;document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});document.getElementById('gearBtn').style.display='none';document.getElementById('hud').style.display='block';document.querySelector('.coins-fixed').style.display='none';document.querySelector('.crystals-fixed').style.display='none';document.getElementById('clanBtn').style.display='none';document.getElementById('xpBarWrap').style.display='none';document.getElementById('bestMassWidget').style.display='none';document.getElementById('achBtn').style.display='none';document.getElementById('achPanel').classList.remove('open');const _sbOff=document.getElementById('serverPickBtn');if(_sbOff)_sbOff.style.display='none';achOpen=false;autopilotMode=false;document.getElementById('apBtn').classList.remove('active');running=true;surviveTimer=0;lastSurviveTick=performance.now();_xpFoodCounter=0;_foodCoinCounter=0;if(isMobile())showJoystick(true);offlineTickInterval=setInterval(offlineTick,33);trackAch('games',1);
+// Фикс для горизонтального режима — теперь player уже есть!
+setTimeout(()=>{if(running&&player&&player.segs&&player.segs.length>0){camX=player.segs[0].x-W/2;camY=player.segs[0].y-H/2;}},150);},null);}
 // ══════ РЕЖИМ ЛАБИРИНТ ══════
 const MAZE_BOTS_COUNT=8;
 const MAZE_FOOD_COUNT=400;
@@ -2033,10 +2127,15 @@ function startMazeMode(){
     mazeState={walls,foods,bots,player:me};
     offlineState=mazeState;
     camX=spawn.x-W/2;camY=spawn.y-H/2;
+    // Фикс для горизонтального режима
+    setTimeout(()=>{if(running&&player&&player.segs&&player.segs.length>0){camX=player.segs[0].x-W/2;camY=player.segs[0].y-H/2;}},100);
     player=me;
     document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});
     document.getElementById('gearBtn').style.display='none';
     document.getElementById('hud').style.display='block';
+    document.querySelector('.coins-fixed').style.display='none';
+    document.querySelector('.crystals-fixed').style.display='none';
+    document.getElementById('clanBtn').style.display='none';
     document.getElementById('xpBarWrap').style.display='none';
     document.getElementById('bestMassWidget').style.display='none';
     document.getElementById('achBtn').style.display='none';
@@ -2096,10 +2195,190 @@ function getServerUrl(){ return SERVERS[_selServer]?.url || SERVERS[0].url; }
 let ws=null,wsConnecting=false;
 let _connectTimeout=null,_loadInterval=null;
 
-function connectWS(){if(wsConnecting)return;wsConnecting=true;gameMode='online';serverWorld=null;_prevWorld=null;if(ws){try{ws.close();}catch(e){}ws=null;}showLoading(t('connecting'));let loadPct=0;_loadInterval=setInterval(()=>{loadPct=Math.min(loadPct+3,85);document.getElementById('loadBarFill').style.width=loadPct+'%';},100);ws=new WebSocket(getServerUrl());_connectTimeout=setTimeout(()=>{if(!running){clearInterval(_loadInterval);wsConnecting=false;if(ws){try{ws.close();}catch(e){}ws=null;}setLoadStatus(t('no_server'),100);document.getElementById('loadBarFill').style.background='#e74c3c';setTimeout(()=>showMenu(),3000);}},8000);ws.onopen=()=>{clearInterval(_loadInterval);document.getElementById('loadBarFill').style.width='92%';setLoadStatus(t('auth'));const name=document.getElementById('nameInput').value.trim()||'Player';ws.send(JSON.stringify({type:'join',name,skinId:selSkin,skinColor:SKINS_DATA[selSkin].b[0]}));};ws.onmessage=(e)=>{try{const msg=JSON.parse(e.data);if(msg.type==='joined'){clearTimeout(_connectTimeout);wsConnecting=false;document.getElementById('loadBarFill').style.width='100%';setLoadStatus(t('ready'));if(msg.playerCount){document.getElementById('onlineNum').textContent=msg.playerCount;}pname=document.getElementById('nameInput').value.trim()||'Player';player={segs:[{x:msg.spawnX||WORLD/2,y:msg.spawnY||WORLD/2}],tAngle:0,angle:0,score:MIN_LEN,boosting:false,alive:true};camX=(msg.spawnX||WORLD/2)-W/2;camY=(msg.spawnY||WORLD/2)-H/2;playIrisOpen(()=>{document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});document.getElementById('gearBtn').style.display='none';document.getElementById('hud').style.display='block';document.getElementById('xpBarWrap').style.display='none';document.getElementById('bestMassWidget').style.display='none';document.getElementById('achBtn').style.display='none';document.getElementById('achPanel').classList.remove('open');achOpen=false;autopilotMode=false;document.getElementById('apBtn').classList.remove('active');const _sbOn=document.getElementById('serverPickBtn');if(_sbOn)_sbOn.style.display='none';running=true;surviveTimer=0;lastSurviveTick=performance.now();_xpFoodCounter=0;_prevScore=MIN_LEN;_foodCoinCounter=0;if(isMobile())showJoystick(true);},null);}if(msg.type==='world'){_prevWorld=serverWorld?{players:serverWorld.players,_segsMap:buildSegsMap(serverWorld)}:null;_worldRecvTime=performance.now();serverWorld=msg;if(msg.playerCount){document.getElementById('onlineNum').textContent=msg.playerCount;}if(serverWorld.players){const me=serverWorld.players.find(p=>p.isMe);if(me&&me.segs&&me.segs.length>0){const sh=me.segs[0];camX+=(sh.x-W/2-camX)*0.08;camY+=(sh.y-H/2-camY)*0.08;if(player){const gained=me.score-(player.score||MIN_LEN);if(gained>0){trackQuest('eat_food',gained);_xpFoodCounter+=gained;const xg=Math.floor(_xpFoodCounter/5);if(xg>0){_xpFoodCounter-=xg*5;addXP(xg);}}player.segs=me.segs;player.score=me.score||player.score;_prevScore=me.score;}}}}if(msg.type==='dead'){clearTimeout(_connectTimeout);const score=msg.score||0;document.getElementById('deathScore').textContent=t('mass')+': '+score;
+function connectWS(){
+  if(wsConnecting)return;
+  wsConnecting=true;
+  gameMode='online';
+  serverWorld=null;
+  _prevWorld=null;
+  if(ws){try{ws.close();}catch(e){}ws=null;}
+  
+  showLoading(t('connecting'));
+  let loadPct=0;
+  _loadInterval=setInterval(()=>{
+    loadPct=Math.min(loadPct+3,85);
+    document.getElementById('loadBarFill').style.width=loadPct+'%';
+  },100);
+  
+  ws=new WebSocket(getServerUrl());
+  
+  _connectTimeout=setTimeout(()=>{
+    if(!running){
+      clearInterval(_loadInterval);
+      wsConnecting=false;
+      if(ws){try{ws.close();}catch(e){}ws=null;}
+      setLoadStatus(t('no_server'),100);
+      document.getElementById('loadBarFill').style.background='#e74c3c';
+      setTimeout(()=>showMenu(),3000);
+    }
+  },8000);
+  
+  ws.onopen=()=>{
+    clearInterval(_loadInterval);
+    document.getElementById('loadBarFill').style.width='92%';
+    setLoadStatus(t('auth'));
+    const name=document.getElementById('nameInput').value.trim()||'Player';
+    ws.send(JSON.stringify({type:'join',name,skinId:selSkin,skinColor:SKINS_DATA[selSkin].b[0]}));
+  };
+  
+  ws.onmessage=(e)=>{
+    try{
+      const msg=JSON.parse(e.data);
+      
+      if(msg.type==='joined'){
+        clearTimeout(_connectTimeout);
+        wsConnecting=false;
+        document.getElementById('loadBarFill').style.width='100%';
+        setLoadStatus(t('ready'));
+        if(msg.playerCount){
+          document.getElementById('onlineNum').textContent=msg.playerCount;
+        }
+        pname=document.getElementById('nameInput').value.trim()||'Player';
+        player={
+          segs:[{x:msg.spawnX||WORLD/2,y:msg.spawnY||WORLD/2}],
+          tAngle:0,angle:0,score:MIN_LEN,boosting:false,alive:true
+        };
+        camX=(msg.spawnX||WORLD/2)-W/2;
+        camY=(msg.spawnY||WORLD/2)-H/2;
+        
+        playIrisOpen(()=>{
+          document.querySelectorAll('.screen').forEach(s=>{
+            s.classList.remove('active');s.style.cssText='';
+          });
+          document.getElementById('gearBtn').style.display='none';
+          document.getElementById('hud').style.display='block';
+          document.querySelector('.coins-fixed').style.display='none';
+          document.querySelector('.crystals-fixed').style.display='none';
+          document.getElementById('clanBtn').style.display='none';
+          document.getElementById('xpBarWrap').style.display='none';
+          document.getElementById('bestMassWidget').style.display='none';
+          document.getElementById('achBtn').style.display='none';
+          document.getElementById('achPanel').classList.remove('open');
+          const _sbOn=document.getElementById('serverPickBtn');
+          if(_sbOn)_sbOn.style.display='none';
+          achOpen=false;
+          autopilotMode=false;
+          document.getElementById('apBtn').classList.remove('active');
+          running=true;
+          surviveTimer=0;
+          lastSurviveTick=performance.now();
+          _xpFoodCounter=0;
+          _prevScore=MIN_LEN;
+          _foodCoinCounter=0;
+          if(isMobile())showJoystick(true);
+          
+          // Фикс для горизонтального режима
+          setTimeout(()=>{
+            if(running&&player&&player.segs&&player.segs.length>0){
+              camX=player.segs[0].x-W/2;
+              camY=player.segs[0].y-H/2;
+            }
+          },150);
+        },null);
+      }
+      
+      if(msg.type==='world'){
+        _prevWorld=serverWorld?{
+          players:serverWorld.players,
+          _segsMap:buildSegsMap(serverWorld)
+        }:null;
+        _worldRecvTime=performance.now();
+        serverWorld=msg;
+        if(msg.playerCount){
+          document.getElementById('onlineNum').textContent=msg.playerCount;
+        }
+        if(serverWorld.players){
+          const me=serverWorld.players.find(p=>p.isMe);
+          if(me&&me.segs&&me.segs.length>0){
+            const sh=me.segs[0];
+            camX+=(sh.x-W/2-camX)*0.08;
+            camY+=(sh.y-H/2-camY)*0.08;
+            if(player){
+              const gained=me.score-(player.score||MIN_LEN);
+              if(gained>0){
+                trackQuest('eat_food',gained);
+                _xpFoodCounter+=gained;
+                const xg=Math.floor(_xpFoodCounter/5);
+                if(xg>0){
+                  _xpFoodCounter-=xg*5;
+                  addXP(xg);
+                }
+              }
+              player.segs=me.segs;
+              player.score=me.score||player.score;
+              _prevScore=me.score;
+            }
+          }
+        }
+      }
+      
+      if(msg.type==='dead'){
+        clearTimeout(_connectTimeout);
+        const score=msg.score||0;
+        document.getElementById('deathScore').textContent=t('mass')+': '+score;
+        const causeEl=document.getElementById('deathCauseMsg');
+        if(causeEl){
+          const c=msg.deathCause;
+          if(c==='wall')causeEl.textContent='🧱 Вы врезались в край карты';
+          else if(c&&c.killerName)causeEl.textContent='💀 Вас подбил '+c.killerName;
+          else causeEl.textContent='';
+        }
+        jbSaveScore(pname,score);
+        clanUpdateScore(score);
+        document.getElementById('hud').style.display='none';
+        running=false;
+        switchScreen('deathScreen',()=>{
+          renderRecords(score);
+          trackQuest('reach_mass',score);
+        });
+      }
+      
+      if(msg.type==='kill_reward'){
+        essence=Math.min(9999999,essence+msg.coins);
+        syncEss();
+        showToast('💀 +'+msg.coins+' '+t('kill_reward'),'#ff6b6b');
+      }
+      if(msg.type==='coin_reward'){
+        essence=Math.min(9999999,essence+msg.coins);
+        syncEss();
+      }
+    }catch(err){
+      console.warn('WS msg error',err);
+    }
+  };
+  
+  ws.onerror=()=>{
+    clearTimeout(_connectTimeout);
+    clearInterval(_loadInterval);
+    wsConnecting=false;
+    setLoadStatus(t('conn_err'),100);
+    document.getElementById('loadBarFill').style.background='#e74c3c';
+    setTimeout(()=>showMenu(),3000);
+  };
+  
+  ws.onclose=()=>{
+    wsConnecting=false;
+    ws=null;
+    serverWorld=null;
+    _prevWorld=null;
+    if(running&&gameMode==='online'){
+      running=false;
+      document.getElementById('hud').style.display='none';
+      showMenu();
+    }
+  };
+}
 const causeEl=document.getElementById('deathCauseMsg');
-if(causeEl){const c=msg.deathCause;if(c==='wall')causeEl.textContent='🧱 Вы врезались в край карты';else if(c&&c.killerName)causeEl.textContent='💀 Вас подбил '+c.killerName;else causeEl.textContent='';}
-jbSaveScore(pname,score);clanUpdateScore(score);document.getElementById('hud').style.display='none';running=false;switchScreen('deathScreen',()=>{renderRecords(score);trackQuest('reach_mass',score);});}if(msg.type==='kill_reward'){essence=Math.min(9999999,essence+msg.coins);syncEss();showToast('💀 +'+msg.coins+' '+t('kill_reward'),'#ff6b6b');}if(msg.type==='coin_reward'){essence=Math.min(9999999,essence+msg.coins);syncEss();}}catch(err){console.warn('WS msg error',err);}};ws.onerror=()=>{clearTimeout(_connectTimeout);clearInterval(_loadInterval);wsConnecting=false;setLoadStatus(t('conn_err'),100);document.getElementById('loadBarFill').style.background='#e74c3c';setTimeout(()=>showMenu(),3000);};ws.onclose=()=>{wsConnecting=false;ws=null;serverWorld=null;_prevWorld=null;if(running&&gameMode==='online'){running=false;document.getElementById('hud').style.display='none';showMenu();}};}
 
 // ══════ INPUT ══════
 let mx=400,my=300;
@@ -2350,9 +2629,19 @@ requestAnimationFrame(loop);
 
 // ══════ КНОПКИ ══════
 document.getElementById('playBtn').onclick=()=>{pname=document.getElementById('nameInput').value.trim()||'Player';showModeSelect();};
-document.getElementById('offlineBtn').onclick=()=>{pname=document.getElementById('nameInput').value.trim()||'Player';startOffline();};
-document.getElementById('onlineBtn').onclick=()=>{pname=document.getElementById('nameInput').value.trim()||'Player';connectWS();};
-document.getElementById('mazeBtn').onclick=()=>{pname=document.getElementById('nameInput').value.trim()||'Player';startMazeMode();};
+document.getElementById('offlineBtn').onclick=()=>{
+  if(running) return;
+  pname=document.getElementById('nameInput').value.trim()||'Player';
+  startOffline();
+};
+document.getElementById('onlineBtn').onclick = () => {
+  showToast('🌐 Онлайн появится в следующем обновлении!', '#ff9f43');
+};
+document.getElementById('mazeBtn').onclick=()=>{
+  if(running) return;
+  pname=document.getElementById('nameInput').value.trim()||'Player';
+  startMazeMode();
+};
 document.getElementById('restartBtn').onclick=()=>{if(gameMode==='offline'){startOffline();}else if(gameMode==='maze'){startMazeMode();}else{if(ws&&ws.readyState===WebSocket.OPEN){running=false;serverWorld=null;_prevWorld=null;showLoading(t('respawn'));ws.send(JSON.stringify({type:'respawn'}));}else connectWS();}};
 document.getElementById('menuBackBtn').onclick=()=>{if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}if(ws){try{ws.close();}catch(e){}ws=null;}wsConnecting=false;serverWorld=null;_prevWorld=null;running=false;offlineState=null;mazeState=null;showMenu();};
 document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter'){pname=document.getElementById('nameInput').value.trim()||'Player';showModeSelect();}});
@@ -2467,9 +2756,91 @@ let surviveTimer=0,lastSurviveTick=0,_xpFoodCounter=0,_foodCoinCounter=0,_prevSc
 
 // ══════ МУЗЫКА ══════
 let audioCtx=null,musicMasterGain=null,_chordTimer=null,_audioStarted=false;
-function initMusic(){if(_audioStarted)return;_audioStarted=true;audioCtx=new(window.AudioContext||window.webkitAudioContext)();musicMasterGain=audioCtx.createGain();musicMasterGain.gain.value=musicEnabled?0.48:0;musicMasterGain.connect(audioCtx.destination);const convSize=audioCtx.sampleRate*3,convBuf=audioCtx.createBuffer(2,convSize,audioCtx.sampleRate);for(let c=0;c<2;c++){const cd=convBuf.getChannelData(c);for(let i=0;i<convSize;i++)cd[i]=(Math.random()*2-1)*Math.pow(1-i/convSize,2.5);}const conv=audioCtx.createConvolver();conv.buffer=convBuf;const convGain=audioCtx.createGain();convGain.gain.value=0.55;conv.connect(convGain);convGain.connect(musicMasterGain);const chords=[[146.83,174.61,220.00,261.63,311.13],[196.00,246.94,293.66,349.23,392.00],[110.00,130.81,164.81,220.00,261.63],[164.81,196.00,246.94,293.66,329.63]];let chordIdx=0;function playChord(){if(!audioCtx)return;const now=audioCtx.currentTime,freqs=chords[chordIdx%chords.length];chordIdx++;freqs.forEach((f,i)=>{const osc=audioCtx.createOscillator(),g=audioCtx.createGain();osc.type=i<2?'sine':'triangle';osc.frequency.value=f;const lfo=audioCtx.createOscillator(),lfoG=audioCtx.createGain();lfo.frequency.value=0.4+Math.random()*0.3;lfoG.gain.value=0.8;lfo.connect(lfoG);lfoG.connect(osc.frequency);lfo.start(now);g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(0.06+(freqs.length-i)*0.008,now+1.5);g.gain.setValueAtTime(0.06+(freqs.length-i)*0.008,now+6);g.gain.linearRampToValueAtTime(0,now+9);osc.connect(g);g.connect(conv);osc.start(now);osc.stop(now+10);});_chordTimer=setTimeout(playChord,8000);}
-_chordTimer=setTimeout(playChord,600);}
-function startMusic(){if(!musicEnabled)return;if(!_audioStarted)initMusic();else if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();if(musicMasterGain)musicMasterGain.gain.setValueAtTime(0.48,audioCtx.currentTime);}
+function initMusic(){if(_audioStarted)return;_audioStarted=true;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  musicMasterGain=audioCtx.createGain();
+  musicMasterGain.gain.value=musicEnabled?0.65:0;
+  musicMasterGain.connect(audioCtx.destination);
+  
+  // Лёгкая реверберация для атмосферы
+  const convSize=audioCtx.sampleRate*2;
+  const convBuf=audioCtx.createBuffer(2,convSize,audioCtx.sampleRate);
+  for(let c=0;c<2;c++){const cd=convBuf.getChannelData(c);
+    for(let i=0;i<convSize;i++)cd[i]=(Math.random()*2-1)*Math.pow(1-i/convSize,3);
+  }
+  const conv=audioCtx.createConvolver();conv.buffer=convBuf;
+  const convGain=audioCtx.createGain();convGain.gain.value=0.35;
+  conv.connect(convGain);convGain.connect(musicMasterGain);
+  
+  // Красивые аккорды (пентатоника — звучит приятно, не "воет")
+  const chords=[
+    [261.63,329.63,392.00,523.25], // C major
+    [293.66,369.99,440.00,587.33], // D major
+    [329.63,415.30,493.88,659.25], // E minor
+    [349.23,440.00,523.25,698.46], // F major
+    [392.00,493.88,587.33,783.99], // G major
+    [329.63,392.00,493.88,587.33], // Em add9
+    [261.63,349.23,440.00,523.25], // Am
+    [293.66,369.99,466.16,587.33], // D sus
+  ];
+  
+  let chordIdx=0;
+  function playChord(){
+    if(!audioCtx)return;
+    const now=audioCtx.currentTime;
+    const freqs=chords[chordIdx%chords.length];
+    chordIdx++;
+    
+    freqs.forEach((f,i)=>{
+      // Основной тон — мягкий синус
+      const osc=audioCtx.createOscillator();
+      const g=audioCtx.createGain();
+      osc.type='sine';
+      osc.frequency.value=f;
+      
+      // Тёплое вибрато
+      const lfo=audioCtx.createOscillator();
+      const lfoG=audioCtx.createGain();
+      lfo.frequency.value=1.2+Math.random()*0.6;
+      lfoG.gain.value=f*0.003;
+      lfo.connect(lfoG);
+      lfoG.connect(osc.frequency);
+      lfo.start(now);
+      
+      // Плавное появление и затухание
+      g.gain.setValueAtTime(0,now);
+      g.gain.linearRampToValueAtTime(0.04+(freqs.length-i)*0.006,now+2);
+      g.gain.setValueAtTime(0.04+(freqs.length-i)*0.006,now+5);
+      g.gain.linearRampToValueAtTime(0,now+8);
+      
+      osc.connect(g);
+      g.connect(conv);
+      osc.start(now);
+      osc.stop(now+9);
+    });
+    
+    // Лёгкий бас
+    if(chordIdx%2===0){
+      const bassFreq=freqs[0]/2;
+      const bass=audioCtx.createOscillator();
+      const bassG=audioCtx.createGain();
+      bass.type='triangle';
+      bass.frequency.value=bassFreq;
+      bassG.gain.setValueAtTime(0,now);
+      bassG.gain.linearRampToValueAtTime(0.10,now+1.5);
+      bassG.gain.linearRampToValueAtTime(0,now+7);
+      bass.connect(bassG);
+      bassG.connect(musicMasterGain);
+      bass.start(now);
+      bass.stop(now+8);
+    }
+    
+    _chordTimer=setTimeout(playChord,6500);
+  }
+  _chordTimer=setTimeout(playChord,400);
+}
+  
+function startMusic(){if(!musicEnabled)return;if(!_audioStarted)initMusic();else if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();if(musicMasterGain)musicMasterGain.gain.setValueAtTime(0.65,audioCtx.currentTime);}
 function stopMusic(){if(audioCtx&&audioCtx.state==='running')audioCtx.suspend();}
 function toggleMusic(){musicEnabled=!musicEnabled;localStorage.setItem('dvx_music',musicEnabled?'on':'off');const L=LANGS[curLang]||LANGS.en;const btn=document.getElementById('musicMenuBtn');if(musicEnabled){btn.textContent=L.music_on;btn.classList.remove('off');startMusic();}else{btn.textContent=L.music_off;btn.classList.add('off');stopMusic();}}
 document.getElementById('musicMenuBtn').onclick=toggleMusic;
@@ -2495,8 +2866,18 @@ const irisCv=document.getElementById('irisCanvas');
 const irisCx=irisCv.getContext('2d');
 function resizeIris(){irisCv.width=window.innerWidth;irisCv.height=window.innerHeight;}
 resizeIris();window.addEventListener('resize',resizeIris);
-window.addEventListener('orientationchange', () => setTimeout(resizeFX, 200));
-window.addEventListener('orientationchange', () => setTimeout(resizeIris, 200));
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    resizeFX();
+    resizeIris();
+    resize();
+    // Центрируем камеру на змейке
+    if (running && player && player.segs && player.segs.length > 0) {
+      camX = player.segs[0].x - W/2;
+      camY = player.segs[0].y - H/2;
+    }
+  }, 500); // 500мс чтобы телефон перестроился
+});
 const LEAF_COLORS_CLASSIC=['#4af078','#2ecc71','#00e5cc','#a8ff78','#f9ca24','#a29bfe','#7bed9f'];
 const STAR_COLORS_SPACE=['#ffffff','#ffe066','#a29bfe','#7bf1ff','#ffcc88','#d4b4ff'];
 const BUBBLE_COLORS_WATER=['#00e5cc','#00b4dc','#5af0ff','#a0e4ff','#60c8ff','#b0f0ff'];
@@ -2821,12 +3202,30 @@ async function clanLoadAll() {
       headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
     });
     const data = await res.json();
-    const clans = JSON.parse(data.result || '[]');
+    let clans = data.result;
+    
+    // Проверяем — если строка, парсим
+    if (typeof clans === 'string') {
+      try { clans = JSON.parse(clans); } catch(e) { clans = []; }
+    }
+    // Если всё ещё строка — парсим ещё раз
+    if (typeof clans === 'string') {
+      try { clans = JSON.parse(clans); } catch(e) { clans = []; }
+    }
+    // Главное — убеждаемся что это массив
+    if (!Array.isArray(clans)) {
+      console.warn('clans не массив, сбрасываем в []');
+      clans = [];
+    }
+    
     _clanCache = clans;
     return clans;
-  } catch(e) { return _clanCache || []; }
+  } catch(e) {
+    console.warn('Clan load error', e);
+    return _clanCache || [];
+  }
 }
-
+  
 async function clanSaveAll(clans) {
   try {
     await fetch(`${UPSTASH_URL}/set/clans`, {
@@ -2858,13 +3257,17 @@ function openClanPanel() {
   _clanPanelOpen = true;
   document.getElementById('clanPanel').classList.add('open');
   document.getElementById('clanOverlay').classList.add('open');
+  document.querySelector('.coins-fixed').style.display = 'none';
+  document.querySelector('.crystals-fixed').style.display = 'none';
   loadClanTab('all');
 }
-
+  
 function closeClanPanel() {
   _clanPanelOpen = false;
   document.getElementById('clanPanel').classList.remove('open');
   document.getElementById('clanOverlay').classList.remove('open');
+  document.querySelector('.coins-fixed').style.display = 'flex';
+  document.querySelector('.crystals-fixed').style.display = 'flex';
 }
 
 document.getElementById('clanBtn').addEventListener('click', openClanPanel);
@@ -3969,6 +4372,90 @@ document.addEventListener('DOMContentLoaded',()=>{
     // Подсвечиваем выбранный сервер
     document.querySelectorAll('.srv-row').forEach((r,i)=>r.classList.toggle('selected',i===_selServer));
   }
+});
+
+// ══════ ГЛОБАЛЬНЫЙ ЧАТ (PieSocket) ══════
+let globalChatSocket = null;
+let globalChatMessages = [];
+
+function toggleGlobalChat() {
+  const overlay = document.getElementById('globalChatOverlay');
+  if (overlay.style.display === 'flex') {
+    overlay.style.display = 'none';
+    return;
+  }
+  overlay.style.display = 'flex';
+  if (!globalChatSocket) connectGlobalChat();
+  document.getElementById('globalChatInput').focus();
+}
+
+function connectGlobalChat() {
+  globalChatSocket = new WebSocket('wss://free.blr2.piesocket.com/v3/1?api_key=UJ5kUPvVyeiMjB5kWM4SuISq1oGrctvRyYYPSUpN&notify_self=1');
+  
+  globalChatSocket.onopen = () => {
+    console.log('Global chat connected');
+  };
+  
+  globalChatSocket.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data);
+      if (msg.event === 'message' && msg.data) {
+        globalChatMessages.push(msg.data);
+        if (globalChatMessages.length > 100) globalChatMessages.shift();
+        renderGlobalChat();
+      }
+    } catch(e) {}
+  };
+  
+  globalChatSocket.onclose = () => {
+    globalChatSocket = null;
+  };
+}
+
+function sendGlobalMessage() {
+  const input = document.getElementById('globalChatInput');
+  const text = input.value.trim();
+  if (!text || !globalChatSocket) return;
+  
+  const nick = (document.getElementById('nameInput').value.trim() || 'Player').slice(0, 16);
+  
+  const msg = {
+    event: 'message',
+    data: {
+      name: nick,
+      text: text.slice(0, 120),
+      time: Date.now()
+    }
+  };
+  
+  globalChatSocket.send(JSON.stringify(msg));
+  input.value = '';
+}
+
+function renderGlobalChat() {
+  const box = document.getElementById('globalChatMessages');
+  if (!box) return;
+  
+  const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+  
+  box.innerHTML = globalChatMessages.map(m => {
+    const time = new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const isMe = m.name === (document.getElementById('nameInput').value.trim() || 'Player');
+    return `<div style="background:${isMe?'rgba(46,204,113,0.15)':'rgba(255,255,255,0.05)'}; border:1px solid ${isMe?'rgba(46,204,113,0.3)':'rgba(255,255,255,0.08)'}; border-radius:10px; padding:8px 12px;">
+      <div style="display:flex; gap:6px; align-items:center; margin-bottom:2px;">
+        <span style="font-size:11px; font-weight:900; color:${isMe?'#2ecc71':'#a29bfe'};">${m.name}</span>
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">${time}</span>
+      </div>
+      <div style="font-size:12px; color:#d4f5e9; word-break:break-word;">${m.text}</div>
+    </div>`;
+  }).join('');
+  
+  if (wasAtBottom) box.scrollTop = box.scrollHeight;
+}
+
+document.getElementById('globalChatSend').addEventListener('click', sendGlobalMessage);
+document.getElementById('globalChatInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendGlobalMessage();
 });
 </script>
 </body>
