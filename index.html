@@ -1311,6 +1311,79 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 </div>
   
 <script>
+// ══════ FIREBASE ══════
+const firebaseConfig = {
+  apiKey: "AIzaSyAK37Rjom9vI9NI2enATRRSWWHQoB1pbhw",
+  authDomain: "devourxio.firebaseapp.com",
+  projectId: "devourxio",
+  storageBucket: "devourxio.firebasestorage.app",
+  messagingSenderId: "615036401121",
+  appId: "1:615036401121:web:c7cb796aedee4f50da4ea0"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Google-вход
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      showToast('✅ Добро пожаловать, ' + user.displayName + '!', '#2ecc71');
+      loadCloudProgress();
+    })
+    .catch((error) => {
+      showToast('❌ Ошибка входа: ' + error.message, '#ff6b6b');
+    });
+}
+
+// Загрузка прогресса из облака
+async function loadCloudProgress() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    const doc = await db.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.essence) { essence = data.essence; syncEss(); }
+      if (data.crystals) { crystals = data.crystals; syncCrystals(); }
+      if (data.playerXP) { playerXP = data.playerXP; updateXPBar(); }
+      if (data.selSkin) { selSkin = data.selSkin; saveSkins(); }
+      if (data.skins) {
+        data.skins.forEach(s => {
+          const skin = SKINS_DATA.find(x => x.id === s.id);
+          if (skin) skin.owned = s.owned;
+        });
+        saveSkins();
+      }
+      showToast('☁️ Прогресс загружен!', '#a29bfe');
+    }
+  } catch(e) {}
+}
+
+// Сохранение прогресса в облако
+async function saveCloudProgress() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    await db.collection('users').doc(user.uid).set({
+      essence,
+      crystals,
+      playerXP,
+      selSkin,
+      skins: SKINS_DATA.map(s => ({ id: s.id, owned: s.owned })),
+      updatedAt: Date.now()
+    }, { merge: true });
+  } catch(e) {}
+}
+
+// Автосохранение каждые 30 секунд
+setInterval(() => {
+  if (auth.currentUser) saveCloudProgress();
+}, 30000);
+  
 // ══════ SKINS ══════
 const SKINS_DATA=[
   {id:0, key:'sk_green',   h:'#27ae60',b:['#2ecc71','#27ae60'],   rarity:'standard', cost:0,    owned:true},
