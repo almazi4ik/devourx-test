@@ -477,8 +477,6 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 .btn-restart:hover{transform:scale(1.05)}
 .btn-back-menu { background:transparent; border:2px solid rgba(255,255,255,0.28); border-radius:60px; color:#fff; font-family:'Fredoka One',cursive; font-size:20px; padding:11px 38px; cursor:pointer; margin-top:12px; }
 .btn-back-menu:hover{background:rgba(255,255,255,0.09)}
-#onlineCounter { position:fixed; top:22px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.7); font-family:'Nunito',sans-serif; font-weight:800; font-size:14px; z-index:200; pointer-events:none; letter-spacing:1px; }
-#onlineCounter span { color:#fff; font-weight:900; }
 .top-panel-title { font-family:'Fredoka One',cursive; font-size:20px; text-align:center; background:linear-gradient(90deg,#f9ca24,#ff9f43); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:6px; }
 #lbOverlay { position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0); pointer-events:none; transition:background 0.3s; }
 #lbOverlay.open { background:rgba(0,0,0,0.7); pointer-events:all; backdrop-filter:blur(6px); }
@@ -996,12 +994,12 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
       <button class="back-btn" id="skinsBack" data-i18n="back">Back</button>
     </div>
   </div>
-  <div class="sk-cats" id="skCats">
-    <button class="cat-btn active" data-cat="all" data-i18n="all">All</button>
-    <button class="cat-btn" data-cat="standard" data-i18n="standard">Standard</button>
-    <button class="cat-btn" data-cat="rare" data-i18n="rare">Rare</button>
-    <button class="cat-btn" data-cat="legendary" data-i18n="legendary">Legendary</button>
-  </div>
+ <div class="sk-cats" id="skCats">
+  <button class="cat-btn active" data-cat="all">All</button>
+  <button class="cat-btn" data-cat="standard">Standard</button>
+  <button class="cat-btn" data-cat="rare">Rare</button>
+  <button class="cat-btn" data-cat="legendary">Legendary</button>
+</div>
   <div class="skins-grid" id="skinsGrid"></div>
 </div>
 
@@ -1092,8 +1090,10 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   width: 48px; height: 48px; border-radius: 50%;
   background: rgba(0,0,0,0.65); border: 2px solid rgba(0,229,204,0.55);
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; backdrop-filter: blur(6px); font-size: 22px;
-" onclick="toggleGlobalChat()">💬</button>
+  cursor: pointer; backdrop-filter: blur(6px); padding: 0;
+" onclick="toggleGlobalChat()">
+  <canvas id="chatIconCanvas" width="36" height="36"></canvas>
+</button>
 
 <div id="globalChatOverlay" style="
   display:none; position:fixed; inset:0; z-index:9999;
@@ -1170,7 +1170,6 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   <div class="bm-name" id="bmName">—</div>
   <div class="bm-score" id="bmScore">0</div>
 </div>
-<div id="onlineCounter">Онлайн: <span id="onlineNum">0</span></div>
 
 <!-- НОВЫЙ БЛОК КРИСТАЛЛОВ -->
 <div class="crystals-fixed" id="crystalsBox" style="position:fixed;top:60px;right:14px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.55);border:2px solid rgba(162,155,254,0.5);border-radius:50px;padding:4px 8px 4px 14px;z-index:999;cursor:pointer;" onclick="toggleCrystalShop()">
@@ -1464,6 +1463,7 @@ syncCrystals(); // ← добавить эту строку
 
 function renderSkins(){
   const grid=document.getElementById('skinsGrid');grid.innerHTML='';
+  // Обычные скины
   const list=curCat==='all'?SKINS_DATA:SKINS_DATA.filter(s=>s.rarity===curCat);
   list.forEach(s=>{
     const locked=!s.owned,card=document.createElement('div');
@@ -1510,7 +1510,8 @@ function renderSkins(){
 document.getElementById('skCats').addEventListener('click',e=>{
   const btn=e.target.closest('.cat-btn');if(!btn)return;
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');curCat=btn.dataset.cat;renderSkins();
+  btn.classList.add('active');curCat=btn.dataset.cat;
+  renderSkins();
 });
 
 // ══════ ЯЗЫКИ ══════
@@ -2660,11 +2661,9 @@ function drawServerSnake(p,cx,cy){
     ctx.beginPath();
     ctx.arc(sx,sy,r*(.72+.28*(1-tt)),0,Math.PI*2);
     
-    // Цвет сегментов
     if(isFlag){
       ctx.fillStyle=getFlagColor(p.skinId,i,segs.length);
     } else if(p.skinId===42){
-      // Кристальный скин — чередуем 3 цвета
       const colors=['#3b82f6','#1d4ed8','#60a5fa'];
       ctx.fillStyle=colors[i%3];
     } else {
@@ -2676,7 +2675,6 @@ function drawServerSnake(p,cx,cy){
   ctx.globalAlpha=1;
   const hx=hd0.x-cx,hy=hd0.y-cy;
   
-  // Свечение для кристального скина
   if(p.skinId===42){
     ctx.beginPath();
     ctx.arc(hx,hy,r+6,0,Math.PI*2);
@@ -4474,7 +4472,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.querySelectorAll('.srv-row').forEach((r,i)=>r.classList.toggle('selected',i===_selServer));
   }
 });
-
+  
 // ══════ ГЛОБАЛЬНЫЙ ЧАТ (PieSocket) ══════
 let globalChatSocket = null;
 let globalChatMessages = [];
@@ -4493,8 +4491,15 @@ function toggleGlobalChat() {
 function connectGlobalChat() {
   globalChatSocket = new WebSocket('wss://free.blr2.piesocket.com/v3/1?api_key=UJ5kUPvVyeiMjB5kWM4SuISq1oGrctvRyYYPSUpN&notify_self=1');
   
-  globalChatSocket.onopen = () => {
+  globalChatSocket.onopen = async () => {
     console.log('Global chat connected');
+    try {
+      const saved = await lbLoad('global_chat');
+      if (Array.isArray(saved)) {
+        globalChatMessages = saved;
+        renderGlobalChat();
+      }
+    } catch(e) {}
   };
   
   globalChatSocket.onmessage = (event) => {
@@ -4502,7 +4507,8 @@ function connectGlobalChat() {
       const msg = JSON.parse(event.data);
       if (msg.event === 'message' && msg.data) {
         globalChatMessages.push(msg.data);
-        if (globalChatMessages.length > 100) globalChatMessages.shift();
+        if (globalChatMessages.length > 50) globalChatMessages.shift();
+        lbSave('global_chat', globalChatMessages);
         renderGlobalChat();
       }
     } catch(e) {}
@@ -4558,6 +4564,44 @@ document.getElementById('globalChatSend').addEventListener('click', sendGlobalMe
 document.getElementById('globalChatInput').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') sendGlobalMessage();
 });
+
+// ══════ РИСУЕМ ИКОНКУ ЧАТА ══════
+function drawChatIcon() {
+  const cv = document.getElementById('chatIconCanvas');
+  if (!cv) return;
+  const c = cv.getContext('2d');
+  const w = 36, h = 36;
+  c.clearRect(0, 0, w, h);
+  
+  c.fillStyle = 'rgba(0,0,0,0.3)';
+  c.beginPath();
+  c.moveTo(8, 8); c.lineTo(28, 8);
+  c.quadraticCurveTo(32, 8, 32, 12); c.lineTo(32, 22);
+  c.quadraticCurveTo(32, 26, 28, 26); c.lineTo(18, 26);
+  c.lineTo(14, 30); c.lineTo(16, 26); c.lineTo(8, 26);
+  c.quadraticCurveTo(4, 26, 4, 22); c.lineTo(4, 12);
+  c.quadraticCurveTo(4, 8, 8, 8);
+  c.fill();
+  
+  const grad = c.createLinearGradient(4, 4, 32, 32);
+  grad.addColorStop(0, '#00e5cc'); grad.addColorStop(1, '#2ecc71');
+  c.fillStyle = grad;
+  c.beginPath();
+  c.moveTo(7, 6); c.lineTo(29, 6);
+  c.quadraticCurveTo(33, 6, 33, 10); c.lineTo(33, 22);
+  c.quadraticCurveTo(33, 26, 29, 26); c.lineTo(18, 26);
+  c.lineTo(14, 30); c.lineTo(16, 26); c.lineTo(7, 26);
+  c.quadraticCurveTo(3, 26, 3, 22); c.lineTo(3, 10);
+  c.quadraticCurveTo(3, 6, 7, 6);
+  c.fill();
+  
+  c.fillStyle = '#fff';
+  c.beginPath(); c.arc(12, 16, 2.5, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.arc(18, 16, 2.5, 0, Math.PI * 2); c.fill();
+  c.beginPath(); c.arc(24, 16, 2.5, 0, Math.PI * 2); c.fill();
+}
+
+window.addEventListener('load', drawChatIcon);
 </script>
 </body>
 </html>
