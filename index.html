@@ -2848,9 +2848,7 @@ document.getElementById('offlineBtn').onclick=()=>{
   pname=document.getElementById('nameInput').value.trim()||'Player';
   startOffline();
 };
-document.getElementById('onlineBtn').onclick = () => {
-  showToast('🌐 Онлайн появится в следующем обновлении!', '#ff9f43');
-};
+document.getElementById('onlineBtn').onclick=()=>{pname=document.getElementById('nameInput').value.trim()||'Player';connectWS();};
 document.getElementById('mazeBtn').onclick=()=>{
   if(running) return;
   pname=document.getElementById('nameInput').value.trim()||'Player';
