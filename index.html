@@ -1248,17 +1248,30 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   </button>
 </div>
       <!-- Not logged in -->
-      <div id="accLoggedOut">
-        <div class="acc-mode-toggle">
-          <button class="acc-mode-btn active" id="accModeLogin" onclick="setAccMode('login')">ВОЙТИ</button>
-          <button class="acc-mode-btn" id="accModeReg" onclick="setAccMode('register')">РЕГИСТРАЦИЯ</button>
-        </div>
-        <div id="accError" class="acc-error"></div>
-        <div id="accSuccess" class="acc-success"></div>
-        <input class="acc-input" id="accEmail" type="email" placeholder="Email" autocomplete="email">
-        <input class="acc-input" id="accPass" type="password" placeholder="Игровой пароль" autocomplete="current-password">
-        <button class="acc-btn acc-btn-green" id="accSubmitBtn" onclick="accSubmit()">ВОЙТИ</button>
-      </div>
+<div id="accLoggedOut">
+  <div class="acc-mode-toggle">
+    <button class="acc-mode-btn active" id="accModeLogin" onclick="setAccMode('login')">ВОЙТИ</button>
+    <button class="acc-mode-btn" id="accModeReg" onclick="setAccMode('register')">РЕГИСТРАЦИЯ</button>
+  </div>
+  
+  <!-- Google-кнопка (меняется в зависимости от режима) -->
+  <button id="googleAuthBtn" onclick="signInWithGoogle()" style="
+    background:#fff; border:none; border-radius:50px; padding:12px 24px;
+    font-family:'Fredoka One',cursive; font-size:15px; color:#333;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    gap:8px; width:100%; box-shadow:0 2px 8px rgba(0,0,0,0.3); margin-bottom:12px;
+  ">
+    🅰 Войти через Google
+  </button>
+  
+  <div style="text-align:center; color:rgba(255,255,255,0.3); margin:8px 0; font-size:12px;">─ ИЛИ ─</div>
+  
+  <div id="accError" class="acc-error"></div>
+  <div id="accSuccess" class="acc-success"></div>
+  <input class="acc-input" id="accEmail" type="email" placeholder="Email" autocomplete="email">
+  <input class="acc-input" id="accPass" type="password" placeholder="Игровой пароль" autocomplete="current-password">
+  <button class="acc-btn acc-btn-green" id="accSubmitBtn" onclick="accSubmit()">ВОЙТИ</button>
+</div>
       <!-- Logged in -->
       <div id="accLoggedIn" style="display:none">
         <div class="acc-logged-in">
