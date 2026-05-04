@@ -2418,9 +2418,6 @@ function connectWS(){
         }:null;
         _worldRecvTime=performance.now();
         serverWorld=msg;
-        if(msg.playerCount){
-          document.getElementById('onlineNum').textContent=msg.playerCount;
-        }
         if(serverWorld.players){
           const me=serverWorld.players.find(p=>p.isMe);
           if(me&&me.segs&&me.segs.length>0){
