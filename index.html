@@ -2340,8 +2340,7 @@ function mkBotAt(x,y,name,skinId){
 
 // ══════ СЕРВЕР ОНЛАЙН ══════
 const SERVERS = [
-  { name:'Europe_1', url:'wss://devourx-server.onrender.com' },
-  { name:'Europe_2', url:'wss://devourx-server-production.up.railway.app' }
+  { name:'Europe_1', url:'wss://devourx-server-1.onrender.com' }
 ];
 let _selServer = parseInt(localStorage.getItem('dvx_server')||'0');
 function getServerUrl(){ return SERVERS[_selServer]?.url || SERVERS[0].url; }
