@@ -2367,9 +2367,6 @@ function connectWS(){
         wsConnecting=false;
         document.getElementById('loadBarFill').style.width='100%';
         setLoadStatus(t('ready'));
-        if(msg.playerCount){
-          document.getElementById('onlineNum').textContent=msg.playerCount;
-        }
         pname=document.getElementById('nameInput').value.trim()||'Player';
         player={
           segs:[{x:msg.spawnX||WORLD/2,y:msg.spawnY||WORLD/2}],
