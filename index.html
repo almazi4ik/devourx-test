@@ -3119,6 +3119,16 @@ function setAccMode(mode) {
   document.getElementById('accSubmitBtn').textContent = mode === 'login' ? 'ВОЙТИ' : 'ЗАРЕГИСТРИРОВАТЬСЯ';
   document.getElementById('accError').textContent = '';
   document.getElementById('accSuccess').textContent = '';
+  
+  // Меняем текст Google-кнопки
+  const googleBtn = document.getElementById('googleAuthBtn');
+  if (googleBtn) {
+    if (mode === 'login') {
+      googleBtn.innerHTML = '🅰 Войти через Google';
+    } else {
+      googleBtn.innerHTML = '🅰 Зарегистрироваться через Google';
+    }
+  }
 }
 
 async function accSubmit() {
