@@ -989,6 +989,32 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   </div>
 </div>
 
+<!-- ЭКРАН ПЕРВОЙ ЗАГРУЗКИ -->
+<div id="firstLoadScreen" style="
+  position:fixed; inset:0; z-index:99999;
+  background:radial-gradient(ellipse 100% 80% at 50% 0%, #1e5e30 0%, #0a1f10 60%, #050e08 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:24px;
+">
+  <div style="font-family:'Fredoka One',cursive; font-size:64px; letter-spacing:2px;
+    filter:drop-shadow(0 0 30px #39ff1488);">
+    <span style="color:#ff4e4e">D</span><span style="color:#ff9f43">e</span><span style="color:#f9ca24">v</span><span style="color:#2ecc71">o</span><span style="color:#00e5cc">u</span><span style="color:#a29bfe">r</span><span style="color:#ff6b9d">X</span><span style="color:#fff;font-size:38px;">.io</span>
+  </div>
+  
+  <div style="width:260px; height:10px; background:rgba(255,255,255,0.1); 
+    border-radius:10px; overflow:hidden; border:1px solid rgba(46,204,113,0.3);">
+    <div id="firstLoadBar" style="height:100%; width:0%; 
+      background:linear-gradient(90deg,#2ecc71,#39ff14); border-radius:10px; 
+      transition:width 0.3s ease;"></div>
+  </div>
+  
+  <div id="firstLoadTip" style="
+    color:rgba(168,216,184,0.85); font-family:'Nunito',sans-serif; 
+    font-size:14px; font-weight:700; text-align:center; 
+    max-width:300px; min-height:40px; transition:opacity 0.4s ease;
+  ">Загрузка...</div>
+</div>
+
 <!-- СКИНЫ -->
 <div id="skinsScreen" class="screen">
   <div class="sk-header">
@@ -4702,6 +4728,59 @@ function drawChatIcon() {
 }
 
 window.addEventListener('load', drawChatIcon);
+
+// ══════ ЭКРАН ПЕРВОЙ ЗАГРУЗКИ ══════
+const FIRST_LOAD_TIPS = [
+  'Используй BOOST чтобы подрезать врагов!',
+  'Войди через Google чтобы сохранить рекорд!',
+  'В Лабиринте стены разрушаются через 90 секунд!',
+  'Собирай еду чтобы вырасти!',
+  'Убивай ботов и забирай их еду!',
+  'Кристаллы можно купить в магазине монет!',
+  'Кланы сражаются за территорию на карте мира!',
+  'Нажми A чтобы включить автопилот!',
+  'Меняй фон в настройках — Классика, Космос, Вода!',
+  'Собирай коллекцию из 43 скинов!'
+];
+
+(function firstLoadSequence() {
+  const screen = document.getElementById('firstLoadScreen');
+  if (!screen) return;
+  
+  // Показываем первую подсказку
+  const tipEl = document.getElementById('firstLoadTip');
+  let tipIndex = 0;
+  tipEl.textContent = FIRST_LOAD_TIPS[0];
+  
+  // Меняем подсказки
+  const tipInterval = setInterval(() => {
+    tipIndex = (tipIndex + 1) % FIRST_LOAD_TIPS.length;
+    tipEl.style.opacity = '0';
+    setTimeout(() => {
+      tipEl.textContent = FIRST_LOAD_TIPS[tipIndex];
+      tipEl.style.opacity = '1';
+    }, 300);
+  }, 3500);
+  
+  // Прогресс-бар
+  const bar = document.getElementById('firstLoadBar');
+  let progress = 0;
+  const loadInterval = setInterval(() => {
+    progress += Math.random() * 20;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(loadInterval);
+      clearInterval(tipInterval);
+      bar.style.width = '100%';
+      setTimeout(() => {
+        screen.style.opacity = '0';
+        screen.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => screen.remove(), 500);
+      }, 500);
+    }
+    bar.style.width = progress + '%';
+  }, 350);
+})();
 </script>
 </body>
 </html>
