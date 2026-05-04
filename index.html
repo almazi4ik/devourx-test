@@ -2691,7 +2691,9 @@ function drawFoodList(fl, cx, cy) {
     
     // Пульсация (дыхание)
     if (f.p === undefined) f.p = Math.random() * Math.PI * 2;
-    f.p += 0.04;
+    // В онлайне замедляем пульсацию чтобы не дёргалась
+    const speed = (gameMode === 'online') ? 0.008 : 0.04;
+    f.p += speed;
     const pulse = 1 + Math.sin(f.p) * 0.1;
     
     const sprite = getFoodSprite(f.r, f.color);
