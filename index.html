@@ -2808,14 +2808,16 @@ function drawServerSnake(p, cx, cy) {
   while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
   const limitedDiff = Math.min(MAX_ANGLE_OFFSET, Math.max(-MAX_ANGLE_OFFSET, angleDiff));
 
-  // Плавное слежение (интерполяция)
-  if (p._lastPupilAngle === undefined) p._lastPupilAngle = ang;
-  let targetPupilAngle = ang + limitedDiff;
-  let diff2 = targetPupilAngle - p._lastPupilAngle;
-  while (diff2 > Math.PI) diff2 -= Math.PI * 2;
-  while (diff2 < -Math.PI) diff2 += Math.PI * 2;
-  p._lastPupilAngle += diff2 * 0.25; // 0.25 — скорость поворота
-  const finalPupilAngle = p._lastPupilAngle;
+// Плавное слежение (интерполяция) — ИСПРАВЛЕННАЯ ВЕРСИЯ
+if (p._lastPupilAngle === undefined) {
+  p._lastPupilAngle = ang; // только при первом появлении змейки
+}
+let targetPupilAngle = ang + limitedDiff;
+let diff2 = targetPupilAngle - p._lastPupilAngle;
+while (diff2 > Math.PI) diff2 -= Math.PI * 2;
+while (diff2 < -Math.PI) diff2 += Math.PI * 2;
+p._lastPupilAngle += diff2 * 0.25;
+const finalPupilAngle = p._lastPupilAngle;
 
   // Рисуем глаза
   [-0.48, 0.48].forEach(offset => {
