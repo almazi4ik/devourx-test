@@ -2009,8 +2009,62 @@ function initOffline(){const spawnX=300+Math.random()*(WORLD-600),spawnY=300+Mat
 function offlineGetR(score){return 6+(Math.min(score,1000)/1000)*22;}
 function offlineGetTurnSpeed(score){const t=Math.min(score,1000)/1000;return 0.18-t*0.125;}
 
-function offlineUpdateSnake(sn,ts){if(!sn.alive)return;let da=sn.tAngle-sn.angle;while(da>Math.PI)da-=Math.PI*2;while(da<-Math.PI)da+=Math.PI*2;sn.angle+=da*offlineGetTurnSpeed(sn.score);const spd=sn.boosting?sn.speed*1.85:sn.speed;const hx=sn.segs[0].x+Math.cos(sn.angle)*spd;const hy=sn.segs[0].y+Math.sin(sn.angle)*spd;if(hx<=10||hx>=WORLD-10||hy<=10||hy>=WORLD-10){offlineKill(sn);return;}if(gameMode==='maze'&&mazeState&&mazeState.walls){const r=offlineGetR(sn.score);if(checkMazeWallCollision(hx,hy,r)){offlineKill(sn);return;}}sn.segs.unshift({x:hx,y:hy});while(sn.segs.length>sn.length)sn.segs.pop();const segDist=8;for(let i=1;i<sn.segs.length;i++){const prev=sn.segs[i-1];const curr=sn.segs[i];const dx=prev.x-curr.x;const dy=prev.y-curr.y;const dist=Math.sqrt(dx*dx+dy*dy);if(dist>segDist){const ratio=(dist-segDist)/dist;curr.x+=dx*ratio;curr.y+=dy*ratio;}}}
-
+function offlineUpdateSnake(sn, ts) {
+  if (!sn.alive) return;
+  
+  let da = sn.tAngle - sn.angle;
+  while (da > Math.PI) da -= Math.PI * 2;
+  while (da < -Math.PI) da += Math.PI * 2;
+  sn.angle += da * offlineGetTurnSpeed(sn.score);
+  
+  const spd = sn.boosting ? sn.speed * 1.85 : sn.speed;
+  const hx = sn.segs[0].x + Math.cos(sn.angle) * spd;
+  const hy = sn.segs[0].y + Math.sin(sn.angle) * spd;
+  
+  // Проверка границ
+  if (hx <= 10 || hx >= WORLD - 10 || hy <= 10 || hy >= WORLD - 10) {
+    offlineKill(sn);
+    return;
+  }
+  
+  // Проверка стен лабиринта
+  if (gameMode === 'maze' && mazeState && mazeState.walls) {
+    const r = offlineGetR(sn.score);
+    if (checkMazeWallCollision(hx, hy, r)) {
+      offlineKill(sn);
+      return;
+    }
+  }
+  
+  // Добавляем новую голову
+  sn.segs.unshift({ x: hx, y: hy });
+  while (sn.segs.length > sn.length) sn.segs.pop();
+  
+  // ========== ШАГ 1: ПЛАВНОЕ ДВИЖЕНИЕ СЕГМЕНТОВ ==========
+  for (let i = 1; i < sn.segs.length; i++) {
+    const target = sn.segs[i - 1];
+    const current = sn.segs[i];
+    // Плавное следование (0.25 — скорость, можно менять 0.2-0.35)
+    current.x += (target.x - current.x) * 0.25;
+    current.y += (target.y - current.y) * 0.25;
+  }
+  
+  // Выравниваем расстояние между сегментами (чтобы не разбегались)
+  const segDist = 10;
+  for (let i = 1; i < sn.segs.length; i++) {
+    const prev = sn.segs[i - 1];
+    const curr = sn.segs[i];
+    const dx = prev.x - curr.x;
+    const dy = prev.y - curr.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > segDist) {
+      const ratio = (dist - segDist) / dist;
+      curr.x += dx * ratio;
+      curr.y += dy * ratio;
+    }
+  }
+}
+  
 function offlineEatFood(sn){const h=sn.segs[0],r=offlineGetR(sn.score);const foodList=(gameMode==='maze'&&mazeState)?mazeState.foods:offlineState.foods;for(let i=foodList.length-1;i>=0;i--){const f=foodList[i];const dx=h.x-f.x,dy=h.y-f.y;const er=(f.size==='big'?f.r+10:f.size==='medium'?f.r+7:f.r+5)+r;if(dx*dx+dy*dy<er*er){const g=f.size==='big'?10:f.size==='medium'?5:2;sn.score+=g;if(sn.length<MAX_BODY){if(sn.length<750){sn.length=Math.min(750,sn.length+g);}else{sn._growBuf=(sn._growBuf||0)+g;if(sn._growBuf>=2){const add=Math.floor(sn._growBuf/2);sn._growBuf-=add*2;sn.length=Math.min(MAX_BODY,sn.length+add);}}}if(sn.isMe){sn.foodEaten=(sn.foodEaten||0)+1;if(sn.foodEaten>=3){sn.foodEaten-=3;essence=Math.min(9999999,essence+1);syncEss();}trackAch('eat',1);_xpFoodCounter+=g;const xg=Math.floor(_xpFoodCounter/5);if(xg>0){_xpFoodCounter-=xg*5;addXP(xg);}}foodList[i]=(gameMode==='maze')?mkMazeFood():mkOfflineFood();}}}
 
 function offlineKill(sn){
