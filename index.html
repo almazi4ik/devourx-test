@@ -3064,7 +3064,6 @@ function drawServerSnake(p, cx, cy) {
       const colors = ['#3b82f6', '#1d4ed8', '#60a5fa'];
       ctx.fillStyle = colors[i % 3];
     } else {
-      // Градиент от головы к хвосту
       const t = i / segs.length;
       const rColor = Math.round(r1 * (1 - t) + r2 * t);
       const gColor = Math.round(g1 * (1 - t) + g2 * t);
@@ -3104,17 +3103,8 @@ function drawServerSnake(p, cx, cy) {
 
   const ang = segs.length > 1 ? Math.atan2(segs[0].y - segs[1].y, segs[0].x - segs[1].x) : 0;
 
-  // ========== ГЛАЗА, СЛЕДЯЩИЕ ЗА КУРСОРОМ ==========
-  const dxToCursor = mx - (hx + camX);
-  const dyToCursor = my - (hy + camY);
-  let targetAngle = Math.atan2(dyToCursor, dxToCursor);
-  
-  let angleDiff = targetAngle - ang;
-  if (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-  if (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-  const maxTurn = Math.PI / 3;
-  const finalAngle = ang + Math.min(maxTurn, Math.max(-maxTurn, angleDiff));
-
+  // ========== ГЛАЗА (СМОТРЯТ ПО ДВИЖЕНИЮ, КАК В SLITHER.IO) ==========
+  // Без слежения за курсором, без бликов
   [-0.48, 0.48].forEach(offset => {
     const eyeX = hx + Math.cos(ang + offset) * r * 0.55;
     const eyeY = hy + Math.sin(ang + offset) * r * 0.55;
@@ -3122,21 +3112,16 @@ function drawServerSnake(p, cx, cy) {
 
     ctx.beginPath();
     ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#f0f0f0';
     ctx.fill();
 
     const pupilOffset = eyeR * 0.45;
-    const pupilX = eyeX + Math.cos(finalAngle) * pupilOffset;
-    const pupilY = eyeY + Math.sin(finalAngle) * pupilOffset;
+    const pupilX = eyeX + Math.cos(ang) * pupilOffset;
+    const pupilY = eyeY + Math.sin(ang) * pupilOffset;
 
     ctx.beginPath();
     ctx.arc(pupilX, pupilY, eyeR * 0.55, 0, Math.PI * 2);
     ctx.fillStyle = '#111';
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(pupilX - eyeR * 0.15, pupilY - eyeR * 0.15, eyeR * 0.2, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
     ctx.fill();
   });
 
