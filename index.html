@@ -2096,8 +2096,187 @@ function offlineKill(sn){
   if(targetList.length>maxFood+200)targetList.splice(0,targetList.length-(maxFood+200));
 }
   
-function offlineBotAI(bot){bot._thinkTimer=(bot._thinkTimer||0)-1;if(bot._thinkTimer>0)return;bot._thinkTimer=3+Math.floor(Math.random()*5);const h=bot.segs[0];const margin=180;const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const allSnakes=state?[state.player,...state.bots]:[offlineState.player,...offlineState.bots];if(h.x<margin||h.x>WORLD-margin||h.y<margin||h.y>WORLD-margin){bot.tAngle=Math.atan2(WORLD/2-h.y,WORLD/2-h.x)+(Math.random()-.5)*0.5;bot.boosting=false;return;}function danger(tx,ty){if(gameMode==='maze'&&mazeState&&mazeState.walls&&checkMazeWallCollision(tx,ty,offlineGetR(bot.score)))return true;for(const other of allSnakes){if(!other||!other.alive||other===bot||!other.segs)continue;for(let i=1;i<Math.min(other.segs.length,30);i++){const s=other.segs[i],dx=tx-s.x,dy=ty-s.y;if(dx*dx+dy*dy<90*90)return true;}}return tx<150||tx>WORLD-150||ty<150||ty>WORLD-150;}let victim=null,victimDist=Infinity;for(const other of allSnakes){if(!other||!other.alive||other===bot||!other.segs)continue;const dx=other.segs[0].x-h.x,dy=other.segs[0].y-h.y;const d=dx*dx+dy*dy;if(other.length<bot.length*0.85&&d<400*400&&d<victimDist){victimDist=d;victim=other;}}if(victim){const vh=victim.segs[0];const vAngle=victim.angle;const intercept=80;const tx=vh.x+Math.cos(vAngle)*intercept;const ty=vh.y+Math.sin(vAngle)*intercept;let angle=Math.atan2(ty-h.y,tx-h.x);const ax=h.x+Math.cos(angle)*100,ay=h.y+Math.sin(angle)*100;if(danger(ax,ay)){angle+=(Math.random()>0.5?1:-1)*(Math.PI/3+Math.random()*0.3);}bot.tAngle=angle+(Math.random()-.5)*0.08;bot.boosting=victimDist<200*200&&bot.length>15;return;}let best=Infinity,tgt=null;const fl=state?state.foods:offlineState.foods;for(let i=0;i<fl.length;i++){const f=fl[i];if(!f)continue;const dx=f.x-h.x,dy=f.y-h.y,d=dx*dx+dy*dy;if(d<best&&!danger(f.x,f.y)){best=d;tgt=f;}}if(!tgt){for(let i=0;i<fl.length;i++){const f=fl[i];if(!f)continue;const dx=f.x-h.x,dy=f.y-h.y,d=dx*dx+dy*dy;if(d<best){best=d;tgt=f;}}}if(tgt){let angle=Math.atan2(tgt.y-h.y,tgt.x-h.x);const ax=h.x+Math.cos(angle)*120,ay=h.y+Math.sin(angle)*120;if(danger(ax,ay)){const left=angle-Math.PI/3,right=angle+Math.PI/3;const alx=h.x+Math.cos(left)*120,aly=h.y+Math.sin(left)*120;const arx=h.x+Math.cos(right)*120,ary=h.y+Math.sin(right)*120;if(!danger(alx,aly))angle=left;else if(!danger(arx,ary))angle=right;else angle+=Math.PI*(0.8+Math.random()*0.4);}bot.tAngle=angle+(Math.random()-.5)*0.12;}bot.boosting=best<100*100&&bot.length>20;}
+// ══════ БОТ-ДОМИНАНТ (Кольцо смерти) + ОБЫЧНЫЙ БОТ ══════
+function updateDominantBot(bot, state) {
+  // 1. Находим группу целей (игрок + боты) в радиусе 350px
+  const targets = [];
+  if (state.player && state.player.alive && state.player !== bot) {
+    const dx = state.player.segs[0].x - bot.segs[0].x;
+    const dy = state.player.segs[0].y - bot.segs[0].y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 350) targets.push(state.player.segs[0]);
+  }
+  for (const other of state.bots) {
+    if (other !== bot && other.alive) {
+      const dx = other.segs[0].x - bot.segs[0].x;
+      const dy = other.segs[0].y - bot.segs[0].y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 350) targets.push(other.segs[0]);
+    }
+  }
 
+  // Если меньше 2 целей — не выгодно крутить
+  if (targets.length < 2) {
+    bot._dominantMode = false;
+    return false;
+  }
+
+  // 2. Вычисляем центр масс группы
+  let centerX = 0, centerY = 0;
+  for (const t of targets) {
+    centerX += t.x;
+    centerY += t.y;
+  }
+  centerX /= targets.length;
+  centerY /= targets.length;
+
+  // 3. Вычисляем радиус захвата
+  const dxToCenter = bot.segs[0].x - centerX;
+  const dyToCenter = bot.segs[0].y - centerY;
+  let currentRadius = Math.hypot(dxToCenter, dyToCenter);
+
+  // 4. Нужная длина окружности (2*pi*R)
+  const requiredLen = Math.max(2 * Math.PI * currentRadius, 200);
+  
+  // 5. Проверка: хватает ли длины тела?
+  if (bot.length < requiredLen) {
+    bot._dominantMode = false;
+    return false;
+  }
+
+  // 6. Переходим в режим "Кольцо"
+  bot._dominantMode = true;
+  
+  // 7. Вычисляем угол движения по окружности
+  let angleToCenter = Math.atan2(bot.segs[0].y - centerY, bot.segs[0].x - centerX);
+  let moveAngle = angleToCenter + Math.PI / 2;
+  if (Math.random() < 0.02) bot._spinDirection = (bot._spinDirection || 1) * -1;
+  moveAngle += (bot._spinDirection || 1) * 0.15;
+
+  // 8. Постепенно уменьшаем радиус (сжатие)
+  if (currentRadius > 120) {
+    currentRadius -= 0.6;
+  } else {
+    currentRadius *= 0.99;
+  }
+
+  // 9. Новая плавная цель для движения
+  const newTargetX = centerX + Math.cos(moveAngle) * currentRadius;
+  const newTargetY = centerY + Math.sin(moveAngle) * currentRadius;
+  const dx = newTargetX - bot.segs[0].x;
+  const dy = newTargetY - bot.segs[0].y;
+  let targetAngle = Math.atan2(dy, dx);
+  
+  let angleDiff = targetAngle - bot.angle;
+  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+  bot.tAngle = bot.angle + angleDiff * 0.3;
+  
+  bot.boosting = true;
+  return true;
+}
+
+function offlineBotAI(bot) {
+  // ОПТИМИЗАЦИЯ: обновляем стратегию раз в 10 кадров
+  if (bot._updateCounter === undefined) bot._updateCounter = 0;
+  bot._updateCounter++;
+  
+  if (bot.isDominant && bot._updateCounter >= 10) {
+    bot._updateCounter = 0;
+    if (updateDominantBot(bot, offlineState)) return;
+  }
+  
+  if (bot._updateCounter >= 5) {
+    bot._updateCounter = 0;
+    
+    // Обычная логика бота (не доминанта)
+    const h = bot.segs[0];
+    const margin = 180;
+    const state = (gameMode === 'maze' && mazeState) ? mazeState : offlineState;
+    const allSnakes = state ? [state.player, ...state.bots] : [offlineState.player, ...offlineState.bots];
+    
+    // Отступ от краёв
+    if (h.x < margin || h.x > WORLD - margin || h.y < margin || h.y > WORLD - margin) {
+      bot.tAngle = Math.atan2(WORLD/2 - h.y, WORLD/2 - h.x) + (Math.random() - 0.5) * 0.5;
+      bot.boosting = false;
+      return;
+    }
+    
+    function danger(tx, ty) {
+      if (gameMode === 'maze' && mazeState && mazeState.walls && checkMazeWallCollision(tx, ty, offlineGetR(bot.score))) return true;
+      for (const other of allSnakes) {
+        if (!other || !other.alive || other === bot || !other.segs) continue;
+        for (let i = 1; i < Math.min(other.segs.length, 30); i++) {
+          const s = other.segs[i];
+          if (Math.hypot(tx - s.x, ty - s.y) < 90) return true;
+        }
+      }
+      return (tx < 150 || tx > WORLD - 150 || ty < 150 || ty > WORLD - 150);
+    }
+    
+    // Охота на жертву
+    let victim = null, victimDist = Infinity;
+    for (const other of allSnakes) {
+      if (!other || !other.alive || other === bot || !other.segs) continue;
+      const d2 = Math.hypot(other.segs[0].x - h.x, other.segs[0].y - h.y);
+      if (other.length < bot.length * 0.85 && d2 < 400 && d2 < victimDist) {
+        victimDist = d2;
+        victim = other;
+      }
+    }
+    
+    if (victim) {
+      const vh = victim.segs[0];
+      const vAngle = victim.angle;
+      const intercept = 80;
+      const tx = vh.x + Math.cos(vAngle) * intercept;
+      const ty = vh.y + Math.sin(vAngle) * intercept;
+      let angle = Math.atan2(ty - h.y, tx - h.x);
+      if (danger(h.x + Math.cos(angle) * 100, h.y + Math.sin(angle) * 100)) {
+        angle += (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 3 + Math.random() * 0.3);
+      }
+      bot.tAngle = angle + (Math.random() - 0.5) * 0.08;
+      bot.boosting = victimDist < 200 && bot.length > 15;
+      return;
+    }
+    
+    // Поиск еды
+    let best = Infinity, tgt = null;
+    const foods = state ? state.foods : offlineState.foods;
+    for (const f of foods) {
+      if (!f) continue;
+      const d2 = Math.hypot(f.x - h.x, f.y - h.y);
+      if (d2 < best && !danger(f.x, f.y)) {
+        best = d2;
+        tgt = f;
+      }
+    }
+    if (!tgt) {
+      for (const f of foods) {
+        if (!f) continue;
+        const d2 = Math.hypot(f.x - h.x, f.y - h.y);
+        if (d2 < best) {
+          best = d2;
+          tgt = f;
+        }
+      }
+    }
+    if (tgt) {
+      let angle = Math.atan2(tgt.y - h.y, tgt.x - h.x);
+      if (danger(h.x + Math.cos(angle) * 120, h.y + Math.sin(angle) * 120)) {
+        const left = angle - Math.PI/3, right = angle + Math.PI/3;
+        const alx = h.x + Math.cos(left) * 120, aly = h.y + Math.sin(left) * 120;
+        const arx = h.x + Math.cos(right) * 120, ary = h.y + Math.sin(right) * 120;
+        if (!danger(alx, aly)) angle = left;
+        else if (!danger(arx, ary)) angle = right;
+        else angle += Math.PI * (0.8 + Math.random() * 0.4);
+      }
+      bot.tAngle = angle + (Math.random() - 0.5) * 0.12;
+    }
+    bot.boosting = best < 10000 && bot.length > 20;
+  }
+}
+  
 function offlineCheckCollisions(){const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const alive=state?[state.player,...state.bots].filter(s=>s.alive):[offlineState.player,...offlineState.bots].filter(s=>s.alive);for(const sn of alive){if(!sn.alive)continue;const h=sn.segs[0],r=offlineGetR(sn.score);for(const other of alive){if(!other.alive||other===sn)continue;for(let i=2;i<other.segs.length;i++){const s=other.segs[i],dx=h.x-s.x,dy=h.y-s.y;const otherR=offlineGetR(other.score)*0.55;if(dx*dx+dy*dy<(r*0.85+otherR)**2){offlineKill(sn);if(!sn.isMe&&other.isMe){essence=Math.min(9999999,essence+3);syncEss();showToast('💀 +3 '+t('kill_reward'),'#ff6b6b');trackAch('kills',1);}break;}}if(!sn.alive)break;}}}
 
 function offlineRespawnBots(){const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;if(!state)return;for(let i=0;i<state.bots.length;i++){if(!state.bots[i].alive){const name=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];state.bots[i]=mkBot(name,Math.floor(Math.random()*3));}}}
