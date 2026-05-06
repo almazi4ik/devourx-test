@@ -2529,10 +2529,18 @@ function startMazeMode(){
     const startM=getStartMass();
     const me={x:spawn.x,y:spawn.y,name:pname,skinId:selSkin,angle,tAngle:angle,speed:2.8,boosting:false,alive:true,length:startM,score:startM,segs:playerSegs,isMe:true,_growBuf:0,foodEaten:0,_deathHandled:false};
     const usedNames=[...BOT_NAMES].sort(()=>Math.random()-.5).slice(0,MAZE_BOTS_COUNT);
-    const bots=usedNames.map((n,i)=>{
-      const sp=findSafeMazeSpawn(walls);
-      return mkBotAt(sp.x,sp.y,n,i%3);
+    
+    // ══════ СОЗДАНИЕ БОТОВ С ДОМИНАНТАМИ (ЛАБИРИНТ) ══════
+    const bots = usedNames.map((n, i) => {
+      const sp = findSafeMazeSpawn(walls);
+      const bot = mkBotAt(sp.x, sp.y, n, i % 3);
+      bot.isDominant = Math.random() < 0.2;        // 20% — доминанты
+      bot._dominantMode = false;
+      bot._spinDirection = Math.random() < 0.5 ? 1 : -1;
+      bot._updateCounter = 0;
+      return bot;
     });
+    
     const foods=[];
     for(let i=0;i<MAZE_FOOD_COUNT;i++){
       const f=mkMazeFood();
@@ -2542,7 +2550,6 @@ function startMazeMode(){
     mazeState={walls,foods,bots,player:me};
     offlineState=mazeState;
     camX=spawn.x-W/2;camY=spawn.y-H/2;
-    // Фикс для горизонтального режима
     setTimeout(()=>{if(running&&player&&player.segs&&player.segs.length>0){camX=player.segs[0].x-W/2;camY=player.segs[0].y-H/2;}},100);
     player=me;
     document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});
