@@ -2929,72 +2929,77 @@ function drawMM(){
 }
 function drawBackground(cx,cy){if(!running){if(currentBG==='space')drawSpaceBackground();else if(currentBG==='water')drawWaterBackground();else{ctx.fillStyle='#0d2b15';ctx.fillRect(0,0,W,H);}return;}const bgColors={'classic':'#0d2b15','space':'#03020d','water':'#020e1a'};ctx.fillStyle=bgColors[currentBG]||'#0d2b15';ctx.fillRect(0,0,W,H);const gridColors={'classic':'rgba(46,204,113,0.055)','space':'rgba(120,100,255,0.06)','water':'rgba(0,160,220,0.055)'};ctx.strokeStyle=gridColors[currentBG]||gridColors.classic;ctx.lineWidth=1;for(let x=Math.floor(cx/CELL)*CELL;x<cx+W+CELL;x+=CELL){ctx.beginPath();ctx.moveTo(x-cx,0);ctx.lineTo(x-cx,H);ctx.stroke();}for(let y=Math.floor(cy/CELL)*CELL;y<cy+H+CELL;y+=CELL){ctx.beginPath();ctx.moveTo(0,y-cy);ctx.lineTo(W,y-cy);ctx.stroke();}ctx.strokeStyle='rgba(231,76,60,0.5)';ctx.lineWidth=8;ctx.strokeRect(-cx,-cy,WORLD,WORLD);}
 
-// ══════ ОПТИМИЗИРОВАННАЯ ЕДА (БЕЗ ГЛОУ, С ПУЛЬСАЦИЕЙ) ══════
-let _foodSprites = {};
-
-const FOOD_PALETTE = [
-  '#ff4444','#ff8800','#ffdd00','#44ff44','#00ff88',
-  '#00ddff','#4488ff','#aa44ff','#ff44aa','#ffaa00',
-  '#88ff00','#00ffcc'
+// ══════ НОВАЯ КРАСИВАЯ ЕДА (СВЕЧЕНИЕ + БЛИКИ + ПУЛЬСАЦИЯ) ══════
+const FOOD_COLORS = [
+  { main: '#5eff5e', glow: 'rgba(94, 255, 94, 0.5)' }, // Зелёный
+  { main: '#ff5e5e', glow: 'rgba(255, 94, 94, 0.5)' }, // Красный
+  { main: '#5e5eff', glow: 'rgba(94, 94, 255, 0.5)' }, // Синий
+  { main: '#ffff5e', glow: 'rgba(255, 255, 94, 0.5)' }, // Жёлтый
+  { main: '#ff5eff', glow: 'rgba(255, 94, 255, 0.5)' }, // Фиолетовый
+  { main: '#5effff', glow: 'rgba(94, 255, 255, 0.5)' }, // Голубой
+  { main: '#ffaa5e', glow: 'rgba(255, 170, 94, 0.5)' }  // Оранжевый
 ];
 
-function snapColor(colorStr) {
-  if (colorStr && colorStr.startsWith('hsl')) {
-    const hue = parseInt(colorStr.match(/\d+/)[0]) || 0;
-    const idx = Math.floor(hue / 30) % FOOD_PALETTE.length;
-    return FOOD_PALETTE[idx];
+function getFoodColor(baseColor) {
+  // Если передан hsl, конвертируем в один из предустановленных цветов
+  if (baseColor && baseColor.startsWith('hsl')) {
+    const hue = parseInt(baseColor.match(/\d+/)[0]) || 0;
+    const index = Math.floor(hue / 51) % FOOD_COLORS.length;
+    return FOOD_COLORS[index];
   }
-  return colorStr || '#2ecc71';
-}
-
-function getFoodSprite(r, baseColor) {
-  const safeColor = snapColor(baseColor);
-  const safeR = Math.round(r);
-  const key = `${safeR}_${safeColor}`;
-  
-  if (!_foodSprites[key]) {
-    const cv = document.createElement('canvas');
-    cv.width = safeR * 2 + 4;
-    cv.height = safeR * 2 + 4;
-    const c = cv.getContext('2d');
-    const cx = cv.width / 2;
-    const cy = cv.height / 2;
-    
-    // Простой кружочек без глоу
-    c.beginPath();
-    c.arc(cx, cy, safeR, 0, Math.PI * 2);
-    c.fillStyle = safeColor;
-    c.fill();
-    
-    // Лёгкий блик (как в оригинале)
-    c.beginPath();
-    c.arc(cx - safeR * 0.3, cy - safeR * 0.3, safeR * 0.27, 0, Math.PI * 2);
-    c.fillStyle = 'rgba(255,255,255,0.28)';
-    c.fill();
-    
-    _foodSprites[key] = { canvas: cv, size: cv.width };
+  // Если уже наш цвет — берём его или дефолтный зелёный
+  for (const col of FOOD_COLORS) {
+    if (col.main === baseColor) return col;
   }
-  return _foodSprites[key];
+  return FOOD_COLORS[0];
 }
 
 function drawFoodList(fl, cx, cy) {
   for (const f of fl) {
     const fx = f.x - cx;
     const fy = f.y - cy;
-    if (fx < -40 || fx > W + 40 || fy < -40 || fy > H + 40) continue;
+    if (fx < -80 || fx > W + 80 || fy < -80 || fy > H + 80) continue;
     
     // Пульсация (дыхание)
     if (f.p === undefined) f.p = Math.random() * Math.PI * 2;
-    // В онлайне замедляем пульсацию чтобы не дёргалась
-    const speed = (gameMode === 'online') ? 0.008 : 0.04;
+    const speed = (gameMode === 'online') ? 0.008 : 0.025;
     f.p += speed;
-    const pulse = 1 + Math.sin(f.p) * 0.1;
+    const pulse = 1 + Math.sin(f.p) * 0.12;
+    const radius = (f.r || 5) * pulse;
     
-    const sprite = getFoodSprite(f.r, f.color);
-    const sw = sprite.size * pulse;
-    const sh = sprite.size * pulse;
+    // Получаем цвета для еды
+    const colorSet = getFoodColor(f.color);
     
-    ctx.drawImage(sprite.canvas, fx - sw/2, fy - sh/2, sw, sh);
+    // 1. РИСУЕМ СВЕЧЕНИЕ (градиентная тень)
+    const grad = ctx.createRadialGradient(fx, fy, 0, fx, fy, radius * 3.5);
+    grad.addColorStop(0, colorSet.glow);
+    grad.addColorStop(1, 'transparent');
+    
+    ctx.beginPath();
+    ctx.fillStyle = grad;
+    ctx.arc(fx, fy, radius * 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 2. РИСУЕМ ОСНОВНОЕ ТЕЛО (насыщенный центр)
+    ctx.beginPath();
+    ctx.arc(fx, fy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = colorSet.main;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = colorSet.main;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // 3. РИСУЕМ БЛИК (эффект стекла/вкусноты)
+    ctx.beginPath();
+    ctx.arc(fx - radius * 0.28, fy - radius * 0.28, radius * 0.24, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.fill();
+    
+    // 4. ВТОРОЙ МАЛЕНЬКИЙ БЛИК ДЛЯ ОБЪЁМА
+    ctx.beginPath();
+    ctx.arc(fx - radius * 0.48, fy - radius * 0.48, radius * 0.1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fill();
   }
 }
   
