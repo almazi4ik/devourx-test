@@ -2004,8 +2004,59 @@ function mkOfflineFood(){const rnd=Math.random();let size,r;if(rnd<0.75){size='s
 
 function mkBot(name,skinId){const x=300+Math.random()*(WORLD-600),y=300+Math.random()*(WORLD-600);const angle=Math.random()*Math.PI*2;const segs=[];for(let i=0;i<MIN_LEN;i++)segs.push({x:x-Math.cos(angle)*i*14,y:y-Math.sin(angle)*i*14});return{x,y,name,skinId:skinId||Math.floor(Math.random()*3),angle,tAngle:angle,speed:2.4+Math.random()*0.6,boosting:false,alive:true,length:MIN_LEN,score:MIN_LEN,segs,isMe:false,_growBuf:0,_thinkTimer:0,foodEaten:0};}
 
-function initOffline(){const spawnX=300+Math.random()*(WORLD-600),spawnY=300+Math.random()*(WORLD-600);const angle=Math.random()*Math.PI*2;const playerSegs=[];for(let i=0;i<MIN_LEN;i++)playerSegs.push({x:spawnX-Math.cos(angle)*i*14,y:spawnY-Math.sin(angle)*i*14});const startM=getStartMass();const me={x:spawnX,y:spawnY,name:pname,skinId:selSkin,angle,tAngle:angle,speed:2.8,boosting:false,alive:true,length:startM,score:startM,segs:playerSegs,isMe:true,_growBuf:0,foodEaten:0,_deathHandled:false};const usedNames=[...BOT_NAMES].sort(()=>Math.random()-.5).slice(0,OFFLINE_BOTS_COUNT);const bots=usedNames.map((n,i)=>mkBot(n,i%3));const foods=[];for(let i=0;i<OFFLINE_FOOD_COUNT;i++)foods.push(mkOfflineFood());offlineState={foods,bots,player:me};return{spawnX,spawnY};}
-
+function initOffline() {
+  const spawnX = 300 + Math.random() * (WORLD - 600);
+  const spawnY = 300 + Math.random() * (WORLD - 600);
+  const angle = Math.random() * Math.PI * 2;
+  
+  const playerSegs = [];
+  for (let i = 0; i < MIN_LEN; i++) {
+    playerSegs.push({
+      x: spawnX - Math.cos(angle) * i * 14,
+      y: spawnY - Math.sin(angle) * i * 14
+    });
+  }
+  
+  const startM = getStartMass();
+  const me = {
+    x: spawnX, y: spawnY,
+    name: pname,
+    skinId: selSkin,
+    angle: angle,
+    tAngle: angle,
+    speed: 2.8,
+    boosting: false,
+    alive: true,
+    length: startM,
+    score: startM,
+    segs: playerSegs,
+    isMe: true,
+    _growBuf: 0,
+    foodEaten: 0,
+    _deathHandled: false
+  };
+  
+  const usedNames = [...BOT_NAMES].sort(() => Math.random() - 0.5).slice(0, OFFLINE_BOTS_COUNT);
+  
+  // ══════ СОЗДАНИЕ БОТОВ С ПОДДЕРЖКОЙ ДОМИНАНТОВ ══════
+  const bots = usedNames.map((n, i) => {
+    const bot = mkBot(n, i % 3);
+    bot.isDominant = Math.random() < 0.2;      // 20% ботов — доминанты
+    bot._dominantMode = false;                 // не в режиме круга по умолчанию
+    bot._spinDirection = Math.random() < 0.5 ? 1 : -1;  // направление закрутки
+    bot._updateCounter = 0;                    // счётчик для оптимизации
+    return bot;
+  });
+  
+  const foods = [];
+  for (let i = 0; i < OFFLINE_FOOD_COUNT; i++) {
+    foods.push(mkOfflineFood());
+  }
+  
+  offlineState = { foods, bots, player: me };
+  return { spawnX, spawnY };
+}
+  
 function offlineGetR(score){return 6+(Math.min(score,1000)/1000)*22;}
 function offlineGetTurnSpeed(score){const t=Math.min(score,1000)/1000;return 0.18-t*0.125;}
 
