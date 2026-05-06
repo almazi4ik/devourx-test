@@ -2986,42 +2986,28 @@ function drawFoodList(fl, cx, cy) {
     const fy = f.y - cy;
     if (fx < -80 || fx > W + 80 || fy < -80 || fy > H + 80) continue;
     
-    // Пульсация (дыхание)
+    // Пульсация
     if (f.p === undefined) f.p = Math.random() * Math.PI * 2;
     const speed = (gameMode === 'online') ? 0.008 : 0.025;
     f.p += speed;
     const pulse = 1 + Math.sin(f.p) * 0.12;
     const radius = (f.r || 5) * pulse;
     
-    // Получаем цвета для еды
     const colorSet = getFoodColor(f.color);
     
-    // 1. РИСУЕМ СВЕЧЕНИЕ (градиентная тень)
-    const grad = ctx.createRadialGradient(fx, fy, 0, fx, fy, radius * 3.5);
-    grad.addColorStop(0, colorSet.glow);
-    grad.addColorStop(1, 'transparent');
-    
-    ctx.beginPath();
-    ctx.fillStyle = grad;
-    ctx.arc(fx, fy, radius * 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // 2. РИСУЕМ ОСНОВНОЕ ТЕЛО (насыщенный центр)
+    // ОСНОВНОЕ ТЕЛО (без свечения)
     ctx.beginPath();
     ctx.arc(fx, fy, radius, 0, Math.PI * 2);
     ctx.fillStyle = colorSet.main;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = colorSet.main;
     ctx.fill();
-    ctx.shadowBlur = 0;
     
-    // 3. РИСУЕМ БЛИК (эффект стекла/вкусноты)
+    // БОЛЬШОЙ БЛИК
     ctx.beginPath();
     ctx.arc(fx - radius * 0.28, fy - radius * 0.28, radius * 0.24, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     ctx.fill();
     
-    // 4. ВТОРОЙ МАЛЕНЬКИЙ БЛИК ДЛЯ ОБЪЁМА
+    // МАЛЕНЬКИЙ БЛИК ДЛЯ ОБЪЁМА
     ctx.beginPath();
     ctx.arc(fx - radius * 0.48, fy - radius * 0.48, radius * 0.1, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
