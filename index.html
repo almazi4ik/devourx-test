@@ -3725,10 +3725,13 @@ window.addEventListener('load',()=>{
   // Загружаем сохранённый ник
   const savedName = localStorage.getItem('dvx_name');
   if(savedName) document.getElementById('nameInput').value = savedName;
-  resize();          // ← ВОТ ТУТ ДОБАВЬ! Прямо перед initParticles()
+  resize();
   initParticles();
   if (currentBG==='water') initWaterFish();
   if (currentBG==='space') initSpaceNebula();
+  
+  // ══════ ЕЖЕДНЕВНАЯ НАГРАДА ══════
+  checkDailyReward();  // ← СЮДА ДОБАВЬ!
 });
   
 // Live обновление ника
