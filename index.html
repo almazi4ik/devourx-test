@@ -1868,6 +1868,7 @@ function showMenu(){
     document.getElementById('clanBtn').style.display='flex';
     showJoystick(false);updateXPBar();
     jbLoadScores().then(scores => updateBestMassWidget(scores));
+    showGameButtons();
   });
 }
 function showModeSelect(){
