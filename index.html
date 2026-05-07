@@ -3791,7 +3791,6 @@ jbLoadScores().then(scores=>updateBestMassWidget(scores));
 
 window.addEventListener('load',()=>{
   drawRobotIcon();applyLang();initRipples();applyBGTheme(currentBG);renderAccPanel();drawClanShield(null);initClanOnLoad();
-  // Загружаем сохранённый ник
   const savedName = localStorage.getItem('dvx_name');
   if(savedName) document.getElementById('nameInput').value = savedName;
   resize();
@@ -3799,8 +3798,13 @@ window.addEventListener('load',()=>{
   if (currentBG==='water') initWaterFish();
   if (currentBG==='space') initSpaceNebula();
   
-  // ══════ ЕЖЕДНЕВНАЯ НАГРАДА ══════
-  checkDailyReward();  // ← СЮДА ДОБАВЬ!
+  checkDailyReward();
+  
+  const friendsBtn = document.getElementById('friendsBtn');
+  if (friendsBtn) friendsBtn.onclick = openFriends;
+  
+  const dailyBtn = document.getElementById('dailyRewardsBtn');
+  if (dailyBtn) dailyBtn.onclick = openDailyRewards;
 });
   
 // Live обновление ника
