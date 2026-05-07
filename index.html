@@ -2752,6 +2752,7 @@ ws.onopen = () => {
           _prevScore=MIN_LEN;
           _foodCoinCounter=0;
           if(isMobile())showJoystick(true);
+          hideGameButtons();
           
           // Фикс для горизонтального режима
           setTimeout(()=>{
