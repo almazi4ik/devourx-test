@@ -1908,6 +1908,7 @@ function switchScreen(toId, onReady){
 
 function showMenu(){
   switchScreen('menuScreen', ()=>{
+   running = false;
     document.getElementById('hud').style.display='none';
     document.getElementById('xpBarWrap').style.display='block';
     document.getElementById('bestMassWidget').style.display='flex';
