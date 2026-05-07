@@ -5272,6 +5272,19 @@ function openDailyRewards() {
     alert(msg);
 }
 
+  // Добавляем стили для анимации наград (если их нет)
+const dailyStyle = document.createElement('style');
+dailyStyle.textContent = `
+  @keyframes popupIn {
+    from { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
+    to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  }
+`;
+if (!document.querySelector('#dailyStyle')) {
+  dailyStyle.id = 'dailyStyle';
+  document.head.appendChild(dailyStyle);
+}
+  
 document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
 document.head.appendChild(styleSheet);
 
