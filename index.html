@@ -1056,14 +1056,14 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
     <div class="srv-row selected" id="srvRow0" onclick="selectServer(0)">
       <div class="srv-dot green"></div>
       <div class="srv-info">
-        <div class="srv-name">europe_1</div>
+        <div class="srv-name">america_1</div>
       </div>
       <div class="srv-ping" id="srvPing0">—</div>
     </div>
     <div class="srv-row" id="srvRow1" onclick="selectServer(1)">
       <div class="srv-dot yellow"></div>
       <div class="srv-info">
-        <div class="srv-name">europe_2</div>
+        <div class="srv-name">europe_1</div>
       </div>
       <div class="srv-ping" id="srvPing1">—</div>
     </div>
@@ -2642,8 +2642,8 @@ function mkBotAt(x,y,name,skinId){
 
 // ══════ СЕРВЕР ОНЛАЙН ══════
 const SERVERS = [
-  { name:'europe_1', url:'wss://almazi4ik-devourx-server.hf.space' },
-  { name:'europe_2', url:'wss://devourx-server-1.onrender.com' }
+  { name:'america_1', url:'wss://almazi4ik-devourx-server.hf.space' },
+  { name:'europe_1', url:'wss://devourx-server-1.onrender.com' }
 ];
 let _selServer = parseInt(localStorage.getItem('dvx_server')||'0');
 function getServerUrl(){ return SERVERS[_selServer]?.url || SERVERS[0].url; }
@@ -2678,13 +2678,20 @@ function connectWS(){
     }
   },8000);
   
-  ws.onopen=()=>{
-    clearInterval(_loadInterval);
-    document.getElementById('loadBarFill').style.width='92%';
-    setLoadStatus(t('auth'));
-    const name=document.getElementById('nameInput').value.trim()||'Player';
-    ws.send(JSON.stringify({type:'join',name,skinId:selSkin,skinColor: (SKINS_DATA[selSkin] || SKINS_DATA[0]).b[0]
-  };
+ws.onopen = () => {
+  clearInterval(_loadInterval);
+  document.getElementById('loadBarFill').style.width = '92%';
+  setLoadStatus(t('auth'));
+  
+  // Небольшая задержка, чтобы соединение точно установилось
+  setTimeout(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({type:'join',name:pname,skinId:selSkin,skinColor:(SKINS_DATA[selSkin] || SKINS_DATA[0]).b[0]}));
+    } else {
+      console.warn('WebSocket not ready, state:', ws.readyState);
+    }
+  }, 100);
+}; 
   
   ws.onmessage=(e)=>{
     try{
