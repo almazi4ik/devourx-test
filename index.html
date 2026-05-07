@@ -5499,40 +5499,12 @@ async function loadIdFromAccount(accountPid) {
 
 // Отобразить ID в панели аккаунта
 function renderPlayerIdInAccount() {
-    const container = document.getElementById('accPlayerIdContainer');
-    if (!container) {
-        // Создаём контейнер, если его нет
-        const loggedInDiv = document.getElementById('accLoggedIn');
-        if (loggedInDiv && myPlayerId) {
-            const idHtml = `
-                <div id="accPlayerIdContainer" class="acc-card" style="margin-top:10px;">
-                    <div class="acc-label">🆔 ТВОЙ ID</div>
-                    <div style="display:flex; align-items:center; justify-content:space-between;">
-                        <div class="acc-value" style="font-family:'Fredoka One',cursive; font-size:22px; color:#a29bfe;">#${myPlayerId}</div>
-                        <button onclick="copyPlayerId()" style="background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:10px; padding:6px 12px; color:#a29bfe; font-size:12px; font-weight:800; cursor:pointer;">📋 КОПИРОВАТЬ</button>
-                    </div>
-                    <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:5px;">Дай этот ID другу, чтобы он мог добавить тебя!</div>
-                </div>
-            `;
-            // Вставляем после displayEmail или в конец
-            const accDisplay = document.getElementById('accDisplayEmail')?.parentElement?.parentElement;
-            if (accDisplay && accDisplay.parentNode) {
-                accDisplay.parentNode.insertAdjacentHTML('beforeend', idHtml);
-            }
-        }
-    } else {
-        // Обновляем существующий
-        container.innerHTML = `
-            <div class="acc-label">🆔 ТВОЙ ID</div>
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <div class="acc-value" style="font-family:'Fredoka One',cursive; font-size:22px; color:#a29bfe;">#${myPlayerId}</div>
-                <button onclick="copyPlayerId()" style="background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:10px; padding:6px 12px; color:#a29bfe; font-size:12px; font-weight:800; cursor:pointer;">📋 КОПИРОВАТЬ</button>
-            </div>
-            <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:5px;">Дай этот ID другу, чтобы он мог добавить тебя!</div>
-        `;
+    const valueEl = document.getElementById('accPlayerIdValue');
+    if (valueEl && myPlayerId) {
+        valueEl.textContent = `#${myPlayerId}`;
     }
 }
-
+  
 function copyPlayerId() {
     if (!myPlayerId) return;
     navigator.clipboard.writeText(`#${myPlayerId}`);
