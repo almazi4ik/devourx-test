@@ -1347,6 +1347,16 @@ onmouseout="this.style.transform='scale(1)'; this.style.borderColor='rgba(0,229,
         </div>
         <button class="acc-btn acc-btn-red" onclick="accLogout()">ВЫЙТИ ИЗ АККАУНТА</button>
       </div>
+
+      <!-- БЛОК ID (показывается всегда) -->
+<div id="accPlayerIdContainer" class="acc-card" style="margin-top:10px;">
+  <div class="acc-label">🆔 ТВОЙ ID</div>
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <div class="acc-value" id="accPlayerIdValue" style="font-family:'Fredoka One',cursive; font-size:22px; color:#a29bfe;">--</div>
+    <button onclick="copyPlayerId()" style="background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:10px; padding:6px 12px; color:#a29bfe; font-size:12px; font-weight:800; cursor:pointer;">📋 КОПИРОВАТЬ</button>
+  </div>
+  <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:5px;">Дай этот ID другу, чтобы он мог добавить тебя!</div>
+</div>
     </div>
     <!-- Stats tab -->
     <div class="sp-section" id="spTabStats">
