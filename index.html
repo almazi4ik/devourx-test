@@ -5380,6 +5380,225 @@ document.getElementById('inviteToClanBtn').onclick = () => {
     // Тут можно будет отправлять приглашения позже
     showToast('🚧 Скоро: отправка приглашений в клан!', '#a29bfe');
 };
+  // ══════ СИСТЕМА УНИКАЛЬНЫХ ID ══════
+const IDS_STORAGE_KEY = 'dvx_player_ids'; // ключ в Upstash
+let myPlayerId = null; // локальный ID игрока (без #)
+
+// Загрузка всех ID из Upstash
+async function loadAllIds() {
+    try {
+        const res = await fetch(`${UPSTASH_URL}/get/${IDS_STORAGE_KEY}`, {
+            headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
+        });
+        const data = await res.json();
+        let ids = data.result;
+        if (typeof ids === 'string') ids = JSON.parse(ids);
+        return Array.isArray(ids) ? ids : [];
+    } catch(e) { return []; }
+}
+
+// Сохранение всех ID в Upstash
+async function saveAllIds(ids) {
+    await fetch(`${UPSTASH_URL}/set/${IDS_STORAGE_KEY}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(JSON.stringify(ids))
+    });
+}
+
+// Генерация нового ID (следующий номер)
+async function generateNewId() {
+    const allIds = await loadAllIds();
+    let nextNum = 1;
+    if (allIds.length > 0) {
+        // Находим максимальный номер
+        const numbers = allIds.map(id => parseInt(id.replace('P', ''))).filter(n => !isNaN(n));
+        nextNum = Math.max(0, ...numbers) + 1;
+    }
+    return `P${nextNum}`;
+}
+
+// Получить или создать ID для текущего игрока
+async function getOrCreatePlayerId() {
+    // Сначала проверяем localStorage
+    const savedId = localStorage.getItem('dvx_player_id');
+    if (savedId && savedId.startsWith('P')) {
+        myPlayerId = savedId;
+        // Проверяем, есть ли ID в облаке (на случай, если потерялся)
+        const allIds = await loadAllIds();
+        if (!allIds.includes(myPlayerId)) {
+            allIds.push(myPlayerId);
+            await saveAllIds(allIds);
+        }
+        return myPlayerId;
+    }
+    
+    // Создаём новый ID
+    const newId = await generateNewId();
+    const allIds = await loadAllIds();
+    allIds.push(newId);
+    await saveAllIds(allIds);
+    
+    myPlayerId = newId;
+    localStorage.setItem('dvx_player_id', myPlayerId);
+    
+    // Если есть регистрация — привязываем ID к аккаунту
+    if (_authToken && _authPid) {
+        await saveIdToAccount(_authPid, myPlayerId);
+    }
+    
+    showToast(`🎉 Твой ID: #${myPlayerId}!`, '#a29bfe');
+    return myPlayerId;
+}
+
+// Привязать ID к аккаунту (при регистрации)
+async function saveIdToAccount(accountPid, playerId) {
+    try {
+        const key = `acc_id_${accountPid}`;
+        await fetch(`${UPSTASH_URL}/set/${key}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(JSON.stringify(playerId))
+        });
+    } catch(e) {}
+}
+
+// Получить ID по аккаунту (при логине)
+async function loadIdFromAccount(accountPid) {
+    try {
+        const key = `acc_id_${accountPid}`;
+        const res = await fetch(`${UPSTASH_URL}/get/${key}`, {
+            headers: { 'Authorization': `Bearer ${UPSTASH_TOKEN}` }
+        });
+        const data = await res.json();
+        let id = data.result;
+        if (typeof id === 'string') id = JSON.parse(id);
+        return id || null;
+    } catch(e) { return null; }
+}
+
+// Отобразить ID в панели аккаунта
+function renderPlayerIdInAccount() {
+    const container = document.getElementById('accPlayerIdContainer');
+    if (!container) {
+        // Создаём контейнер, если его нет
+        const loggedInDiv = document.getElementById('accLoggedIn');
+        if (loggedInDiv && myPlayerId) {
+            const idHtml = `
+                <div id="accPlayerIdContainer" class="acc-card" style="margin-top:10px;">
+                    <div class="acc-label">🆔 ТВОЙ ID</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div class="acc-value" style="font-family:'Fredoka One',cursive; font-size:22px; color:#a29bfe;">#${myPlayerId}</div>
+                        <button onclick="copyPlayerId()" style="background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:10px; padding:6px 12px; color:#a29bfe; font-size:12px; font-weight:800; cursor:pointer;">📋 КОПИРОВАТЬ</button>
+                    </div>
+                    <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:5px;">Дай этот ID другу, чтобы он мог добавить тебя!</div>
+                </div>
+            `;
+            // Вставляем после displayEmail или в конец
+            const accDisplay = document.getElementById('accDisplayEmail')?.parentElement?.parentElement;
+            if (accDisplay && accDisplay.parentNode) {
+                accDisplay.parentNode.insertAdjacentHTML('beforeend', idHtml);
+            }
+        }
+    } else {
+        // Обновляем существующий
+        container.innerHTML = `
+            <div class="acc-label">🆔 ТВОЙ ID</div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div class="acc-value" style="font-family:'Fredoka One',cursive; font-size:22px; color:#a29bfe;">#${myPlayerId}</div>
+                <button onclick="copyPlayerId()" style="background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:10px; padding:6px 12px; color:#a29bfe; font-size:12px; font-weight:800; cursor:pointer;">📋 КОПИРОВАТЬ</button>
+            </div>
+            <div style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:5px;">Дай этот ID другу, чтобы он мог добавить тебя!</div>
+        `;
+    }
+}
+
+function copyPlayerId() {
+    if (!myPlayerId) return;
+    navigator.clipboard.writeText(`#${myPlayerId}`);
+    showToast(`🆔 ID #${myPlayerId} скопирован!`, '#2ecc71');
+}
+
+// Поиск игрока по ID (для добавления в друзья)
+async function findPlayerById(playerId) {
+    // Убираем # если есть
+    const cleanId = playerId.replace(/^#/, '');
+    const allIds = await loadAllIds();
+    if (!allIds.includes(cleanId)) return null;
+    
+    // Пытаемся найти имя игрока (из лидерборда или кланов)
+    // Для начала — проверяем, не текущий ли это игрок
+    if (myPlayerId === cleanId) return { id: cleanId, name: pname, isMe: true };
+    
+    // Ищем в глобальном топе
+    try {
+        const scores = await jbLoadScores();
+        const playerScore = scores.find(s => s.pid === cleanId);
+        if (playerScore) return { id: cleanId, name: playerScore.name, isMe: false };
+    } catch(e) {}
+    
+    return { id: cleanId, name: `Player_${cleanId.slice(-4)}`, isMe: false };
+}
+
+// Добавление друга по ID
+async function addFriendById(playerId) {
+    const cleanId = playerId.replace(/^#/, '');
+    if (cleanId === myPlayerId) {
+        showToast('❌ Нельзя добавить самого себя', '#ff6b6b');
+        return false;
+    }
+    
+    const friends = loadFriends();
+    if (friends.includes(cleanId)) {
+        showToast(`⚠️ Игрок #${cleanId} уже в друзьях`, '#ff9f43');
+        return false;
+    }
+    
+    const player = await findPlayerById(cleanId);
+    if (!player) {
+        showToast(`❌ Игрок с ID #${cleanId} не найден`, '#ff6b6b');
+        return false;
+    }
+    
+    friends.push(cleanId);
+    saveFriends(friends);
+    renderFriendsList();
+    showToast(`✅ ${player.name} (#${cleanId}) добавлен в друзья!`, '#2ecc71');
+    return true;
+}
+
+// Обновляем функцию добавления друга (чтобы можно было по ID)
+// Находим кнопку добавления друга и меняем логику
+function initFriendById() {
+    const addBtn = document.getElementById('addFriendBtn');
+    const input = document.getElementById('friendNameInput');
+    if (addBtn) {
+        // Сохраняем старую обработку, но добавляем проверку на ID
+        const oldOnclick = addBtn.onclick;
+        addBtn.onclick = () => {
+            const val = input.value.trim();
+            if (val.startsWith('#') || (val.startsWith('P') && /^P\d+$/i.test(val))) {
+                addFriendById(val);
+            } else {
+                addFriend(val);
+            }
+            input.value = '';
+        };
+    }
+}
+
+// Инициализация всей системы ID
+async function initPlayerIdSystem() {
+    await getOrCreatePlayerId();
+    renderPlayerIdInAccount();
+    initFriendById();
+}
 </script>
 </body>
 </html>
