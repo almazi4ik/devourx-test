@@ -2617,6 +2617,7 @@ function startMazeMode(){
     running=true;surviveTimer=0;lastSurviveTick=performance.now();
     _xpFoodCounter=0;_foodCoinCounter=0;
     if(isMobile())showJoystick(true);
+    hideGameButtons();
     offlineTickInterval=setInterval(offlineTick,33);
     trackAch('games',1);
     mazeBreakTimeout=setTimeout(()=>{
