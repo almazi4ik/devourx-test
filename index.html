@@ -5601,6 +5601,7 @@ async function initPlayerIdSystem() {
     await getOrCreatePlayerId();
     renderPlayerIdInAccount();
     initFriendById();
+    if (typeof renderAccPanel === 'function') renderAccPanel();
 }
 </script>
 </body>
