@@ -5135,71 +5135,49 @@ const FIRST_LOAD_TIPS = [
   }, 350);
 })();
 
-  // ══════ ЕЖЕДНЕВНЫЕ НАГРАДЫ (v1.4) ══════
+// ══════ ЕЖЕДНЕВНЫЕ НАГРАДЫ ══════
 const DAILY_REWARDS = [
-    { day: 1, coins: 100, crystals: 0, message: '+100 монет за вход!' },
-    { day: 2, coins: 200, crystals: 0, message: '+200 монет за вход!' },
-    { day: 3, coins: 0, crystals: 5, message: '+5 кристаллов за вход!' },
-    { day: 4, coins: 300, crystals: 0, message: '+300 монет за вход!' },
-    { day: 5, coins: 0, crystals: 10, message: '+10 кристаллов за вход!' },
-    { day: 6, coins: 500, crystals: 0, message: '+500 монет за вход!' },
-    { day: 7, coins: 0, crystals: 50, message: '+50 КРИСТАЛЛОВ и РЕДКИЙ СКИН!' }
+    { day: 1, coins: 100, crystals: 0, message: '+100 монет' },
+    { day: 2, coins: 200, crystals: 0, message: '+200 монет' },
+    { day: 3, coins: 0, crystals: 5, message: '+5 кристаллов' },
+    { day: 4, coins: 300, crystals: 0, message: '+300 монет' },
+    { day: 5, coins: 0, crystals: 10, message: '+10 кристаллов' },
+    { day: 6, coins: 500, crystals: 0, message: '+500 монет' },
+    { day: 7, coins: 0, crystals: 50, message: '+50 КРИСТАЛЛОВ + СКИН!' }
 ];
 
 function checkDailyReward() {
     const today = new Date().toISOString().slice(0,10);
     const lastClaim = localStorage.getItem('dvx_last_claim');
+    if (lastClaim === today) return;
     
-    if (lastClaim !== today) {
-        // Получаем текущий стрик (череду дней)
-        let streak = parseInt(localStorage.getItem('dvx_streak') || '0');
-        const lastDate = localStorage.getItem('dvx_last_streak_date');
-        
-        // Если пропустил день — сбрасываем стрик
-        if (lastDate && lastDate !== yesterday()) {
-            streak = 0;
-        }
-        
-        // Следующий день стрика (максимум 7)
-        streak = (streak % 7) + 1;
-        
-        const reward = DAILY_REWARDS[streak - 1];
-        
-        // Выдаём награду
-        if (reward.coins > 0) {
-            essence += reward.coins;
-            syncEss();
-        }
-        if (reward.crystals > 0) {
-            crystals += reward.crystals;
-            syncCrystals();
-        }
-        
-        // Если день 7 — даём особый скин (например, sk_phoenix или sk_toxic)
-        if (streak === 7) {
-            const legendarySkin = SKINS_DATA.find(s => s.rarity === 'legendary' && !s.owned);
-            if (legendarySkin) {
-                legendarySkin.owned = true;
-                saveSkins();
-                showToast(`🎁 ДЕНЬ 7! Ты получил скин ${legendarySkin.key}!`, '#f9ca24');
-            } else {
-                // Если все легендарки уже есть — даём 100 кристаллов
-                crystals += 100;
-                syncCrystals();
-                showToast(`🎁 ДЕНЬ 7! Ты получил 100 КРИСТАЛЛОВ!`, '#f9ca24');
-            }
+    let streak = parseInt(localStorage.getItem('dvx_streak') || '0');
+    const lastDate = localStorage.getItem('dvx_last_streak_date');
+    if (lastDate && lastDate !== yesterday()) streak = 0;
+    streak = (streak % 7) + 1;
+    
+    const reward = DAILY_REWARDS[streak - 1];
+    if (reward.coins > 0) { essence += reward.coins; syncEss(); }
+    if (reward.crystals > 0) { crystals += reward.crystals; syncCrystals(); }
+    
+    if (streak === 7) {
+        const legendarySkin = SKINS_DATA.find(s => s.rarity === 'legendary' && !s.owned);
+        if (legendarySkin) {
+            legendarySkin.owned = true;
+            saveSkins();
+            showToast(`🎁 ДЕНЬ 7! Скин ${legendarySkin.key}!`, '#f9ca24');
         } else {
-            showToast(`🎁 ДЕНЬ ${streak}! ${reward.message}`, '#a29bfe');
+            crystals += 100;
+            syncCrystals();
+            showToast(`🎁 ДЕНЬ 7! 100 кристаллов!`, '#f9ca24');
         }
-        
-        // Сохраняем прогресс
-        localStorage.setItem('dvx_last_claim', today);
-        localStorage.setItem('dvx_streak', streak);
-        localStorage.setItem('dvx_last_streak_date', today);
-        
-        // Показываем крутое уведомление
-        showDailyRewardPopup(streak, reward);
+    } else {
+        showToast(`🎁 ДЕНЬ ${streak}! ${reward.message}`, '#a29bfe');
     }
+    
+    localStorage.setItem('dvx_last_claim', today);
+    localStorage.setItem('dvx_streak', streak);
+    localStorage.setItem('dvx_last_streak_date', today);
 }
 
 function yesterday() {
@@ -5208,38 +5186,19 @@ function yesterday() {
     return d.toISOString().slice(0,10);
 }
 
-function showDailyRewardPopup(day, reward) {
-    const popup = document.createElement('div');
-    popup.style.cssText = `
-        position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-        background:linear-gradient(160deg,#1a1a3e,#0f0f2a);
-        border:3px solid #a29bfe; border-radius:24px;
-        padding:24px; text-align:center; z-index:10000;
-        box-shadow:0 0 60px rgba(162,155,254,0.5);
-        animation:popupIn 0.4s ease;
-    `;
-    popup.innerHTML = `
-        <div style="font-size:64px; margin-bottom:12px;">🎁</div>
-        <div style="font-family:'Fredoka One',cursive; font-size:28px; color:#a29bfe;">ДЕНЬ ${day}!</div>
-        <div style="font-family:'Nunito',sans-serif; font-size:18px; margin:16px 0;">
-            ${reward.coins > 0 ? `💰 +${reward.coins} монет<br>` : ''}
-            ${reward.crystals > 0 ? `💎 +${reward.crystals} кристаллов<br>` : ''}
-            ${day === 7 ? '✨ + РЕДКИЙ СКИН ✨' : ''}
-        </div>
-        <button id="closeDailyPopup" style="background:#6c5ce7; border:none; border-radius:40px; padding:10px 28px; color:#fff; font-family:'Fredoka One',cursive; font-size:18px; cursor:pointer;">ЗАБРАТЬ!</button>
-    `;
-    document.body.appendChild(popup);
-    document.getElementById('closeDailyPopup').onclick = () => popup.remove();
+function openDailyRewards() {
+    const streak = parseInt(localStorage.getItem('dvx_streak') || '0');
+    const canClaim = localStorage.getItem('dvx_last_claim') !== new Date().toISOString().slice(0,10);
+    let msg = `📅 Твой стрик: ${streak}/7 дней\n\n`;
+    DAILY_REWARDS.forEach(r => {
+        const isClaimed = streak >= r.day;
+        msg += `${isClaimed ? '✅' : '🔸'} День ${r.day}: ${r.coins > 0 ? r.coins+'💰' : ''} ${r.crystals > 0 ? r.crystals+'💎' : ''}\n`;
+    });
+    if (canClaim && streak < 7) msg += `\n🎁 Забери награду ${streak+1}-го дня!`;
+    alert(msg);
 }
 
-// Добавляем анимацию
-const styleSheet = document.createElement("style");
-styleSheet.textContent = `
-    @keyframes popupIn {
-        from { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
-        to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-    }
-`;
+document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
 document.head.appendChild(styleSheet);
 </script>
 </body>
