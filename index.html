@@ -1130,43 +1130,6 @@ onmouseout="this.style.transform='scale(1)'; this.style.borderColor='rgba(0,229,
   </div>
 </div>
 
-  <!-- ОКНО ДРУЗЕЙ -->
-<div id="friendsOverlay" style="
-  display:none; position:fixed; inset:0; z-index:9998;
-  background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
-  align-items:center; justify-content:center;
-">
-  <div id="friendsPanel" style="
-    background:linear-gradient(160deg,#1a2a1a,#0d1a0d);
-    border:2px solid rgba(46,204,113,0.4); border-radius:20px;
-    width:min(360px, 90vw); max-height:80vh; display:flex; flex-direction:column;
-    overflow:hidden;
-  " onclick="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; background:rgba(0,0,0,0.5); border-bottom:1px solid rgba(46,204,113,0.2);">
-      <span style="font-family:'Fredoka One',cursive; font-size:20px; color:#2ecc71;">👥 ДРУЗЬЯ</span>
-      <button onclick="closeFriends()" style="
-        background:none; border:none; color:#fff; font-size:20px; cursor:pointer;
-        width:30px; height:30px; border-radius:50%;
-      " onmouseover="this.style.background='rgba(231,76,60,0.3)'; this.style.color='#e74c3c';"
-         onmouseout="this.style.background='none'; this.style.color='#fff';">✕</button>
-    </div>
-    
-    <!-- Добавить друга -->
-    <div style="padding:12px; display:flex; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08);">
-      <input id="friendNameInput" type="text" placeholder="Имя друга..." style="flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(46,204,113,0.3); border-radius:12px; padding:10px; color:#fff; font-size:14px; outline:none;">
-      <button id="addFriendBtn" style="background:#2ecc71; border:none; border-radius:12px; padding:0 16px; color:#fff; font-weight:800; cursor:pointer;">➕ ДОБАВИТЬ</button>
-    </div>
-    
-    <!-- Список друзей -->
-    <div id="friendsList" style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px;"></div>
-    
-    <!-- Пригласить в клан -->
-    <div style="padding:12px; border-top:1px solid rgba(255,255,255,0.08);">
-      <button id="inviteToClanBtn" style="width:100%; background:rgba(162,155,254,0.2); border:1px solid rgba(162,155,254,0.4); border-radius:12px; padding:10px; color:#a29bfe; font-weight:800; cursor:pointer;">⚔️ ПРИГЛАСИТЬ В КЛАН</button>
-    </div>
-  </div>
-</div>
-
 <!-- КЛАНЫ ОВЕРЛЕЙ + ПАНЕЛЬ -->
 <div id="clanOverlay"></div>
 <div id="clanPanel">
