@@ -1910,21 +1910,19 @@ document.getElementById('skinsBack').onclick=showMenu;
 document.getElementById('modeBackBtn').onclick=showMenu;
 
 // ══════ CANVAS ══════
-let canvas, ctx, mc, mctx, W, H;
-
-document.addEventListener('DOMContentLoaded', () => {
-    canvas = document.getElementById('gameCanvas');
-    if (!canvas) {
-        console.error('gameCanvas not found!');
-        return;
-    }
-    ctx = canvas.getContext('2d');
-    mc = document.getElementById('minimap');
+const canvas = document.getElementById('gameCanvas');
+if (!canvas) {
+    console.error('gameCanvas not found!');
+} else {
+    const ctx = canvas.getContext('2d');
+    const mc = document.getElementById('minimap');
+    const mctx = mc ? mc.getContext('2d') : null;
     if (mc) {
-        mctx = mc.getContext('2d');
         mc.width = 108;
         mc.height = 108;
     }
+}
+let W, H;
     resize();
 });
 
