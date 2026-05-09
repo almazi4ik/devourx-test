@@ -1357,7 +1357,23 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Google-вход
+// Обработка входа через Google (после редиректа) — ЭТО НОВЫЙ КОД
+firebase.auth().getRedirectResult()
+  .then((result) => {
+    if (result.user) {
+      console.log("✅ Успешный вход:", result.user.displayName);
+      loadCloudProgress();
+      showToast('✅ Добро пожаловать, ' + result.user.displayName + '!', '#2ecc71');
+    }
+  })
+  .catch((error) => {
+    console.error("❌ Ошибка входа:", error);
+    if (!error.message.includes('missing initial state')) {
+      showToast('❌ Ошибка входа: ' + error.message, '#ff6b6b');
+    }
+  });
+
+// Google-вход (теперь с redirect)
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
@@ -1385,7 +1401,9 @@ async function loadCloudProgress() {
       }
       showToast('☁️ Прогресс загружен!', '#a29bfe');
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('Cloud load error:', e);
+  }
 }
 
 // Сохранение прогресса в облако
