@@ -5302,80 +5302,155 @@ function showGameButtons() {
     const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
-// ══════ ЛЁГКОЕ ОБУЧЕНИЕ (рядом с кнопкой PLAY) ══════
-(function() {
-  if (localStorage.getItem('dvx_tutorial_light') === 'done') return;
+// ══════ КРАСИВЫЙ ТУТОРИАЛ (ЗАТЕМНЕНИЕ + ПОДСВЕТКА + МИГАНИЕ) ══════
+(function(){
+  localStorage.removeItem('dvx_tutorial_pro');
   
-  // Ждём появления кнопки PLAY
-  const checkInterval = setInterval(() => {
-    const playBtn = document.getElementById('playBtn');
-    if (!playBtn) return;
-    
-    clearInterval(checkInterval);
-    
-    // Получаем координаты кнопки
-    const rect = playBtn.getBoundingClientRect();
-    
-    // Создаём плашку с приветствием
-    const bubble = document.createElement('div');
-    bubble.id = 'tutorialBubble';
-    bubble.innerHTML = `
-      <div style="
-        position: fixed;
-        top: ${rect.top - 70}px;
-        left: ${rect.left + rect.width - 120}px;
-        background: #0d2b15;
-        border: 2px solid #2ecc71;
-        border-radius: 20px;
-        padding: 12px 18px;
-        font-family: 'Nunito', sans-serif;
-        font-size: 14px;
-        font-weight: bold;
-        color: #fff;
-        z-index: 99999;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        backdrop-filter: blur(4px);
-        text-align: center;
-        min-width: 180px;
-      ">
-        <div style="font-family:'Fredoka One',cursive; font-size:16px; color:#2ecc71; margin-bottom:6px;">👋 ПРИВЕТ!</div>
-        <div>Нажми <span style="color:#2ecc71; font-weight:900;">ИГРАТЬ</span>, чтобы начать</div>
-      </div>
-    `;
-    
-    // Стрелочка вниз к кнопке
-    const arrow = document.createElement('div');
-    arrow.style.cssText = `
-      position: fixed;
-      top: ${rect.top - 18}px;
-      left: ${rect.left + rect.width - 55}px;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 15px solid #2ecc71;
-      z-index: 99999;
-    `;
-    
-    document.body.appendChild(bubble);
-    document.body.appendChild(arrow);
-    
-    // Лёгкая пульсация кнопки
-    playBtn.style.transition = 'box-shadow 0.3s ease';
-    playBtn.style.boxShadow = '0 0 0 3px #2ecc71, 0 0 0 6px rgba(46,204,113,0.3)';
-    
-    // Убираем обучение при клике на PLAY или через 10 секунд
-    const finishTutorial = () => {
-      if (bubble) bubble.remove();
-      if (arrow) arrow.remove();
-      if (playBtn) playBtn.style.boxShadow = '';
-      localStorage.setItem('dvx_tutorial_light', 'done');
-    };
-    
-    playBtn.addEventListener('click', finishTutorial, { once: true });
-    setTimeout(finishTutorial, 10000);
-    
+  const playBtn = document.getElementById('playBtn');
+  if (!playBtn) {
+    console.log('❌ Кнопка PLAY не найдена');
+    return;
+  }
+  
+  // Удаляем старые
+  const oldOverlay = document.getElementById('tutOverlay');
+  if (oldOverlay) oldOverlay.remove();
+  
+  // Получаем координаты кнопки
+  const rect = playBtn.getBoundingClientRect();
+  
+  // ══════ 1. ЗАТЕМНЕНИЕ ФОНА (НО НАДПИСИ НЕ ЗАБЛОКИРОВАНЫ) ══════
+  const overlay = document.createElement('div');
+  overlay.id = 'tutOverlay';
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    z-index: 9998;
+    pointer-events: none;
+    transition: all 0.4s ease;
+  `;
+  document.body.appendChild(overlay);
+  
+  // Через 50мс запускаем плавное затемнение
+  setTimeout(() => {
+    overlay.style.background = 'rgba(0, 0, 0, 0.7)';
+    overlay.style.backdropFilter = 'blur(6px)';
+  }, 50);
+  
+  // ══════ 2. ПОДСВЕТКА КНОПКИ (СВЕТИТСЯ И МИГАЕТ) ══════
+  playBtn.style.position = 'relative';
+  playBtn.style.zIndex = '9999';
+  playBtn.style.transition = 'all 0.2s ease';
+  playBtn.style.boxShadow = '0 0 0 4px #2ecc71, 0 0 0 8px rgba(46,204,113,0.3)';
+  playBtn.style.transform = 'scale(1.02)';
+  
+  // Мигание (пульсация)
+  let pulseState = false;
+  const pulseInterval = setInterval(() => {
+    if (!playBtn) {
+      clearInterval(pulseInterval);
+      return;
+    }
+    pulseState = !pulseState;
+    playBtn.style.boxShadow = pulseState 
+      ? '0 0 0 6px #2ecc71, 0 0 0 14px rgba(46,204,113,0.5)'
+      : '0 0 0 4px #2ecc71, 0 0 0 8px rgba(46,204,113,0.3)';
+  }, 600);
+  
+  // ══════ 3. ПЛАВНОЕ ПОЯВЛЕНИЕ ТЕКСТА ══════
+  const tooltip = document.createElement('div');
+  tooltip.id = 'tutTooltip';
+  tooltip.style.cssText = `
+    position: fixed;
+    top: ${rect.top - 80}px;
+    left: ${rect.left + rect.width / 2 - 140}px;
+    width: 280px;
+    background: linear-gradient(135deg, #0d2b15, #0a1f10);
+    border: 2px solid #2ecc71;
+    border-radius: 20px;
+    padding: 18px 20px;
+    font-family: 'Nunito', sans-serif;
+    color: #fff;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    pointer-events: none;
+  `;
+  tooltip.innerHTML = `
+    <div style="font-family: 'Fredoka One', cursive; font-size: 22px; color: #2ecc71; margin-bottom: 10px;">
+      🐍 ДОБРО ПОЖАЛОВАТЬ!
+    </div>
+    <div style="font-size: 14px; line-height: 1.5; margin-bottom: 8px;">
+      Нажми <span style="color: #2ecc71; font-weight: 900;">«ИГРАТЬ»</span>, чтобы начать своё приключение
+    </div>
+    <div style="font-size: 12px; color: rgba(168,230,192,0.6); margin-top: 8px;">
+      💡 Это окно не мешает — можешь нажать прямо сейчас
+    </div>
+  `;
+  document.body.appendChild(tooltip);
+  
+  // Анимация появления
+  setTimeout(() => {
+    tooltip.style.opacity = '1';
+    tooltip.style.transform = 'translateY(0)';
   }, 100);
+  
+  // ══════ 4. СТРЕЛКА (с плавным появлением) ══════
+  const arrow = document.createElement('div');
+  arrow.id = 'tutArrow';
+  arrow.style.cssText = `
+    position: fixed;
+    top: ${rect.top - 12}px;
+    left: ${rect.left + rect.width / 2 - 12}px;
+    width: 24px;
+    height: 24px;
+    background: #2ecc71;
+    transform: rotate(45deg);
+    border-radius: 4px;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  `;
+  document.body.appendChild(arrow);
+  
+  setTimeout(() => {
+    arrow.style.opacity = '1';
+  }, 200);
+  
+  // ══════ 5. ЗАВЕРШЕНИЕ ПРИ НАЖАТИИ ИЛИ ЧЕРЕЗ 12 СЕКУНД ══════
+  const finishTutorial = () => {
+    if (overlay) overlay.remove();
+    if (tooltip) tooltip.remove();
+    if (arrow) arrow.remove();
+    if (playBtn) {
+      playBtn.style.boxShadow = '';
+      playBtn.style.transform = '';
+    }
+    clearInterval(pulseInterval);
+    localStorage.setItem('dvx_tutorial_pro', 'done');
+    console.log('✅ Обучение завершено!');
+  };
+  
+  // Клик по кнопке
+  playBtn.addEventListener('click', finishTutorial, { once: true });
+  
+  // Таймаут (12 секунд)
+  setTimeout(finishTutorial, 12000);
+  
+  // Клик на любом месте тоже может завершить (по желанию)
+  // overlay.addEventListener('click', finishTutorial);
+  
+  console.log('🎓ТУТОРИАЛ ЗАПУЩЕН!');
 })();
 </script>
 </body>
