@@ -1384,6 +1384,27 @@ async function loadCloudProgress() {
   }
 }
 
+async function saveCloudProgress() {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    await db.collection('users').doc(user.uid).set({
+      essence,
+      crystals,
+      playerXP,
+      selSkin,
+      skins: SKINS_DATA.map(s => ({ id: s.id, owned: s.owned })),
+      updatedAt: Date.now()
+    }, { merge: true });
+  } catch(e) {
+    console.warn('Cloud save error:', e);
+  }
+}
+
+setInterval(() => {
+  if (auth.currentUser) saveCloudProgress();
+}, 30000);
+
 // Сохранение прогресса в облако
 async function saveCloudProgress() {
   const user = auth.currentUser;
