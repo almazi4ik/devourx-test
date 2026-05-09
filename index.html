@@ -5302,267 +5302,80 @@ function showGameButtons() {
     const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
-// ══════ КРАСИВОЕ ОБУЧЕНИЕ ══════
+// ══════ ЛЁГКОЕ ОБУЧЕНИЕ (рядом с кнопкой PLAY) ══════
 (function() {
-  if (localStorage.getItem('dvx_tutorial_v2') === 'done') {
-    console.log('✅ Обучение уже пройдено');
-    return;
-  }
+  if (localStorage.getItem('dvx_tutorial_light') === 'done') return;
   
-  let currentStep = 0;
-  
-  const steps = [
-    {
-      element: '#playBtn',
-      title: '👋 ПРИВЕТ, ИГРОК!',
-      text: 'Нажми сюда, чтобы начать игру',
-      buttonText: 'НАЧНЁМ! →',
-      position: 'top'
-    },
-    {
-      element: '#offlineBtn',
-      title: '🤖 ОФЛАЙН-РЕЖИМ',
-      text: 'Здесь ты можешь играть против ботов даже без интернета! Отличный способ потренироваться.',
-      buttonText: 'ДАЛЕЕ →',
-      position: 'top'
-    },
-    {
-      element: '#onlineBtn',
-      title: '🌐 ОНЛАЙН-БИТВЫ',
-      text: 'Сражайся с реальными игроками по всему миру. Покажи, на что способен!',
-      buttonText: 'ДАЛЕЕ →',
-      position: 'top'
-    },
-    {
-      element: '#mazeBtn',
-      title: '🏛️ ЛАБИРИНТ',
-      text: 'Уникальный режим с узкими коридорами и разрушающимися стенами!',
-      buttonText: 'ДАЛЕЕ →',
-      position: 'top'
-    },
-    {
-      element: null,
-      title: '🎉 ПОГНАЛИ!',
-      text: 'Ты готов! Выбирай любой режим и становись королём змей! 🐍',
-      buttonText: 'ГОУ! 🚀',
-      position: 'center'
-    }
-  ];
-  
-  function createModal(step) {
-    // Удаляем старый если есть
-    const old = document.getElementById('tutorialModal');
-    if (old) old.remove();
+  // Ждём появления кнопки PLAY
+  const checkInterval = setInterval(() => {
+    const playBtn = document.getElementById('playBtn');
+    if (!playBtn) return;
     
-    const s = step;
-    const modal = document.createElement('div');
-    modal.id = 'tutorialModal';
-    modal.style.cssText = `
+    clearInterval(checkInterval);
+    
+    // Получаем координаты кнопки
+    const rect = playBtn.getBoundingClientRect();
+    
+    // Создаём плашку с приветствием
+    const bubble = document.createElement('div');
+    bubble.id = 'tutorialBubble';
+    bubble.innerHTML = `
+      <div style="
+        position: fixed;
+        top: ${rect.top - 70}px;
+        left: ${rect.left + rect.width - 120}px;
+        background: #0d2b15;
+        border: 2px solid #2ecc71;
+        border-radius: 20px;
+        padding: 12px 18px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+        z-index: 99999;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        backdrop-filter: blur(4px);
+        text-align: center;
+        min-width: 180px;
+      ">
+        <div style="font-family:'Fredoka One',cursive; font-size:16px; color:#2ecc71; margin-bottom:6px;">👋 ПРИВЕТ!</div>
+        <div>Нажми <span style="color:#2ecc71; font-weight:900;">ИГРАТЬ</span>, чтобы начать</div>
+      </div>
+    `;
+    
+    // Стрелочка вниз к кнопке
+    const arrow = document.createElement('div');
+    arrow.style.cssText = `
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 20000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.3s ease;
+      top: ${rect.top - 18}px;
+      left: ${rect.left + rect.width - 55}px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 15px solid #2ecc71;
+      z-index: 99999;
     `;
     
-    // Если есть элемент для подсветки
-    if (s.element && s.element !== null) {
-      const el = document.querySelector(s.element);
-      if (el) {
-        el.style.transition = 'all 0.3s ease';
-        el.style.boxShadow = '0 0 0 4px #2ecc71, 0 0 0 8px rgba(46, 204, 113, 0.3)';
-        el.style.transform = 'scale(1.02)';
-        
-        // Анимация пульсации
-        let pulse = true;
-        const pulseInterval = setInterval(() => {
-          if (!el || !pulse) {
-            clearInterval(pulseInterval);
-            return;
-          }
-          el.style.boxShadow = el.style.boxShadow === '0 0 0 4px #2ecc71, 0 0 0 8px rgba(46, 204, 113, 0.3)'
-            ? '0 0 0 6px #2ecc71, 0 0 0 12px rgba(46, 204, 113, 0.5)'
-            : '0 0 0 4px #2ecc71, 0 0 0 8px rgba(46, 204, 113, 0.3)';
-        }, 600);
-        
-        modal._pulseInterval = pulseInterval;
-        
-        // Получаем позицию элемента
-        const rect = el.getBoundingClientRect();
-        const isTop = s.position === 'top';
-        
-        modal.innerHTML = `
-          <div style="
-            background: linear-gradient(135deg, #0a2a1a, #0d351f);
-            border: 2px solid #2ecc71;
-            border-radius: 24px;
-            padding: 24px;
-            max-width: 320px;
-            width: 85%;
-            text-align: center;
-            animation: slideUp 0.4s ease;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-          ">
-            <div style="font-family: 'Fredoka One', cursive; font-size: 28px; color: #2ecc71; margin-bottom: 12px;">
-              ${s.title}
-            </div>
-            <div style="font-family: 'Nunito', sans-serif; font-size: 15px; color: #e8f5e9; line-height: 1.5; margin-bottom: 20px;">
-              ${s.text}
-            </div>
-            <button id="tutorialNextBtn" style="
-              background: #2ecc71;
-              border: none;
-              border-radius: 50px;
-              padding: 12px 28px;
-              font-family: 'Fredoka One', cursive;
-              font-size: 16px;
-              color: #0a1f10;
-              cursor: pointer;
-              transition: transform 0.2s, box-shadow 0.2s;
-              box-shadow: 0 4px 12px rgba(46,204,113,0.3);
-            " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 16px rgba(46,204,113,0.5)';"
-            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(46,204,113,0.3)';">${s.buttonText}</button>
-          </div>
-        `;
-        
-        // Стрелка указывающая на элемент
-        const arrow = document.createElement('div');
-        arrow.style.cssText = `
-          position: fixed;
-          ${isTop ? `top: ${rect.bottom + 5}px;` : `bottom: ${window.innerHeight - rect.top + 5}px;`}
-          left: ${rect.left + rect.width/2 - 12}px;
-          width: 24px;
-          height: 24px;
-          background: #2ecc71;
-          transform: rotate(45deg);
-          border-radius: 4px;
-          z-index: 20001;
-          box-shadow: -2px -2px 4px rgba(0,0,0,0.1);
-        `;
-        modal.appendChild(arrow);
-      } else {
-        // Элемент не найден, показываем просто центр
-        modal.innerHTML = `
-          <div style="
-            background: linear-gradient(135deg, #0a2a1a, #0d351f);
-            border: 2px solid #2ecc71;
-            border-radius: 24px;
-            padding: 24px;
-            max-width: 320px;
-            width: 85%;
-            text-align: center;
-            animation: slideUp 0.4s ease;
-          ">
-            <div style="font-family: 'Fredoka One', cursive; font-size: 28px; color: #2ecc71; margin-bottom: 12px;">
-              ${s.title}
-            </div>
-            <div style="font-family: 'Nunito', sans-serif; font-size: 15px; color: #e8f5e9; line-height: 1.5; margin-bottom: 20px;">
-              ${s.text}
-            </div>
-            <button id="tutorialNextBtn" style="
-              background: #2ecc71;
-              border: none;
-              border-radius: 50px;
-              padding: 12px 28px;
-              font-family: 'Fredoka One', cursive;
-              font-size: 16px;
-              color: #0a1f10;
-              cursor: pointer;
-            ">${s.buttonText}</button>
-          </div>
-        `;
-      }
-    } else {
-      // Центральный модал без стрелки
-      modal.innerHTML = `
-        <div style="
-          background: linear-gradient(135deg, #0a2a1a, #0d351f);
-          border: 2px solid #2ecc71;
-          border-radius: 24px;
-          padding: 32px;
-          max-width: 320px;
-          width: 85%;
-          text-align: center;
-          animation: slideUp 0.4s ease;
-        ">
-          <div style="font-family: 'Fredoka One', cursive; font-size: 32px; color: #2ecc71; margin-bottom: 16px;">
-            ${s.title}
-          </div>
-          <div style="font-family: 'Nunito', sans-serif; font-size: 16px; color: #e8f5e9; line-height: 1.5; margin-bottom: 24px;">
-            ${s.text}
-          </div>
-          <button id="tutorialNextBtn" style="
-            background: #2ecc71;
-            border: none;
-            border-radius: 50px;
-            padding: 14px 32px;
-            font-family: 'Fredoka One', cursive;
-            font-size: 18px;
-            color: #0a1f10;
-            cursor: pointer;
-          ">${s.buttonText}</button>
-        </div>
-      `;
-    }
+    document.body.appendChild(bubble);
+    document.body.appendChild(arrow);
     
-    document.body.appendChild(modal);
+    // Лёгкая пульсация кнопки
+    playBtn.style.transition = 'box-shadow 0.3s ease';
+    playBtn.style.boxShadow = '0 0 0 3px #2ecc71, 0 0 0 6px rgba(46,204,113,0.3)';
     
-    // Добавляем анимации
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      @keyframes slideUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `;
-    if (!document.querySelector('#tutorialAnimStyle')) {
-      style.id = 'tutorialAnimStyle';
-      document.head.appendChild(style);
-    }
+    // Убираем обучение при клике на PLAY или через 10 секунд
+    const finishTutorial = () => {
+      if (bubble) bubble.remove();
+      if (arrow) arrow.remove();
+      if (playBtn) playBtn.style.boxShadow = '';
+      localStorage.setItem('dvx_tutorial_light', 'done');
+    };
     
-    document.getElementById('tutorialNextBtn').onclick = () => nextStep(modal);
-  }
-  
-  function nextStep(modal) {
-    // Очищаем стили с элемента
-    const step = steps[currentStep];
-    if (step && step.element && step.element !== null) {
-      const el = document.querySelector(step.element);
-      if (el) {
-        el.style.boxShadow = '';
-        el.style.transform = '';
-        if (modal && modal._pulseInterval) clearInterval(modal._pulseInterval);
-      }
-    }
+    playBtn.addEventListener('click', finishTutorial, { once: true });
+    setTimeout(finishTutorial, 10000);
     
-    if (modal) modal.remove();
-    currentStep++;
-    
-    if (currentStep < steps.length) {
-      createModal(steps[currentStep]);
-    } else {
-      localStorage.setItem('dvx_tutorial_v2', 'done');
-      console.log('✅ Обучение завершено!');
-    }
-  }
-  
-  // Запускаем через 1 секунду после загрузки
-  setTimeout(() => {
-    if (localStorage.getItem('dvx_tutorial_v2') !== 'done') {
-      createModal(steps[0]);
-    }
-  }, 1000);
+  }, 100);
 })();
 </script>
 </body>
