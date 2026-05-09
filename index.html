@@ -5302,6 +5302,213 @@ function showGameButtons() {
     const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
+// ══════ СИСТЕМА ОБУЧЕНИЯ ДЛЯ НОВИЧКОВ ══════
+(function() {
+  // Проверяем, нужно ли показывать обучение
+  if (localStorage.getItem('dvx_tutorial') === 'done') return;
+  
+  let currentStep = 0;
+  let overlay = null;
+  let active = false;
+  
+  // Шаги обучения
+  const steps = [
+    {
+      selector: '#playBtn',
+      title: '🎮 НАЧНИ ИГРУ',
+      text: 'Нажми сюда, чтобы выбрать режим и начать игру.',
+      position: 'top'
+    },
+    {
+      selector: '#skinsMenuBtn',
+      title: '🎨 КАСТОМИЗАЦИЯ',
+      text: 'Здесь ты можешь купить и надеть крутые скины на свою змейку.',
+      position: 'top'
+    },
+    {
+      selector: '#achMenuBtn',
+      title: '🏆 ДОСТИЖЕНИЯ',
+      text: 'Выполняй задания, чтобы получать монеты и опыт!',
+      position: 'top'
+    },
+    {
+      selector: '#lbMenuBtn',
+      title: '📊 РЕЙТИНГ',
+      text: 'Соревнуйся с другими игроками в ежедневном, недельном и общем топе.',
+      position: 'top'
+    },
+    {
+      selector: '#musicMenuBtn',
+      title: '🎵 МУЗЫКА',
+      text: 'Включи или выключи фон. Тебе решать!',
+      position: 'top'
+    },
+    {
+      selector: '.name-input',
+      title: '✏️ ТВОЙ НИК',
+      text: 'Придумай имя, чтобы тебя запомнили!',
+      position: 'bottom'
+    },
+    {
+      selector: '.coins-fixed',
+      title: '💰 МОНЕТЫ И КРИСТАЛЛЫ',
+      text: 'Покупай новые скины за золото и редкие — за кристаллы.',
+      position: 'bottom'
+    },
+    {
+      selector: '#gearBtn',
+      title: '⚙️ НАСТРОЙКИ',
+      text: 'Тут можно сменить язык, фон или войти в аккаунт.',
+      position: 'top'
+    }
+  ];
+  
+  function createOverlay() {
+    if (overlay) return;
+    
+    overlay = document.createElement('div');
+    overlay.id = 'tutorialOverlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 10000;
+      pointer-events: all;
+      transition: background 0.3s ease;
+    `;
+    document.body.appendChild(overlay);
+    
+    const tooltip = document.createElement('div');
+    tooltip.id = 'tutorialTooltip';
+    tooltip.style.cssText = `
+      position: fixed;
+      background: linear-gradient(135deg, #0a1f10, #0d2b15);
+      border: 2px solid #2ecc71;
+      border-radius: 16px;
+      padding: 16px 20px;
+      max-width: 280px;
+      z-index: 10001;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      font-family: 'Nunito', sans-serif;
+      color: #fff;
+      pointer-events: all;
+      backdrop-filter: blur(4px);
+    `;
+    overlay.appendChild(tooltip);
+    
+    const arrow = document.createElement('div');
+    arrow.id = 'tutorialArrow';
+    arrow.style.cssText = `
+      position: fixed;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      z-index: 10001;
+      pointer-events: none;
+    `;
+    overlay.appendChild(arrow);
+  }
+  
+  function highlightElement(el, position) {
+    if (!el || !overlay) return;
+    
+    const rect = el.getBoundingClientRect();
+    const tooltip = document.getElementById('tutorialTooltip');
+    const arrow = document.getElementById('tutorialArrow');
+    
+    // Создаём "подсветку" через outline
+    el.style.outline = '3px solid #2ecc71';
+    el.style.outlineOffset = '4px';
+    el.style.transition = 'outline 0.2s ease';
+    
+    // Позиционируем тултип
+    let top, left;
+    const step = steps[currentStep];
+    const pos = step.position || 'top';
+    
+    if (pos === 'top') {
+      top = rect.top - 80;
+      left = rect.left + rect.width / 2 - 140;
+      arrow.style.borderTop = 'none';
+      arrow.style.borderBottom = '10px solid #2ecc71';
+      arrow.style.top = rect.top - 10 + 'px';
+      arrow.style.left = rect.left + rect.width / 2 - 10 + 'px';
+    } else {
+      top = rect.bottom + 20;
+      left = rect.left + rect.width / 2 - 140;
+      arrow.style.borderTop = '10px solid #2ecc71';
+      arrow.style.borderBottom = 'none';
+      arrow.style.top = rect.bottom - 5 + 'px';
+      arrow.style.left = rect.left + rect.width / 2 - 10 + 'px';
+    }
+    
+    tooltip.style.top = Math.max(10, Math.min(top, window.innerHeight - 200)) + 'px';
+    tooltip.style.left = Math.max(10, left) + 'px';
+    tooltip.innerHTML = `
+      <div style="font-family:'Fredoka One',cursive; font-size:18px; color:#2ecc71; margin-bottom:8px;">${step.title}</div>
+      <div style="font-size:14px; line-height:1.5; margin-bottom:16px;">${step.text}</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button id="tutorialSkip" style="background:transparent; border:1px solid rgba(255,255,255,0.3); border-radius:20px; padding:5px 12px; color:rgba(255,255,255,0.6); cursor:pointer; font-size:12px;">Пропустить</button>
+        <button id="tutorialNext" style="background:#2ecc71; border:none; border-radius:20px; padding:5px 16px; color:#0a1f10; font-weight:800; cursor:pointer; font-size:12px;">${currentStep === steps.length - 1 ? 'ГОТОВО' : 'ДАЛЕЕ →'}</button>
+      </div>
+    `;
+    
+    document.getElementById('tutorialSkip').onclick = finishTutorial;
+    document.getElementById('tutorialNext').onclick = nextStep;
+  }
+  
+  function clearHighlight() {
+    const prevEl = document.querySelector(steps[currentStep - 1]?.selector);
+    if (prevEl) {
+      prevEl.style.outline = '';
+    }
+  }
+  
+  function nextStep() {
+    clearHighlight();
+    currentStep++;
+    if (currentStep >= steps.length) {
+      finishTutorial();
+    } else {
+      showStep();
+    }
+  }
+  
+  function showStep() {
+    if (!active) return;
+    const step = steps[currentStep];
+    const el = document.querySelector(step.selector);
+    if (el) {
+      highlightElement(el, step.position);
+    } else {
+      // Если элемент не найден (например, кнопка скрыта), пропускаем шаг
+      nextStep();
+    }
+  }
+  
+  function finishTutorial() {
+    active = false;
+    if (overlay) overlay.remove();
+    clearHighlight();
+    localStorage.setItem('dvx_tutorial', 'done');
+  }
+  
+  // Запускаем обучение через небольшую задержку, чтобы всё прогрузилось
+  setTimeout(() => {
+    // Проверяем ещё раз, может уже показали
+    if (localStorage.getItem('dvx_tutorial') === 'done') return;
+    // Не показываем во время игры
+    if (running) return;
+    
+    active = true;
+    createOverlay();
+    showStep();
+  }, 500);
+})();
 </script>
 </body>
 </html>
