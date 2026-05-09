@@ -1360,15 +1360,8 @@ const db = firebase.firestore();
 // Google-вход
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      const user = result.user;
-      showToast('✅ Добро пожаловать, ' + user.displayName + '!', '#2ecc71');
-      loadCloudProgress();
-    })
-    .catch((error) => {
-      showToast('❌ Ошибка входа: ' + error.message, '#ff6b6b');
-    });
+  provider.setCustomParameters({ prompt: 'select_account' });
+  auth.signInWithRedirect(provider);
 }
 
 // Загрузка прогресса из облака
