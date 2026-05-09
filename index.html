@@ -1909,23 +1909,36 @@ document.getElementById('skinsMenuBtn').onclick=showSkins;
 document.getElementById('skinsBack').onclick=showMenu;
 document.getElementById('modeBackBtn').onclick=showMenu;
 
-// ══════ CANVAS ══════
+// ══════ CANVAS И ВСЕ ОБРАБОТЧИКИ ══════
 let canvas, ctx, mc, mctx, W, H;
 
-canvas = document.getElementById('gameCanvas');
-if (canvas) {
+function initCanvasAndEvents() {
+    canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        console.error('gameCanvas not found!');
+        return;
+    }
     ctx = canvas.getContext('2d');
-} else {
-    console.error('gameCanvas not found!');
+    
+    mc = document.getElementById('minimap');
+    if (mc) {
+        mctx = mc.getContext('2d');
+        mc.width = 108;
+        mc.height = 108;
+    }
+    
+    // ВСЕ ОБРАБОТЧИКИ ТОЛЬКО ЗДЕСЬ, ПОСЛЕ ПРОВЕРКИ
+    canvas.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    canvas.addEventListener('mousedown', e => { if (e.button === 0) boosting = true; });
+    canvas.addEventListener('mouseup', e => { if (e.button === 0) boosting = false; });
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); mx = e.touches[0].clientX; my = e.touches[0].clientY; }, { passive: false });
+    canvas.addEventListener('touchstart', () => boosting = true, { passive: true });
+    canvas.addEventListener('touchend', () => boosting = false, { passive: true });
+    
+    // Запускаем resize после инициализации
+    resize();
 }
-
-mc = document.getElementById('minimap');
-if (mc) {
-    mctx = mc.getContext('2d');
-    mc.width = 108;
-    mc.height = 108;
-}
-
+  
 function resize(){
   const isMobileDevice = isMobile();
   
@@ -1957,15 +1970,8 @@ function resize(){
   }
 }
 
-// ══════ ВСЕ ОБРАБОТЧИКИ CANVAS ЗАВЕРНИ В ПРОВЕРКУ ══════
-if (canvas) {
-    canvas.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    canvas.addEventListener('mousedown', e => { if (e.button === 0) boosting = true; });
-    canvas.addEventListener('mouseup', e => { if (e.button === 0) boosting = false; });
-    canvas.addEventListener('touchmove', e => { e.preventDefault(); mx = e.touches[0].clientX; my = e.touches[0].clientY; }, { passive: false });
-    canvas.addEventListener('touchstart', () => boosting = true, { passive: true });
-    canvas.addEventListener('touchend', () => boosting = false, { passive: true });
-}
+// Вызываем после полной загрузки DOM
+document.addEventListener('DOMContentLoaded', initCanvasAndEvents);
   
 // ══════ PARTICLES ══════
 const PARTICLE_COUNT = isMobile() ? 12 : 38; // Меньше частиц на телефонах
