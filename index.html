@@ -3542,115 +3542,40 @@ document.addEventListener('pointerdown',e=>{if(running)return;const color=curren
 let _playerId = localStorage.getItem('dvx_pid');
 if(!_playerId){ _playerId = 'p_'+(Date.now().toString(36)+Math.random().toString(36).slice(2)); localStorage.setItem('dvx_pid',_playerId); }
 
-// ══════ AUTH ══════
-const AUTH_URL = 'https://devourx-server.onrender.com';
-let _authToken = localStorage.getItem('dvx_token') || null;
-let _authEmail = localStorage.getItem('dvx_email') || null;
-let _authPid   = localStorage.getItem('dvx_pid2')  || null;
-let _accMode   = 'login';
-
-function setAccMode(mode) {
-  _accMode = mode;
-  document.getElementById('accModeLogin').classList.toggle('active', mode === 'login');
-  document.getElementById('accModeReg').classList.toggle('active', mode === 'register');
-  document.getElementById('accSubmitBtn').textContent = mode === 'login' ? 'ВОЙТИ' : 'ЗАРЕГИСТРИРОВАТЬСЯ';
-  document.getElementById('accError').textContent = '';
-  document.getElementById('accSuccess').textContent = '';
-  
-  // Меняем текст Google-кнопки
-  const googleBtn = document.getElementById('googleAuthBtn');
-  if (googleBtn) {
-    if (mode === 'login') {
-      googleBtn.innerHTML = '🅰 Войти через Google';
-    } else {
-      googleBtn.innerHTML = '🅰 Зарегистрироваться через Google';
-    }
-  }
-}
-
-async function accSubmit() {
-  const email = document.getElementById('accEmail').value.trim();
-  const pass  = document.getElementById('accPass').value;
-  const errEl = document.getElementById('accError');
-  const okEl  = document.getElementById('accSuccess');
-  errEl.textContent = ''; okEl.textContent = '';
-  if (!email || !pass) { errEl.textContent = 'Введи email и пароль'; return; }
-  const btn = document.getElementById('accSubmitBtn');
-  const origText = btn.textContent;
-  btn.textContent = '...'; btn.disabled = true;
-  try {
-    const url = _accMode === 'login' ? `${AUTH_URL}/auth/login` : `${AUTH_URL}/auth/register`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass })
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) {
-      errEl.textContent = data.error || 'Ошибка';
-      btn.textContent = origText; btn.disabled = false;
-      return;
-    }
-    _authToken = data.token; _authEmail = data.email; _authPid = data.pid;
-    localStorage.setItem('dvx_token', _authToken);
-    localStorage.setItem('dvx_email', _authEmail);
-    localStorage.setItem('dvx_pid2',  _authPid);
-    if (_accMode === 'register' && data.newAccount) {
-      essence = Math.min(9999999, essence + 10000); syncEss();
-      addXP(1000);
-      trackAch('register', 1);
-      showToast('🎉 +10 000 монет за регистрацию!', '#f9ca24');
-      okEl.textContent = '🎉 Аккаунт создан! +10 000 монет';
-    } else {
-      okEl.textContent = '✅ Добро пожаловать!';
-    }
-    setTimeout(() => renderAccPanel(), 800);
-  } catch(e) {
-    errEl.textContent = 'Нет связи с сервером';
-  }
-  btn.textContent = origText; btn.disabled = false;
-}
-
 function accLogout() {
-  _authToken = null; _authEmail = null; _authPid = null;
-  localStorage.removeItem('dvx_token');
-  localStorage.removeItem('dvx_email');
-  localStorage.removeItem('dvx_pid2');
-  renderAccPanel();
-  showToast('👋 Вышел из аккаунта', '#a29bfe');
+  auth.signOut().then(() => {
+    showToast('👋 Вышел из аккаунта', '#a29bfe');
+    renderAccPanel();
+    // Сбрасываем локальный прогресс (по желанию)
+    essence = 18;
+    crystals = 0;
+    playerXP = 0;
+    syncEss();
+    syncCrystals();
+    updateXPBar();
+  }).catch((error) => {
+    showToast('❌ Ошибка выхода: ' + error.message, '#ff6b6b');
+  });
 }
 
 function renderAccPanel() {
   const loggedOut = document.getElementById('accLoggedOut');
   const loggedIn  = document.getElementById('accLoggedIn');
   if (!loggedOut || !loggedIn) return;
-  if (_authEmail) {
+  
+  const user = auth.currentUser;
+  if (user) {
+    // Залогинен
     loggedOut.style.display = 'none';
     loggedIn.style.display  = 'block';
-    document.getElementById('accDisplayEmail').textContent = _authEmail;
-    document.getElementById('accDisplayPid').textContent   = _authPid || '—';
+    document.getElementById('accDisplayEmail').textContent = user.email || user.displayName;
+    document.getElementById('accDisplayPid').textContent = user.uid.slice(-8);
   } else {
+    // Не залогинен
     loggedOut.style.display = 'block';
     loggedIn.style.display  = 'none';
   }
-  // renderPlayerIdInAccount();
 }
-
-// Проверяем сохранённую сессию при загрузке
-(async function initAuth() {
-  if (!_authToken) return;
-  try {
-    const res = await fetch(`${AUTH_URL}/auth/check`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: _authToken })
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) { accLogout(); return; }
-    _authEmail = data.email; _authPid = data.pid;
-    localStorage.setItem('dvx_email', _authEmail);
-  } catch(e) { /* offline — оставляем сессию */ }
-})();
 
 // ══════ ЛИДЕРБОРДЫ (Daily, Weekly, All-Time) ══════
 function getDailyKey(){return'lb_daily_'+new Date().toISOString().slice(0,10);}
