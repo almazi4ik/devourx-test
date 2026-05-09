@@ -1358,6 +1358,7 @@ async function loadCloudProgress() {
   try {
     const doc = await db.collection('users').doc(user.uid).get();
     if (doc.exists) {
+      // Существующий пользователь — загружаем данные
       const data = doc.data();
       if (data.essence) { essence = data.essence; syncEss(); }
       if (data.crystals) { crystals = data.crystals; syncCrystals(); }
@@ -1371,6 +1372,19 @@ async function loadCloudProgress() {
         saveSkins();
       }
       showToast('☁️ Прогресс загружен!', '#a29bfe');
+    } else {
+      // ⭐ НОВЫЙ ПОЛЬЗОВАТЕЛЬ! ДАЁМ БОНУС (1500 монет + 250 XP)
+      essence = Math.min(9999999, essence + 1500);
+      crystals = Math.min(9999999, crystals + 0);  // кристаллы не даём
+      playerXP = Math.min(9999999, playerXP + 250);
+      syncEss();
+      syncCrystals();
+      updateXPBar();
+      
+      // Автосохраняем бонус в облако при первом входе
+      await saveCloudProgress();
+      
+      showToast('🎁 Бонус за регистрацию: +1500💰 +250 XP!', '#f9ca24');
     }
   } catch(e) {
     console.warn('Cloud load error:', e);
