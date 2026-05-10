@@ -3394,31 +3394,26 @@ document.getElementById('mazeBtn').onclick=()=>{
   startMazeMode();
 };
 document.getElementById('brBtn').onclick = () => {
-  if (running) return;
-  pname = document.getElementById('nameInput').value.trim() || 'Player';
-  
-  // Настройки режима
-  gameMode = 'br';
-  brZoneSize = WORLD;
-  brLastShrink = Date.now();
-  
-  // Запускаем оффлайн движок
-  startOffline(); 
-  
-  // Добавляем "мяса": сбрасываем стандартных ботов и спавним 20 новых
-  if (offlineState) {
-    offlineState.bots = [];
-    for(let i = 0; i < 20; i++) {
-      const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
-      offlineState.bots.push(mkBot(name, Math.floor(Math.random() * 3)));
+    if (running) return;
+    pname = document.getElementById('nameInput').value.trim() || 'Player';
+    
+    // СБРОС ПАРАМЕТРОВ ПЕРЕД СТАРТОМ
+    gameMode = 'br';
+    brZoneSize = WORLD; // Ставим 4000
+    brLastShrink = Date.now(); // Засекаем время старта
+    
+    startOffline(); 
+
+    if (offlineState) {
+        offlineState.bots = [];
+        for(let i = 0; i < 20; i++) {
+            offlineState.bots.push(mkBot(BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]));
+        }
+        for(let i = 0; i < 2000; i++) {
+            offlineState.foods.push(mkOfflineFood());
+        }
     }
-    // Добавляем экстра-еду для быстрого роста
-    for(let i = 0; i < 1500; i++) {
-      offlineState.foods.push(mkOfflineFood());
-    }
-  }
-  
-  showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
+    showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
 };
 document.getElementById('restartBtn').onclick=()=>{if(gameMode==='offline'){startOffline();}else if(gameMode==='maze'){startMazeMode();}else{if(ws&&ws.readyState===WebSocket.OPEN){running=false;serverWorld=null;_prevWorld=null;showLoading(t('respawn'));ws.send(JSON.stringify({type:'respawn'}));}else connectWS();}};
 document.getElementById('menuBackBtn').onclick=()=>{if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}if(ws){try{ws.close();}catch(e){}ws=null;}wsConnecting=false;serverWorld=null;_prevWorld=null;running=false;offlineState=null;mazeState=null;showMenu();};
