@@ -3944,10 +3944,6 @@ window.addEventListener('load',()=>{
   const dailyBtn = document.getElementById('dailyRewardsBtn');
   if (dailyBtn) dailyBtn.onclick = openDailyRewards;
   
-  // ══════ СИСТЕМА ID — ВСТАВЬ СЮДА! ══════
-  initPlayerIdSystem();
-});
-  
 // Live обновление ника
 document.getElementById('nameInput').addEventListener('input', () => {
   const name = document.getElementById('nameInput').value.trim() || 'Player';
@@ -5454,6 +5450,12 @@ document.getElementById('playBtn').addEventListener('click', () => {
     currentModeIndex = 0;
     const wrapper = document.getElementById('modeWrapper');
     if(wrapper) wrapper.style.transform = 'translateX(0px)';
+});
+  // Прокрутка режимов колесиком мыши
+document.getElementById('modeWrapper').parentElement.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (e.deltaY > 0) changeMode(1);  // Крутим вниз/вправо
+    else changeMode(-1);            // Крутим вверх/влево
 });
 </script>
 </body>
