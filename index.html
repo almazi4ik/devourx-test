@@ -3073,8 +3073,32 @@ function updHUD() {
   }
 }
   
-function drawMM(){
+function drawMM() {
   mctx.clearRect(0,0,108,108);
+  mctx.fillStyle='rgba(0,0,0,0.6)';
+  mctx.fillRect(0,0,108,108);
+
+  // --- ДОБАВЛЯЕМ ОТРИСОВКУ ЗОНЫ НА РАДАР ---
+  if (gameMode === 'br') {
+    const sc = 108 / WORLD; // Коэффициент масштаба
+    const offset = (WORLD - brZoneSize) / 2;
+    
+    // Рисуем красную область зоны на миникарте
+    mctx.strokeStyle = '#ff4e4e';
+    mctx.lineWidth = 2;
+    mctx.strokeRect(offset * sc, offset * sc, brZoneSize * sc, brZoneSize * sc);
+    
+    // Закрашиваем то, что ВНЕ зоны, тёмно-красным
+    mctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+    // Лево
+    mctx.fillRect(0, 0, offset * sc, 108);
+    // Право
+    mctx.fillRect((offset + brZoneSize) * sc, 0, (108 - (offset + brZoneSize) * sc), 108);
+    // Верх
+    mctx.fillRect(offset * sc, 0, brZoneSize * sc, offset * sc);
+    // Низ
+    mctx.fillRect(offset * sc, (offset + brZoneSize) * sc, brZoneSize * sc, (108 - (offset + brZoneSize) * sc));
+  }
   
   // Фон миникарты (тёмный)
   mctx.fillStyle='rgba(0,0,0,0.6)';
