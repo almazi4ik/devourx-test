@@ -931,34 +931,49 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 <div id="modeScreen" class="screen">
   <div class="mode-logo"><span class="ld">D</span><span class="le">e</span><span class="lv">v</span><span class="lo">o</span><span class="lu">u</span><span class="lr">r</span><span class="lx">X</span></div>
   <div class="mode-title" data-i18n="choose_mode">ВЫБЕРИ РЕЖИМ</div>
-  <div class="mode-btns">
-    <div class="mode-card mode-card-offline" id="offlineBtn">
-      <span class="mode-badge mode-badge-bot" data-i18n="bots">БОТЫ</span>
-      <div class="mode-icon">🤖</div>
-      <div class="mode-label" data-i18n="offline">ОФЛАЙН</div>
-      <div class="mode-desc" data-i18n="offline_desc">Играй против ботов<br>без интернета</div>
+
+  <div class="carousel-main-container" style="display:flex; align-items:center; justify-content:center; gap:20px; width:100%; max-width:500px;">
+    
+    <button class="carousel-arrow" onclick="changeMode(-1)" style="background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; width:50px; height:50px; color:#fff; font-size:24px; cursor:pointer; transition:0.2s;">❮</button>
+
+    <div class="mode-viewport" style="width:220px; overflow:hidden;">
+      <div id="modeWrapper" style="display:flex; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0);">
+        
+        <div class="mode-card mode-card-offline" id="offlineBtn" style="min-width:220px; margin:0;">
+          <span class="mode-badge mode-badge-bot" data-i18n="bots">БОТЫ</span>
+          <div class="mode-icon">🤖</div>
+          <div class="mode-label" data-i18n="offline">ОФЛАЙН</div>
+          <div class="mode-desc" data-i18n="offline_desc">Играй против ботов<br>без интернета</div>
+        </div>
+
+        <div class="mode-card mode-card-online" id="onlineBtn" style="min-width:220px; margin:0;">
+          <span class="mode-badge mode-badge-live"><span class="live-dot"></span><span data-i18n="live">LIVE</span></span>
+          <div class="mode-icon">🌐</div>
+          <div class="mode-label" data-i18n="online_btn">ОНЛАЙН</div>
+          <div class="mode-desc" data-i18n="online_desc">Сражайся с реальными<br>игроками</div>
+        </div>
+
+        <div class="mode-card mode-card-maze" id="mazeBtn" style="min-width:220px; margin:0;">
+          <span class="mode-badge mode-badge-maze">🌀</span>
+          <div class="mode-icon">🏛️</div>
+          <div class="mode-label" data-i18n="maze">ЛАБИРИНТ</div>
+          <div class="mode-desc" data-i18n="maze_desc">Узкие коридоры<br>и тупики</div>
+        </div>
+
+        <div class="mode-card" id="brBtn" style="min-width:220px; margin:0; background:linear-gradient(160deg,#4a0a0a,#200505); border-color:#ff4e4e;">
+          <span class="mode-badge" style="background:rgba(255,78,78,0.2); color:#ff4e4e; border:1px solid #ff4e4e;">BATTLE</span>
+          <div class="mode-icon">💥</div>
+          <div class="mode-label" style="color:#ff4e4e;">ГОЛОДНЫЕ ИГРЫ</div>
+          <div class="mode-desc" style="color:rgba(255,200,200,0.6);">20 ботов, сужающаяся зона<br>и гора кристаллов за ТОП-1</div>
+        </div>
+
+      </div>
     </div>
-    <div class="mode-card mode-card-online" id="onlineBtn">
-      <span class="mode-badge mode-badge-live"><span class="live-dot"></span><span data-i18n="live">LIVE</span></span>
-      <div class="mode-icon">🌐</div>
-      <div class="mode-label" data-i18n="online_btn">ОНЛАЙН</div>
-      <div class="mode-desc" data-i18n="online_desc">Сражайся с реальными<br>игроками</div>
-    </div>
-    <!-- ═══ НОВЫЙ РЕЖИМ ЛАБИРИНТ ═══ -->
- <div class="mode-card mode-card-maze" id="mazeBtn">
-  <span class="mode-badge mode-badge-maze">🌀</span>
-  <div class="mode-icon">🏛️</div>
-  <div class="mode-label" data-i18n="maze">ЛАБИРИНТ</div>
-  <div class="mode-desc" data-i18n="maze_desc">Узкие коридоры<br>и тупики</div>
-</div>
-    <div class="mode-card" id="brBtn" style="background:linear-gradient(160deg,#4a0a0a,#200505); border-color:#ff4e4e;">
-  <span class="mode-badge" style="background:rgba(255,78,78,0.2); color:#ff4e4e; border:1px solid #ff4e4e;">BATTLE</span>
-  <div class="mode-icon">💥</div>
-  <div class="mode-label" style="color:#ff4e4e;">ГОЛОДНЫЕ ИГРЫ</div>
-  <div class="mode-desc" style="color:rgba(255,200,200,0.6);">20 ботов, сужающаяся зона<br>и гора кристаллов за ТОП-1</div>
-</div>
+
+    <button class="carousel-arrow" onclick="changeMode(1)" style="background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; width:50px; height:50px; color:#fff; font-size:24px; cursor:pointer; transition:0.2s;">❯</button>
   </div>
-  <button class="mode-back" id="modeBackBtn" data-i18n="back">← Назад</button>
+
+  <button class="mode-back" id="modeBackBtn" data-i18n="back" style="margin-top: 40px;">← Назад</button>
   <button id="serverPickBtn" onclick="openServerPick()" style="margin-top:8px;background:transparent;border:2px solid rgba(255,255,255,0.15);border-radius:50px;padding:9px 40px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,255,255,0.4);display:none;align-items:center;justify-content:center;gap:6px;pointer-events:all;letter-spacing:1px;transition:all .15s;">
     ⚙️ <span id="spbName">Europe_1</span>
   </button>
