@@ -3324,6 +3324,30 @@ function draw(cx,cy){
     drawParticles();
     return;
   }
+  if (gameMode === 'br') {
+    const offset = (WORLD - brZoneSize) / 2;
+    
+    // 1. Отрисовка красной "опасной" области за краями зоны
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
+    // Верхняя часть
+    ctx.fillRect(-cx, -cy, WORLD, offset);
+    // Нижняя часть
+    ctx.fillRect(-cx, offset + brZoneSize - cy, WORLD, offset);
+    // Левая часть
+    ctx.fillRect(-cx, offset - cy, offset, brZoneSize);
+    // Правая часть
+    ctx.fillRect(offset + brZoneSize - cx, offset - cy, offset, brZoneSize);
+
+    // 2. Отрисовка самой границы (яркая линия)
+    ctx.strokeStyle = '#ff4e4e';
+    ctx.lineWidth = 15;
+    ctx.lineJoin = "round";
+    
+    // Делаем линию пунктирной для красоты
+    ctx.setLineDash([30, 20]); 
+    ctx.strokeRect(offset - cx, offset - cy, brZoneSize, brZoneSize);
+    ctx.setLineDash([]); // Сбрасываем пунктир для остальной отрисовки
+}
   if(gameMode==='maze'){drawWalls(cx,cy);}
   if(serverWorld){drawFoodList(serverWorld.foods||[],cx,cy);for(const p of(serverWorld.players||[]))drawServerSnake(p,cx,cy);}
 }
