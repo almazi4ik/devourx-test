@@ -2400,65 +2400,25 @@ function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!
 
 if (gameMode === 'br') {
     const now = Date.now();
-    // 1. Механика сужения зоны каждые 12 секунд
-    if (now - brLastShrink > 12000 && brZoneSize > BR_MIN_SIZE) {
-        brZoneSize -= BR_SHRINK_STEP;
-        brLastShrink = now;
-        showToast('⚠️ ПРЕДУПРЕЖДЕНИЕ: ЗОНА СУЖАЕТСЯ!', '#ff4e4e');
+    
+    // Уменьшим интервал до 10 секунд для драйва
+    if (now - brLastShrink > 10000) { 
+        if (brZoneSize > BR_MIN_SIZE) {
+            brZoneSize -= BR_SHRINK_STEP;
+            brLastShrink = now; // ОБЯЗАТЕЛЬНО обновляем время!
+            showToast('⚠️ ЗОНА СУЖАЕТСЯ!', '#ff4e4e');
+            console.log("Новый размер зоны:", brZoneSize); // Проверь в консоли (F12)
+        }
     }
-
-    // 2. Урон за пределами зоны (для тебя)
+    
+    // УРОН (откусываем массу)
     const h = player.segs[0];
     const offset = (WORLD - brZoneSize) / 2;
     if (h.x < offset || h.x > offset + brZoneSize || h.y < offset || h.y > offset + brZoneSize) {
-        player.score = Math.max(0, player.score - 3); // Теряем массу каждую миллисекунду
-        if (player.score <= 5) offlineKill(player);
-    }
-
-    // 3. Логика ботов: если бот за зоной, он бросает всё и бежит в центр
-    offlineState.bots.forEach(bot => {
-        if (!bot.alive) return;
-        const bh = bot.segs[0];
-        if (bh.x < offset || bh.x > offset + brZoneSize || bh.y < offset || bh.y > offset + brZoneSize) {
-            // Целимся ровно в центр карты
-            bot.tAngle = Math.atan2(WORLD/2 - bh.y, WORLD/2 - bh.x);
-            bot.boosting = true; // Боты тоже умеют спешить выжить
-        }
-    });
-
-    // 4. ПРОВЕРКА НА ПОБЕДУ (Если ты жив, а ботов нет)
-    const aliveBots = offlineState.bots.filter(b => b.alive).length;
-    if (player.alive && aliveBots === 0) {
-        if (!player._winHandled) {
-            player._winHandled = true;
-            
-            // Тот самый приз!
-            const prizeCry = 3;
-            const prizeCoins = 150;
-            crystals += prizeCry;
-            essence += prizeCoins;
-            
-            syncCrystals();
-            syncEss();
-            
-            showToast(`🏆 ГЕРОЙ! +${prizeCry} 💎 и +${prizeCoins} 💰`, '#f9ca24');
-            
-            // Выходим в меню через 4 секунды триумфа
-            setTimeout(() => { 
-                running = false; 
-                showMenu(); 
-            }, 4000);
-        }
+        player.score = Math.max(5, player.score - 1); // Чуть медленнее, но верно
+        if (Math.random() < 0.1) showToast('ТЫ ВНЕ ЗОНЫ!', '#ff4e4e');
     }
 }
-  // Очищаем просроченную еду (дроп из убитых змеек)
-  const now=Date.now();
-  const allFood=(gameMode==='maze'&&mazeState)?mazeState.foods:offlineState.foods;
-  for(let i=allFood.length-1;i>=0;i--){
-    if(allFood[i].expireAt && now>allFood[i].expireAt){
-      allFood.splice(i,1);
-    }
-  }
   const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const me=state.player;if(!me.alive){if(!me._deathHandled){me._deathHandled=true;if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}running=false;const score=me.score||0;const deathMsg=gameMode==='maze'?'🧱 Вы врезались в стену лабиринта!':'';document.getElementById('deathCauseMsg').textContent=deathMsg;document.getElementById('deathScore').textContent=t('mass')+': '+score;jbSaveScore(pname,score);clanUpdateScore(score);document.getElementById('hud').style.display='none';switchScreen('deathScreen',()=>{renderRecords(score);trackAch('mass',score);trackAch('survive',surviveTimer);});}return;}if(!autopilotMode){me.tAngle=Math.atan2(my-H/2,mx-W/2);me.boosting=boosting&&me.score>MIN_LEN;}else{
   const h=me.segs[0];
   const allSnakes=state.bots.filter(b=>b.alive);
