@@ -5423,33 +5423,53 @@ function showGameButtons() {
     const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
-  // --- ЛОГИКА КАРУСЕЛИ РЕЖИМОВ ---
-let currentModeIndex = 0;
-const totalModes = 4;
-const cardWidth = 220; 
-
+  // --- ИСПРАВЛЕННАЯ ЛОГИКА КАРУСЕЛИ ---
 function changeMode(direction) {
     const wrapper = document.getElementById('modeWrapper');
     if (!wrapper) return;
 
+    // Теперь мы используем переменную, объявленную в начале файла
     currentModeIndex += direction;
 
-    if (currentModeIndex >= totalModes) {
-        currentModeIndex = 0;
-    } else if (currentModeIndex < 0) {
-        currentModeIndex = totalModes - 1;
-    }
+    if (currentModeIndex >= totalModes) currentModeIndex = 0;
+    if (currentModeIndex < 0) currentModeIndex = totalModes - 1;
 
     const newOffset = currentModeIndex * -cardWidth;
     wrapper.style.transform = `translateX(${newOffset}px)`;
-    console.log("Режим изменен на: " + currentModeIndex);
 }
 
-// Сброс карусели при нажатии PLAY
-document.getElementById('playBtn').addEventListener('click', () => {
-    currentModeIndex = 0;
-    const wrapper = document.getElementById('modeWrapper');
-    if(wrapper) wrapper.style.transform = 'translateX(0px)';
+// Безопасная привязка событий
+window.addEventListener('load', () => {
+    const playBtn = document.getElementById('playBtn');
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            currentModeIndex = 0;
+            const wrapper = document.getElementById('modeWrapper');
+            if(wrapper) wrapper.style.transform = 'translateX(0px)';
+        });
+    }
+
+    const brBtn = document.getElementById('brBtn');
+    if (brBtn) {
+        brBtn.onclick = () => {
+            if (running) return;
+            pname = document.getElementById('nameInput').value.trim() || 'Player';
+            gameMode = 'br';
+            brZoneSize = WORLD;
+            brLastShrink = Date.now();
+            startOffline(); 
+            if (offlineState) {
+                offlineState.bots = [];
+                for(let i = 0; i < 20; i++) {
+                    offlineState.bots.push(mkBot(getRandomBotName(), Math.floor(Math.random() * 3)));
+                }
+                for(let i = 0; i < 1500; i++) {
+                    offlineState.foods.push(mkOfflineFood());
+                }
+            }
+            showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
+        };
+    }
 });
 </script>
 </body>
