@@ -2016,6 +2016,11 @@ let serverWorld=null,player=null,running=false;
 let camX=0,camY=0,boosting=false,pname=localStorage.getItem('dvx_name')||'Player';
 let autopilotMode=false;
 let gameMode='online';
+let brZoneSize = 4000; 
+let brLastShrink = 0;
+const BR_MIN_SIZE = 500;
+const BR_SHRINK_STEP = 400; // Зона будет сжиматься ощутимо
+const BR_FOOD_MULTIPLIER = 8; // В 8 раз больше еды для "мяса"
 
 let _prevWorld=null,_worldRecvTime=0;
 const INTERP_DURATION=55;
