@@ -2484,16 +2484,243 @@ if (gameMode === 'br') {
   me.tAngle=angle;me.boosting=false;
 }if(me.boosting&&me.length>MIN_LEN&&Math.random()<0.05){me.length=Math.max(MIN_LEN,me.length-1);me.score=Math.max(MIN_LEN,me.score-1);}offlineUpdateSnake(me,0.18);offlineEatFood(me);if(me.segs.length>0){camX+=(me.segs[0].x-W/2-camX)*0.12;camY+=(me.segs[0].y-H/2-camY)*0.12;}const now2=performance.now();if(now2-lastSurviveTick>=1000){surviveTimer++;lastSurviveTick=now2;trackQuest('survive_time',1);}for(const bot of state.bots){if(!bot.alive)continue;offlineBotAI(bot);if(bot.boosting&&bot.length>MIN_LEN&&Math.random()<0.05){bot.length=Math.max(MIN_LEN,bot.length-1);bot.score=Math.max(MIN_LEN,bot.score-1);}offlineUpdateSnake(bot,0.13);offlineEatFood(bot);}offlineCheckCollisions();offlineRespawnBots();const allPlayers=[me,...state.bots].filter(p=>p.alive).map(p=>({name:p.name,skinId:p.skinId,score:p.score,segs:p.segs.slice(0,750),boosting:p.boosting,isMe:p.isMe}));const lb=[...allPlayers].sort((a,b)=>b.score-a.score).slice(0,10).map(p=>({name:p.name,score:p.score,isMe:p.isMe}));serverWorld={players:allPlayers,foods:state.foods,leaderboard:lb};}
 
-function startOffline(){gameMode='offline';if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}mazeState=null;serverWorld=null;_prevWorld=null;playIrisOpen(()=>{const{spawnX,spawnY}=initOffline();camX=spawnX-W/2;camY=spawnY-H/2;player=offlineState.player;document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});document.getElementById('gearBtn').style.display='none';document.getElementById('hud').style.display='block';document.querySelector('.coins-fixed').style.display='none';document.querySelector('.crystals-fixed').style.display='none';document.getElementById('clanBtn').style.display='none';document.getElementById('xpBarWrap').style.display='none';document.getElementById('bestMassWidget').style.display='none';document.getElementById('achBtn').style.display='none';document.getElementById('achPanel').classList.remove('open');const _sbOff=document.getElementById('serverPickBtn');if(_sbOff)_sbOff.style.display='none';achOpen=false;autopilotMode=false;document.getElementById('apBtn').classList.remove('active');running=true;surviveTimer=0;lastSurviveTick=performance.now();_xpFoodCounter=0;_foodCoinCounter=0;if(isMobile())showJoystick(true);hideGameButtons();offlineTickInterval=setInterval(offlineTick,33);trackAch('games',1);
+function startOffline() {
+    // Сохраняем текущий режим игры
+    const currentGameMode = gameMode;
+    
+    // Очищаем все интервалы и таймеры
+    if (offlineTickInterval) {
+        clearInterval(offlineTickInterval);
+        offlineTickInterval = null;
+    }
+    if (mazeBreakTimeout) {
+        clearTimeout(mazeBreakTimeout);
+        mazeBreakTimeout = null;
+    }
+    
+    // Сбрасываем состояния
+    mazeState = null;
+    serverWorld = null;
+    _prevWorld = null;
+    
+    // Анимация открытия (затемнение)
+    playIrisOpen(() => {
+        // Инициализируем игру в зависимости от режима
+        let initResult;
+        
+        switch(currentGameMode) {
+            case 'maze':
+                initResult = initMazeMode();
+                break;
+            case 'br':
+                initResult = initBattleRoyaleMode();
+                break;
+            default:
+                initResult = initOffline();
+                break;
+        }
+        
+        const { spawnX, spawnY } = initResult;
+        
+        // Устанавливаем камеру на игрока
+        camX = spawnX - W / 2;
+        camY = spawnY - H / 2;
+        player = offlineState.player;
+        
+        // Скрываем все меню и показываем HUD
+        document.querySelectorAll('.screen').forEach(s => {
+            s.classList.remove('active');
+            s.style.cssText = '';
+        });
+        
+        // Настройка видимости элементов интерфейса
+        const elementsToHide = [
+            'gearBtn', 'clanBtn', 'xpBarWrap', 'bestMassWidget', 'achBtn', 'serverPickBtn'
+        ];
+        elementsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+        
+        const elementsToShow = ['hud'];
+        elementsToShow.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'block';
+        });
+        
+        // Скрываем монеты и кристаллы во время игры
+        const coinElements = document.querySelectorAll('.coins-fixed, .crystals-fixed');
+        coinElements.forEach(el => el.style.display = 'none');
+        
+        // Закрываем панель достижений если открыта
+        const achPanel = document.getElementById('achPanel');
+        if (achPanel) achPanel.classList.remove('open');
+        
+        // Сбрасываем состояния игрока
+        achOpen = false;
+        autopilotMode = false;
+        
+        const apBtn = document.getElementById('apBtn');
+        if (apBtn) apBtn.classList.remove('active');
+        
+        // Запускаем игровой цикл
+        running = true;
+        surviveTimer = 0;
+        lastSurviveTick = performance.now();
+        _xpFoodCounter = 0;
+        _foodCoinCounter = 0;
+        _prevScore = MIN_LEN;
+        
+        // Показываем джойстик на мобильных устройствах
+        if (isMobile()) showJoystick(true);
+        
+        // Скрываем игровые кнопки меню
+        hideGameButtons();
+        
+        // Запускаем игровой тикер
+        offlineTickInterval = setInterval(offlineTick, 33);
+        
+        // Трекинг статистики
+        trackAch('games', 1);
+        
+        // Дополнительная инициализация для режима BR
+        if (currentGameMode === 'br') {
+            // Устанавливаем параметры зоны
+            brZoneSize = WORLD;
+            brLastShrink = Date.now();
+            
+            // Добавляем дополнительную еду для режима BR
+            if (offlineState && offlineState.foods) {
+                const extraFoodCount = OFFLINE_FOOD_COUNT * BR_FOOD_MULTIPLIER;
+                for (let i = offlineState.foods.length; i < extraFoodCount; i++) {
+                    offlineState.foods.push(mkOfflineFood());
+                }
+            }
+            
+            showToast('🔥 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
+            showToast('⚠️ ЗОНА БУДЕТ СЖИМАТЬСЯ!', '#ff9f43');
+        }
+        
+        // Для режима лабиринта - запускаем таймер разрушения стен
+        if (currentGameMode === 'maze') {
+            mazeBreakTimeout = setTimeout(() => {
+                if (gameMode === 'maze' && mazeState && mazeState.walls) {
+                    const breakCount = Math.floor(mazeState.walls.length * 0.4);
+                    for (let i = 0; i < breakCount && mazeState.walls.length > 0; i++) {
+                        const idx = Math.floor(Math.random() * mazeState.walls.length);
+                        mazeState.walls.splice(idx, 1);
+                    }
+                    showToast('🌀 СТЕНЫ РАЗРУШАЮТСЯ! Будь осторожен!', '#6c5ce7');
+                }
+            }, MAZE_BREAK_TIME);
+        }
+        
+        // Небольшая задержка для стабилизации камеры
+        setTimeout(() => {
+            if (running && player && player.segs && player.segs.length > 0) {
+                camX = player.segs[0].x - W / 2;
+                camY = player.segs[0].y - H / 2;
+            }
+        }, 150);
+        
+        console.log(`✅ Игра запущена в режиме: ${currentGameMode.toUpperCase()}`);
+    }, null);
+}
+
+// Вспомогательная функция для инициализации режима Maze
+function initMazeMode() {
+    const walls = generateMazeWalls();
+    const spawn = findSafeMazeSpawn(walls);
+    const angle = Math.random() * Math.PI * 2;
+    
+    const playerSegs = [];
+    for (let i = 0; i < MIN_LEN; i++) {
+        playerSegs.push({
+            x: spawn.x - Math.cos(angle) * i * 14,
+            y: spawn.y - Math.sin(angle) * i * 14
+        });
+    }
+    
+    const startM = getStartMass();
+    const me = {
+        x: spawn.x, y: spawn.y,
+        name: pname,
+        skinId: selSkin,
+        angle: angle,
+        tAngle: angle,
+        speed: 2.8,
+        boosting: false,
+        alive: true,
+        length: startM,
+        score: startM,
+        segs: playerSegs,
+        isMe: true,
+        _growBuf: 0,
+        foodEaten: 0,
+        _deathHandled: false
+    };
+    
+    // Создаем ботов с поддержкой доминантов
+    const usedNames = [...BOT_NAMES].sort(() => Math.random() - 0.5).slice(0, MAZE_BOTS_COUNT);
+    const bots = usedNames.map((n, i) => {
+        const sp = findSafeMazeSpawn(walls);
+        const bot = mkBotAt(sp.x, sp.y, n, i % 3);
+        bot.isDominant = Math.random() < 0.2;
+        bot._dominantMode = false;
+        bot._spinDirection = Math.random() < 0.5 ? 1 : -1;
+        bot._updateCounter = 0;
+        return bot;
+    });
+    
+    // Создаем еду
+    const foods = [];
+    for (let i = 0; i < MAZE_FOOD_COUNT; i++) {
+        let f = mkMazeFood();
+        let attempts = 0;
+        while (checkMazeWallCollisionDirect(f.x, f.y, f.r, walls) && attempts < 10) {
+            f = mkMazeFood();
+            attempts++;
+        }
+        foods.push(f);
+    }
+    
+    mazeState = { walls, foods, bots, player: me };
+    offlineState = mazeState;
+    
+    return { spawnX: spawn.x, spawnY: spawn.y };
+}
+
+// Вспомогательная функция для инициализации режима Battle Royale
+function initBattleRoyaleMode() {
+    const result = initOffline();
+    
+    // Увеличиваем количество ботов до 20
+    if (offlineState && offlineState.bots) {
+        const currentBotCount = offlineState.bots.length;
+        if (currentBotCount < 20) {
+            const additionalBots = 20 - currentBotCount;
+            const usedNames = [...BOT_NAMES].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < additionalBots; i++) {
+                const name = usedNames[i % usedNames.length];
+                const bot = mkBot(name, i % 3);
+                bot.isDominant = Math.random() < 0.15;
+                offlineState.bots.push(bot);
+            }
+        }
+    }
+    
+    return result;
+}
 // Фикс для горизонтального режима — теперь player уже есть!
 setTimeout(()=>{if(running&&player&&player.segs&&player.segs.length>0){camX=player.segs[0].x-W/2;camY=player.segs[0].y-H/2;}},150);},null);}
 // ══════ РЕЖИМ ЛАБИРИНТ ══════
-const MAZE_BOTS_COUNT=8;
-const MAZE_FOOD_COUNT=400;
-const MAZE_CELL=160;
-const MAZE_WALL_W=28;
-const MAZE_BREAK_TIME=90000;
-
+// Константы для режимов
+const MAZE_BOTS_COUNT = 8;
+const MAZE_FOOD_COUNT = 400;
+const MAZE_BREAK_TIME = 90000; // 90 секунд
+const MAZE_CELL = 160;
+const MAZE_WALL_W = 28;
+  
 function mkMazeFood(){return mkOfflineFood();}
 
 function generateMazeWalls() {
