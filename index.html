@@ -2397,6 +2397,60 @@ function offlineCheckCollisions(){const state=(gameMode==='maze'&&mazeState)?maz
 function offlineRespawnBots(){const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;if(!state)return;for(let i=0;i<state.bots.length;i++){if(!state.bots[i].alive){const name=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];state.bots[i]=mkBot(name,Math.floor(Math.random()*3));}}}
 
 function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!offlineState)return;
+
+if (gameMode === 'br') {
+    const now = Date.now();
+    // 1. Механика сужения зоны каждые 12 секунд
+    if (now - brLastShrink > 12000 && brZoneSize > BR_MIN_SIZE) {
+        brZoneSize -= BR_SHRINK_STEP;
+        brLastShrink = now;
+        showToast('⚠️ ПРЕДУПРЕЖДЕНИЕ: ЗОНА СУЖАЕТСЯ!', '#ff4e4e');
+    }
+
+    // 2. Урон за пределами зоны (для тебя)
+    const h = player.segs[0];
+    const offset = (WORLD - brZoneSize) / 2;
+    if (h.x < offset || h.x > offset + brZoneSize || h.y < offset || h.y > offset + brZoneSize) {
+        player.score = Math.max(0, player.score - 3); // Теряем массу каждую миллисекунду
+        if (player.score <= 5) offlineKill(player);
+    }
+
+    // 3. Логика ботов: если бот за зоной, он бросает всё и бежит в центр
+    offlineState.bots.forEach(bot => {
+        if (!bot.alive) return;
+        const bh = bot.segs[0];
+        if (bh.x < offset || bh.x > offset + brZoneSize || bh.y < offset || bh.y > offset + brZoneSize) {
+            // Целимся ровно в центр карты
+            bot.tAngle = Math.atan2(WORLD/2 - bh.y, WORLD/2 - bh.x);
+            bot.boosting = true; // Боты тоже умеют спешить выжить
+        }
+    });
+
+    // 4. ПРОВЕРКА НА ПОБЕДУ (Если ты жив, а ботов нет)
+    const aliveBots = offlineState.bots.filter(b => b.alive).length;
+    if (player.alive && aliveBots === 0) {
+        if (!player._winHandled) {
+            player._winHandled = true;
+            
+            // Тот самый приз!
+            const prizeCry = 3;
+            const prizeCoins = 150;
+            crystals += prizeCry;
+            essence += prizeCoins;
+            
+            syncCrystals();
+            syncEss();
+            
+            showToast(`🏆 ГЕРОЙ! +${prizeCry} 💎 и +${prizeCoins} 💰`, '#f9ca24');
+            
+            // Выходим в меню через 4 секунды триумфа
+            setTimeout(() => { 
+                running = false; 
+                showMenu(); 
+            }, 4000);
+        }
+    }
+}
   // Очищаем просроченную еду (дроп из убитых змеек)
   const now=Date.now();
   const allFood=(gameMode==='maze'&&mazeState)?mazeState.foods:offlineState.foods;
