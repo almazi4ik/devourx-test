@@ -5451,12 +5451,6 @@ document.getElementById('playBtn').addEventListener('click', () => {
     const wrapper = document.getElementById('modeWrapper');
     if(wrapper) wrapper.style.transform = 'translateX(0px)';
 });
-  // Прокрутка режимов колесиком мыши
-document.getElementById('modeWrapper').parentElement.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    if (e.deltaY > 0) changeMode(1);  // Крутим вниз/вправо
-    else changeMode(-1);            // Крутим вверх/влево
-});
 </script>
 </body>
 </html>
