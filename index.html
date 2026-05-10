@@ -5437,9 +5437,8 @@ function changeMode(direction) {
     wrapper.style.transform = `translateX(${newOffset}px)`;
 }
 
-// Безопасная привязка событий при загрузке страницы
+// Безопасная привязка событий
 window.addEventListener('load', () => {
-    // 1. Сброс карусели при открытии выбора режимов
     const playBtn = document.getElementById('playBtn');
     if (playBtn) {
         playBtn.addEventListener('click', () => {
@@ -5449,23 +5448,20 @@ window.addEventListener('load', () => {
         });
     }
 
-    // 2. Логика запуска Battle Royale
     const brBtn = document.getElementById('brBtn');
     if (brBtn) {
         brBtn.onclick = () => {
             if (running) return;
             pname = document.getElementById('nameInput').value.trim() || 'Player';
             gameMode = 'br';
-            brZoneSize = 4000; // Используем WORLD или 4000
+            brZoneSize = 4000; 
             brLastShrink = Date.now();
-            
             startOffline(); 
-            
             if (offlineState) {
                 offlineState.bots = [];
                 for(let i = 0; i < 20; i++) {
-                    // Используем BOT_NAMES если нет функции getRandomBotName
-                    const bName = (typeof getRandomBotName === 'function') ? getRandomBotName() : "Bot_" + i;
+                    // Используем массив имен ботов, который у тебя уже есть в коде
+                    const bName = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
                     offlineState.bots.push(mkBot(bName, Math.floor(Math.random() * 3)));
                 }
                 for(let i = 0; i < 1500; i++) {
@@ -5476,7 +5472,6 @@ window.addEventListener('load', () => {
         };
     }
 });
-
 </script>
 </body>
 </html>
