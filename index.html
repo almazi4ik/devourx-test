@@ -2712,12 +2712,13 @@ function initBattleRoyaleMode() {
     return result;
 }
 // Фикс для горизонтального режима — теперь player уже есть!
-setTimeout(() => {
-    if (running && player && player.segs && player.segs.length > 0) {
-        camX = player.segs[0].x - W / 2;
-        camY = player.segs[0].y - H / 2;
-    }
-}, 150);
+    setTimeout(() => {
+        if (running && player && player.segs && player.segs.length > 0) {
+            camX = player.segs[0].x - W / 2;
+            camY = player.segs[0].y - H / 2;
+        }
+    }, 150);
+    
 });
 // ══════ РЕЖИМ ЛАБИРИНТ ══════
 // Константы для режимов
