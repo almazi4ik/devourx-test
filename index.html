@@ -5332,57 +5332,33 @@ const FIRST_LOAD_TIPS = [
   }, 350);
 })();
 
-// ══════ ЕЖЕДНЕВНЫЕ НАГРАДЫ (ПЕРЕПИСАНО) ══════
-function checkDailyReward() {
-    try {
-        const today = new Date().toISOString().slice(0,10);
-        const lastClaim = localStorage.getItem('dvx_last_claim');
-        if (lastClaim === today) return;
-        
-        let streak = parseInt(localStorage.getItem('dvx_streak') || '0');
-        const lastDate = localStorage.getItem('dvx_last_streak_date');
-        
-        const yest = new Date();
-        yest.setDate(yest.getDate() - 1);
-        const yestStr = yest.toISOString().slice(0,10);
+// Добавьте недостающие определения
+const DAILY_REWARDS = [
+  { day: 1, coins: 500, crystals: 0, message: '500 монет' },
+  { day: 2, coins: 800, crystals: 0, message: '800 монет' },
+  { day: 3, coins: 1000, crystals: 5, message: '1000 монет + 5 кристаллов' },
+  { day: 4, coins: 1500, crystals: 0, message: '1500 монет' },
+  { day: 5, coins: 2000, crystals: 10, message: '2000 монет + 10 кристаллов' },
+  { day: 6, coins: 3000, crystals: 0, message: '3000 монет' },
+  { day: 7, coins: 5000, crystals: 50, message: '5000 монет + 50 кристаллов + легендарный скин!' }
+];
 
-        if (lastDate && lastDate !== yestStr) streak = 0;
-        streak = (streak % 7) + 1;
-        
-        const reward = DAILY_REWARDS[streak - 1];
-        if (reward.coins > 0) { essence += reward.coins; syncEss(); }
-        if (reward.crystals > 0) { crystals += reward.crystals; syncCrystals(); }
-        
-        if (streak === 7) {
-            const legendarySkin = (typeof SKINS_DATA !== 'undefined') ? SKINS_DATA.find(s => s.rarity === 'legendary' && !s.owned) : null;
-            if (legendarySkin) {
-                legendarySkin.owned = true;
-                if(typeof saveSkins === 'function') saveSkins();
-                showToast(`🎁 ДЕНЬ 7! Скин ${legendarySkin.key}!`, '#f9ca24');
-            } else {
-                crystals += 100; syncCrystals();
-                showToast(`🎁 ДЕНЬ 7! 100 кристаллов!`, '#f9ca24');
-            }
-        } else {
-            showToast(`🎁 ДЕНЬ ${streak}! ${reward.message}`, '#a29bfe');
-        }
-        
-        localStorage.setItem('dvx_last_claim', today);
-        localStorage.setItem('dvx_streak', streak);
-        localStorage.setItem('dvx_last_streak_date', today);
-    } catch(e) { console.error("Ошибка в наградах:", e); }
-}
-
-function openDailyRewards() {
-    const streak = parseInt(localStorage.getItem('dvx_streak') || '0');
-    const canClaim = localStorage.getItem('dvx_last_claim') !== new Date().toISOString().slice(0,10);
-    let msg = `📅 Твой стрик: ${streak}/7 дней\n\n`;
-    DAILY_REWARDS.forEach(r => {
-        const isClaimed = streak >= r.day;
-        msg += `${isClaimed ? '✅' : '🔸'} День ${r.day}: ${r.coins > 0 ? r.coins+'💰' : ''} ${r.crystals > 0 ? r.crystals+'💎' : ''}\n`;
-    });
-    if (canClaim && streak < 7) msg += `\n🎁 Забери награду ${streak+1}-го дня!`;
-    alert(msg);
+// Добавьте roundRect
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    this.moveTo(x+r, y);
+    this.lineTo(x+w-r, y);
+    this.quadraticCurveTo(x+w, y, x+w, y+r);
+    this.lineTo(x+w, y+h-r);
+    this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    this.lineTo(x+r, y+h);
+    this.quadraticCurveTo(x, y+h, x, y+h-r);
+    this.lineTo(x, y+r);
+    this.quadraticCurveTo(x, y, x+r, y);
+    return this;
+  };
 }
 
 // Привязка кнопки наград
