@@ -5337,29 +5337,51 @@ function getInterpolatedWorld() {
     return { ...serverWorld, players: interpPlayers };
 }
 
+// --- ИСПРАВЛЕННЫЙ LOOP ДЛЯ ПЛАВНОСТИ 60 FPS ---
 function loop(ts) {
+    // ВАЖНО: всегда запрашиваем следующий кадр в начале, чтобы FPS был стабильным
+    requestAnimationFrame(loop);
+
     if (running) {
-        updHUD();
+        updHUD(); // Отправка данных на сервер (15 раз в сек внутри)
+        
+        // Получаем интерполированный мир для плавности
         const worldToDraw = (gameMode === 'online') ? getInterpolatedWorld() : serverWorld;
+        
         drawBackground(camX, camY);
         if (gameMode === 'maze') drawWalls(camX, camY);
+        
         if (worldToDraw) {
             drawFoodList(worldToDraw.foods || [], camX, camY);
-            for (const p of (worldToDraw.players || [])) drawServerSnake(p, camX, camY);
+            for (const p of (worldToDraw.players || [])) {
+                drawServerSnake(p, camX, camY);
+            }
         }
         drawMM();
-    } else { draw(camX, camY); }
-    requestAnimationFrame(loop);
+    } else {
+        // Главное меню: рисуем фон и медленные частицы
+        drawBackground(camX, camY);
+        updateParticles(); 
+        drawParticles();
+    }
 }
+
+// Запускаем цикл первый раз
 requestAnimationFrame(loop);
 
 function initPlayerIdSystem() {
     const idVal = document.getElementById('accPlayerIdValue');
     if (idVal) idVal.textContent = _playerId;
 }
+
 function copyPlayerId() {
-    navigator.clipboard.writeText(_playerId).then(() => showToast('ID скопирован! 📋', '#a29bfe'));
+    navigator.clipboard.writeText(_playerId).then(() => {
+        showToast('ID скопирован! 📋', '#a29bfe');
+    });
 }
+
+// Закрываем window.addEventListener
+} } 
 </script>
 </body>
 </html>
