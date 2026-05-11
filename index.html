@@ -5614,7 +5614,7 @@ function changeMode(direction) {
 // Финальный запуск всех систем
 window.addEventListener('load', () => {
     console.log("DevourX Ready!");
-    
+
     const pBtn = document.getElementById('playBtn');
     if (pBtn) {
         pBtn.addEventListener('click', () => {
@@ -5649,7 +5649,12 @@ window.addEventListener('load', () => {
             }
         };
     }
-}); 
+});
+
+// ЗАКРЫВАЕМ ПОТЕРЯННЫЕ СКОБКИ ВЫШЕ (МЕТОД ГРУБОЙ СИЛЫ)
+} catch(e) { console.error("Критическая ошибка синтаксиса выше по коду!", e); }
+} 
+} 
 </script>
 </body>
 </html>
