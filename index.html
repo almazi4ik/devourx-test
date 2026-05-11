@@ -5612,49 +5612,54 @@ function changeMode(direction) {
 }
 
 // Финальный запуск всех систем
-window.addEventListener('load', () => {
-    console.log("DevourX Ready!");
+try {
+    window.addEventListener('load', () => {
+        console.log("DevourX Ready!");
 
-    const pBtn = document.getElementById('playBtn');
-    if (pBtn) {
-        pBtn.addEventListener('click', () => {
-            window.currentModeIndex = 0;
-            const wrp = document.getElementById('modeWrapper');
-            if(wrp) wrp.style.transform = 'translateX(0px)';
-        });
-    }
+        const pBtn = document.getElementById('playBtn');
+        if (pBtn) {
+            pBtn.addEventListener('click', () => {
+                window.currentModeIndex = 0;
+                const wrp = document.getElementById('modeWrapper');
+                if(wrp) wrp.style.transform = 'translateX(0px)';
+            });
+        }
 
-    const bBtn = document.getElementById('brBtn');
-    if (bBtn) {
-        bBtn.onclick = () => {
-            if (window.running) return;
-            window.gameMode = 'br';
-            window.brZoneSize = 4000;
-            window.brLastShrink = Date.now();
-            
-            if(typeof startOffline === 'function') {
-                startOffline();
-            }
-            
-            setTimeout(() => {
-                const p = window.player || window.me || (window.offlineState && window.offlineState.player);
-                if (window.running && p && p.segs && p.segs.length > 0) {
-                    window.camX = p.segs[0].x - window.innerWidth / 2;
-                    window.camY = p.segs[0].y - window.innerHeight / 2;
+        const bBtn = document.getElementById('brBtn');
+        if (bBtn) {
+            bBtn.onclick = () => {
+                if (window.running) return;
+                window.gameMode = 'br';
+                window.brZoneSize = 4000;
+                window.brLastShrink = Date.now();
+                
+                if(typeof startOffline === 'function') {
+                    startOffline();
                 }
-            }, 150);
-            
-            if(typeof showToast === 'function') {
-                showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
-            }
-        };
-    }
-});
+                
+                setTimeout(() => {
+                    const p = window.player || window.me || (window.offlineState && window.offlineState.player);
+                    if (window.running && p && p.segs && p.segs.length > 0) {
+                        window.camX = p.segs[0].x - window.innerWidth / 2;
+                        window.camY = p.segs[0].y - window.innerHeight / 2;
+                    }
+                }, 150);
+                
+                if(typeof showToast === 'function') {
+                    showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
+                }
+            };
+        }
+    });
+} catch(e) { 
+    console.error("Ошибка в финальном блоке инициализации:", e); 
+}
 
-// ЗАКРЫВАЕМ ПОТЕРЯННЫЕ СКОБКИ ВЫШЕ (МЕТОД ГРУБОЙ СИЛЫ)
-} catch(e) { console.error("Критическая ошибка синтаксиса выше по коду!", e); }
-} 
-} 
+/** * НИЖЕ — ЗАКРЫВАЮЩИЕ СКОБКИ ДЛЯ ВСЕГО ФАЙЛА 
+ * Если выше по коду (в функциях кланов, чата или тика) 
+ * потерялась скобка, эти три штуки должны их закрыть.
+ */
+} } } 
 </script>
 </body>
 </html>
