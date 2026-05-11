@@ -5317,7 +5317,7 @@ function getInterpolatedWorld() {
     const now = performance.now();
     const renderTime = now - RENDER_DELAY;
     
-    const serverTickRate = 66; // Твой TICK на сервере (15 FPS)
+    const serverTickRate = 66; // Твой TICK на сервере
     let t = (renderTime - _worldRecvTime) / serverTickRate;
     t = Math.max(0, Math.min(1.2, t)); 
 
@@ -5367,7 +5367,8 @@ function copyPlayerId() {
     });
 }
 
-// ЗАКРЫВАЕМ ГЛАВНЫЙ LOAD (тот самый window.addEventListener, который был открыт в начале скрипта)
+// ЗАКРЫВАЕМ ГЛАВНЫЙ LOAD (window.addEventListener), который был открыт в начале файла.
+// ПОСЛЕ ЭТОГО БОЛЬШЕ НИКАКИХ СКОБОК БЫТЬ НЕ ДОЛЖНО!
 }); 
 </script>
 </body>
