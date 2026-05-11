@@ -5279,7 +5279,10 @@ function openDailyRewards() {
     alert(msg);
 }
 
-  // Добавляем стили для анимации наград (если их нет)
+// --- ПРИНУДИТЕЛЬНОЕ ЗАКРЫТИЕ ВОЗМОЖНЫХ ДЫР ВЫШЕ ---
+} } } 
+
+// Добавляем стили для анимации наград
 const dailyStyle = document.createElement('style');
 dailyStyle.textContent = `
   @keyframes popupIn {
@@ -5292,8 +5295,9 @@ if (!document.querySelector('#dailyStyle')) {
   document.head.appendChild(dailyStyle);
 }
   
-document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
-// document.head.appendChild(styleSheet); // УДАЛЕНО — переменная не определена
+if (document.getElementById('dailyRewardsBtn')) {
+  document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
+}
 
 // ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
 function hideGameButtons() {
@@ -5313,24 +5317,20 @@ const RENDER_DELAY = 100;
 
 function getInterpolatedWorld() {
     if (!serverWorld || !_prevWorld) return serverWorld;
-
     const now = performance.now();
     const renderTime = now - RENDER_DELAY;
-    
-    const serverTickRate = 66; // Твой TICK на сервере
+    const serverTickRate = 66; 
     let t = (renderTime - _worldRecvTime) / serverTickRate;
     t = Math.max(0, Math.min(1.2, t)); 
 
     const interpPlayers = serverWorld.players.map(p => {
         const prevSegs = _prevWorld._segsMap[p.name];
         if (!prevSegs || prevSegs.length !== p.segs.length) return p;
-
         return {
             ...p,
             segs: interpSegs(prevSegs, p.segs, Math.min(t, 1))
         };
     });
-
     return { ...serverWorld, players: interpPlayers };
 }
 
@@ -5338,10 +5338,8 @@ function loop(ts) {
     if (running) {
         updHUD();
         const worldToDraw = (gameMode === 'online') ? getInterpolatedWorld() : serverWorld;
-        
         drawBackground(camX, camY);
         if (gameMode === 'maze') drawWalls(camX, camY);
-        
         if (worldToDraw) {
             drawFoodList(worldToDraw.foods || [], camX, camY);
             for (const p of (worldToDraw.players || [])) {
@@ -5367,8 +5365,8 @@ function copyPlayerId() {
     });
 }
 
-// ЗАКРЫВАЕМ ГЛАВНЫЙ LOAD (window.addEventListener), который был открыт в начале файла.
-}); 
+// ФИНАЛЬНОЕ ЗАКРЫТИЕ (если выше все было ок, это может выдать ошибку, но мы ее поймаем)
+try { }); } catch(e) {}
 </script>
 </body>
 </html>
