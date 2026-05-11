@@ -5309,7 +5309,7 @@ function showGameButtons() {
 }
 
 // --- ЛОГИКА ИНТЕРПОЛЯЦИИ ДЛЯ 60 FPS ---
-const RENDER_DELAY = 100; // Задержка отрисовки для сглаживания лагов
+const RENDER_DELAY = 100; 
 
 function getInterpolatedWorld() {
     if (!serverWorld || !_prevWorld) return serverWorld;
@@ -5317,10 +5317,9 @@ function getInterpolatedWorld() {
     const now = performance.now();
     const renderTime = now - RENDER_DELAY;
     
-    // Вычисляем прогресс между двумя пакетами сервера (сервер дает 15 FPS = каждые 66мс)
-    const serverTickRate = 66; 
+    const serverTickRate = 66; // Твой TICK на сервере
     let t = (renderTime - _worldRecvTime) / serverTickRate;
-    t = Math.max(0, Math.min(1.2, t)); // Небольшой запас для экстраполяции
+    t = Math.max(0, Math.min(1.2, t)); 
 
     const interpPlayers = serverWorld.players.map(p => {
         const prevSegs = _prevWorld._segsMap[p.name];
@@ -5335,12 +5334,9 @@ function getInterpolatedWorld() {
     return { ...serverWorld, players: interpPlayers };
 }
 
-// Переписанный цикл loop для максимальной плавности
 function loop(ts) {
     if (running) {
         updHUD();
-        
-        // Если играем онлайн — используем интерполяцию, если офлайн — обычный мир
         const worldToDraw = (gameMode === 'online') ? getInterpolatedWorld() : serverWorld;
         
         drawBackground(camX, camY);
@@ -5354,14 +5350,12 @@ function loop(ts) {
         }
         drawMM();
     } else {
-        // Когда в меню — просто рисуем фон и частицы
         draw(camX, camY);
     }
     requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-// --- ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ ID ---
 function initPlayerIdSystem() {
     const idVal = document.getElementById('accPlayerIdValue');
     if (idVal) idVal.textContent = _playerId;
@@ -5373,8 +5367,7 @@ function copyPlayerId() {
     });
 }
 
-// ФИНАЛЬНОЕ ЗАКРЫТИЕ window.addEventListener('load', ...)
-// УБРАНЫ ЛИШНИЕ СКОБКИ, КОТОРЫЕ ВЫЗЫВАЛИ ОШИБКУ
+// ЗАКРЫВАЕМ ГЛАВНЫЙ LOAD (window.addEventListener), который мы открыли в самом начале файла
 }); 
 </script>
 </body>
