@@ -5295,7 +5295,7 @@ if (!document.querySelector('#dailyStyle')) {
 document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
 // document.head.appendChild(styleSheet); // УДАЛЕНО — переменная не определена
 
-  // ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
+// ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
 function hideGameButtons() {
     const chatBtn = document.getElementById('globalChatBtn');
     const dailyBtn = document.getElementById('dailyRewardsBtn');
@@ -5307,6 +5307,74 @@ function showGameButtons() {
     const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
+
+// --- ЛОГИКА ИНТЕРПОЛЯЦИИ ДЛЯ 60 FPS ---
+const RENDER_DELAY = 100; // Задержка отрисовки для сглаживания лагов
+
+function getInterpolatedWorld() {
+    if (!serverWorld || !_prevWorld) return serverWorld;
+
+    const now = performance.now();
+    const renderTime = now - RENDER_DELAY;
+    
+    // Вычисляем прогресс между двумя пакетами сервера (сервер дает 15 FPS = каждые 66мс)
+    const serverTickRate = 66; 
+    let t = (renderTime - _worldRecvTime) / serverTickRate;
+    t = Math.max(0, Math.min(1.2, t)); // Небольшой запас для экстраполяции
+
+    const interpPlayers = serverWorld.players.map(p => {
+        const prevSegs = _prevWorld._segsMap[p.name];
+        if (!prevSegs || prevSegs.length !== p.segs.length) return p;
+
+        return {
+            ...p,
+            segs: interpSegs(prevSegs, p.segs, Math.min(t, 1))
+        };
+    });
+
+    return { ...serverWorld, players: interpPlayers };
+}
+
+// Переписанный цикл loop для максимальной плавности
+function loop(ts) {
+    if (running) {
+        updHUD();
+        
+        // Если играем онлайн — используем интерполяцию, если офлайн — обычный мир
+        const worldToDraw = (gameMode === 'online') ? getInterpolatedWorld() : serverWorld;
+        
+        drawBackground(camX, camY);
+        if (gameMode === 'maze') drawWalls(camX, camY);
+        
+        if (worldToDraw) {
+            drawFoodList(worldToDraw.foods || [], camX, camY);
+            for (const p of (worldToDraw.players || [])) {
+                drawServerSnake(p, camX, camY);
+            }
+        }
+        drawMM();
+    } else {
+        // Когда в меню — просто рисуем фон и частицы
+        draw(camX, camY);
+    }
+    requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// --- ИНИЦИАЛИЗАЦИЯ СИСТЕМЫ ID ---
+function initPlayerIdSystem() {
+    const idVal = document.getElementById('accPlayerIdValue');
+    if (idVal) idVal.textContent = _playerId;
+}
+
+function copyPlayerId() {
+    navigator.clipboard.writeText(_playerId).then(() => {
+        showToast('ID скопирован! 📋', '#a29bfe');
+    });
+}
+
+// ЗАКРЫВАЕМ ГЛАВНЫЙ LOAD (window.addEventListener)
+}); 
 </script>
 </body>
 </html>
