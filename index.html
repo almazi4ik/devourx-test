@@ -898,16 +898,6 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   z-index: 999 !important;
   position: fixed !important;
 }
-
-  /* ═══ КАРУСЕЛЬ ВЫБОРА РЕЖИМА ═══ */
-.carousel-arrow:hover {
-  background: rgba(46, 204, 113, 0.3) !important;
-  border-color: #2ecc71 !important;
-  transform: scale(1.1);
-}
-.carousel-arrow:active {
-  transform: scale(0.9);
-}
 </style>
   <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -941,49 +931,28 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
 <div id="modeScreen" class="screen">
   <div class="mode-logo"><span class="ld">D</span><span class="le">e</span><span class="lv">v</span><span class="lo">o</span><span class="lu">u</span><span class="lr">r</span><span class="lx">X</span></div>
   <div class="mode-title" data-i18n="choose_mode">ВЫБЕРИ РЕЖИМ</div>
-
-  <div class="carousel-main-container" style="display:flex; align-items:center; justify-content:center; gap:20px; width:100%; max-width:500px;">
-    
-    <button class="carousel-arrow" onclick="changeMode(-1)" style="background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; width:50px; height:50px; color:#fff; font-size:24px; cursor:pointer; transition:0.2s;">❮</button>
-
-    <div class="mode-viewport" style="width:220px; overflow:hidden;">
-      <div id="modeWrapper" style="display:flex; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0);">
-        
-        <div class="mode-card mode-card-offline" id="offlineBtn" style="min-width:220px; margin:0;">
-          <span class="mode-badge mode-badge-bot" data-i18n="bots">БОТЫ</span>
-          <div class="mode-icon">🤖</div>
-          <div class="mode-label" data-i18n="offline">ОФЛАЙН</div>
-          <div class="mode-desc" data-i18n="offline_desc">Играй против ботов<br>без интернета</div>
-        </div>
-
-        <div class="mode-card mode-card-online" id="onlineBtn" style="min-width:220px; margin:0;">
-          <span class="mode-badge mode-badge-live"><span class="live-dot"></span><span data-i18n="live">LIVE</span></span>
-          <div class="mode-icon">🌐</div>
-          <div class="mode-label" data-i18n="online_btn">ОНЛАЙН</div>
-          <div class="mode-desc" data-i18n="online_desc">Сражайся с реальными<br>игроками</div>
-        </div>
-
-        <div class="mode-card mode-card-maze" id="mazeBtn" style="min-width:220px; margin:0;">
-          <span class="mode-badge mode-badge-maze">🌀</span>
-          <div class="mode-icon">🏛️</div>
-          <div class="mode-label" data-i18n="maze">ЛАБИРИНТ</div>
-          <div class="mode-desc" data-i18n="maze_desc">Узкие коридоры<br>и тупики</div>
-        </div>
-
-        <div class="mode-card" id="brBtn" style="min-width:220px; margin:0; background:linear-gradient(160deg,#4a0a0a,#200505); border-color:#ff4e4e;">
-          <span class="mode-badge" style="background:rgba(255,78,78,0.2); color:#ff4e4e; border:1px solid #ff4e4e;">BATTLE</span>
-          <div class="mode-icon">💥</div>
-          <div class="mode-label" style="color:#ff4e4e;">ГОЛОДНЫЕ ИГРЫ</div>
-          <div class="mode-desc" style="color:rgba(255,200,200,0.6);">20 ботов, сужающаяся зона<br>и гора кристаллов за ТОП-1</div>
-        </div>
-
-      </div>
+  <div class="mode-btns">
+    <div class="mode-card mode-card-offline" id="offlineBtn">
+      <span class="mode-badge mode-badge-bot" data-i18n="bots">БОТЫ</span>
+      <div class="mode-icon">🤖</div>
+      <div class="mode-label" data-i18n="offline">ОФЛАЙН</div>
+      <div class="mode-desc" data-i18n="offline_desc">Играй против ботов<br>без интернета</div>
     </div>
-
-    <button class="carousel-arrow" onclick="changeMode(1)" style="background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; width:50px; height:50px; color:#fff; font-size:24px; cursor:pointer; transition:0.2s;">❯</button>
+    <div class="mode-card mode-card-online" id="onlineBtn">
+      <span class="mode-badge mode-badge-live"><span class="live-dot"></span><span data-i18n="live">LIVE</span></span>
+      <div class="mode-icon">🌐</div>
+      <div class="mode-label" data-i18n="online_btn">ОНЛАЙН</div>
+      <div class="mode-desc" data-i18n="online_desc">Сражайся с реальными<br>игроками</div>
+    </div>
+    <!-- ═══ НОВЫЙ РЕЖИМ ЛАБИРИНТ ═══ -->
+ <div class="mode-card mode-card-maze" id="mazeBtn">
+  <span class="mode-badge mode-badge-maze">🌀</span>
+  <div class="mode-icon">🏛️</div>
+  <div class="mode-label" data-i18n="maze">ЛАБИРИНТ</div>
+  <div class="mode-desc" data-i18n="maze_desc">Узкие коридоры<br>и тупики</div>
+</div>
   </div>
-
-  <button class="mode-back" id="modeBackBtn" data-i18n="back" style="margin-top: 40px;">← Назад</button>
+  <button class="mode-back" id="modeBackBtn" data-i18n="back">← Назад</button>
   <button id="serverPickBtn" onclick="openServerPick()" style="margin-top:8px;background:transparent;border:2px solid rgba(255,255,255,0.15);border-radius:50px;padding:9px 40px;cursor:pointer;font-family:'Fredoka One',cursive;font-size:14px;color:rgba(255,255,255,0.4);display:none;align-items:center;justify-content:center;gap:6px;pointer-events:all;letter-spacing:1px;transition:all .15s;">
     ⚙️ <span id="spbName">Europe_1</span>
   </button>
@@ -2047,11 +2016,6 @@ let serverWorld=null,player=null,running=false;
 let camX=0,camY=0,boosting=false,pname=localStorage.getItem('dvx_name')||'Player';
 let autopilotMode=false;
 let gameMode='online';
-let brZoneSize = 4000; 
-let brLastShrink = 0;
-const BR_MIN_SIZE = 500;
-const BR_SHRINK_STEP = 400; // Зона будет сжиматься ощутимо
-const BR_FOOD_MULTIPLIER = 8; // В 8 раз больше еды для "мяса"
 
 let _prevWorld=null,_worldRecvTime=0;
 const INTERP_DURATION=55;
@@ -2422,28 +2386,14 @@ function offlineCheckCollisions(){const state=(gameMode==='maze'&&mazeState)?maz
 function offlineRespawnBots(){const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;if(!state)return;for(let i=0;i<state.bots.length;i++){if(!state.bots[i].alive){const name=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];state.bots[i]=mkBot(name,Math.floor(Math.random()*3));}}}
 
 function offlineTick(){if(!running||(gameMode!=='offline'&&gameMode!=='maze')||!offlineState)return;
-
-if (gameMode === 'br') {
-    const now = Date.now();
-    
-    // Уменьшим интервал до 10 секунд для драйва
-    if (now - brLastShrink > 10000) { 
-        if (brZoneSize > BR_MIN_SIZE) {
-            brZoneSize -= BR_SHRINK_STEP;
-            brLastShrink = now; // ОБЯЗАТЕЛЬНО обновляем время!
-            showToast('⚠️ ЗОНА СУЖАЕТСЯ!', '#ff4e4e');
-            console.log("Новый размер зоны:", brZoneSize); // Проверь в консоли (F12)
-        }
+  // Очищаем просроченную еду (дроп из убитых змеек)
+  const now=Date.now();
+  const allFood=(gameMode==='maze'&&mazeState)?mazeState.foods:offlineState.foods;
+  for(let i=allFood.length-1;i>=0;i--){
+    if(allFood[i].expireAt && now>allFood[i].expireAt){
+      allFood.splice(i,1);
     }
-    
-    // УРОН (откусываем массу)
-    const h = player.segs[0];
-    const offset = (WORLD - brZoneSize) / 2;
-    if (h.x < offset || h.x > offset + brZoneSize || h.y < offset || h.y > offset + brZoneSize) {
-        player.score = Math.max(5, player.score - 1); // Чуть медленнее, но верно
-        if (Math.random() < 0.1) showToast('ТЫ ВНЕ ЗОНЫ!', '#ff4e4e');
-    }
-}
+  }
   const state=(gameMode==='maze'&&mazeState)?mazeState:offlineState;const me=state.player;if(!me.alive){if(!me._deathHandled){me._deathHandled=true;if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}running=false;const score=me.score||0;const deathMsg=gameMode==='maze'?'🧱 Вы врезались в стену лабиринта!':'';document.getElementById('deathCauseMsg').textContent=deathMsg;document.getElementById('deathScore').textContent=t('mass')+': '+score;jbSaveScore(pname,score);clanUpdateScore(score);document.getElementById('hud').style.display='none';switchScreen('deathScreen',()=>{renderRecords(score);trackAch('mass',score);trackAch('survive',surviveTimer);});}return;}if(!autopilotMode){me.tAngle=Math.atan2(my-H/2,mx-W/2);me.boosting=boosting&&me.score>MIN_LEN;}else{
   const h=me.segs[0];
   const allSnakes=state.bots.filter(b=>b.alive);
@@ -2484,248 +2434,16 @@ if (gameMode === 'br') {
   me.tAngle=angle;me.boosting=false;
 }if(me.boosting&&me.length>MIN_LEN&&Math.random()<0.05){me.length=Math.max(MIN_LEN,me.length-1);me.score=Math.max(MIN_LEN,me.score-1);}offlineUpdateSnake(me,0.18);offlineEatFood(me);if(me.segs.length>0){camX+=(me.segs[0].x-W/2-camX)*0.12;camY+=(me.segs[0].y-H/2-camY)*0.12;}const now2=performance.now();if(now2-lastSurviveTick>=1000){surviveTimer++;lastSurviveTick=now2;trackQuest('survive_time',1);}for(const bot of state.bots){if(!bot.alive)continue;offlineBotAI(bot);if(bot.boosting&&bot.length>MIN_LEN&&Math.random()<0.05){bot.length=Math.max(MIN_LEN,bot.length-1);bot.score=Math.max(MIN_LEN,bot.score-1);}offlineUpdateSnake(bot,0.13);offlineEatFood(bot);}offlineCheckCollisions();offlineRespawnBots();const allPlayers=[me,...state.bots].filter(p=>p.alive).map(p=>({name:p.name,skinId:p.skinId,score:p.score,segs:p.segs.slice(0,750),boosting:p.boosting,isMe:p.isMe}));const lb=[...allPlayers].sort((a,b)=>b.score-a.score).slice(0,10).map(p=>({name:p.name,score:p.score,isMe:p.isMe}));serverWorld={players:allPlayers,foods:state.foods,leaderboard:lb};}
 
-function startOffline() {
-    // Сохраняем текущий режим игры
-    const currentGameMode = gameMode;
-    
-    // Очищаем все интервалы и таймеры
-    if (offlineTickInterval) {
-        clearInterval(offlineTickInterval);
-        offlineTickInterval = null;
-    }
-    if (mazeBreakTimeout) {
-        clearTimeout(mazeBreakTimeout);
-        mazeBreakTimeout = null;
-    }
-    
-    // Сбрасываем состояния
-    mazeState = null;
-    serverWorld = null;
-    _prevWorld = null;
-    
-    // Анимация открытия (затемнение)
-    playIrisOpen(() => {
-        // Инициализируем игру в зависимости от режима
-        let initResult;
-        
-        switch(currentGameMode) {
-            case 'maze':
-                initResult = initMazeMode();
-                break;
-            case 'br':
-                initResult = initBattleRoyaleMode();
-                break;
-            default:
-                initResult = initOffline();
-                break;
-        }
-        
-        const { spawnX, spawnY } = initResult;
-        
-        // Устанавливаем камеру на игрока
-        camX = spawnX - W / 2;
-        camY = spawnY - H / 2;
-        player = offlineState.player;
-        
-        // Скрываем все меню и показываем HUD
-        document.querySelectorAll('.screen').forEach(s => {
-            s.classList.remove('active');
-            s.style.cssText = '';
-        });
-        
-        // Настройка видимости элементов интерфейса
-        const elementsToHide = [
-            'gearBtn', 'clanBtn', 'xpBarWrap', 'bestMassWidget', 'achBtn', 'serverPickBtn'
-        ];
-        elementsToHide.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'none';
-        });
-        
-        const elementsToShow = ['hud'];
-        elementsToShow.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = 'block';
-        });
-        
-        // Скрываем монеты и кристаллы во время игры
-        const coinElements = document.querySelectorAll('.coins-fixed, .crystals-fixed');
-        coinElements.forEach(el => el.style.display = 'none');
-        
-        // Закрываем панель достижений если открыта
-        const achPanel = document.getElementById('achPanel');
-        if (achPanel) achPanel.classList.remove('open');
-        
-        // Сбрасываем состояния игрока
-        achOpen = false;
-        autopilotMode = false;
-        
-        const apBtn = document.getElementById('apBtn');
-        if (apBtn) apBtn.classList.remove('active');
-        
-        // Запускаем игровой цикл
-        running = true;
-        surviveTimer = 0;
-        lastSurviveTick = performance.now();
-        _xpFoodCounter = 0;
-        _foodCoinCounter = 0;
-        _prevScore = MIN_LEN;
-        
-        // Показываем джойстик на мобильных устройствах
-        if (isMobile()) showJoystick(true);
-        
-        // Скрываем игровые кнопки меню
-        hideGameButtons();
-        
-        // Запускаем игровой тикер
-        offlineTickInterval = setInterval(offlineTick, 33);
-        
-        // Трекинг статистики
-        trackAch('games', 1);
-        
-        // Дополнительная инициализация для режима BR
-        if (currentGameMode === 'br') {
-            // Устанавливаем параметры зоны
-            brZoneSize = WORLD;
-            brLastShrink = Date.now();
-            
-            // Добавляем дополнительную еду для режима BR
-            if (offlineState && offlineState.foods) {
-                const extraFoodCount = OFFLINE_FOOD_COUNT * BR_FOOD_MULTIPLIER;
-                for (let i = offlineState.foods.length; i < extraFoodCount; i++) {
-                    offlineState.foods.push(mkOfflineFood());
-                }
-            }
-            
-            showToast('🔥 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
-            showToast('⚠️ ЗОНА БУДЕТ СЖИМАТЬСЯ!', '#ff9f43');
-        }
-        
-        // Для режима лабиринта - запускаем таймер разрушения стен
-        if (currentGameMode === 'maze') {
-            mazeBreakTimeout = setTimeout(() => {
-                if (gameMode === 'maze' && mazeState && mazeState.walls) {
-                    const breakCount = Math.floor(mazeState.walls.length * 0.4);
-                    for (let i = 0; i < breakCount && mazeState.walls.length > 0; i++) {
-                        const idx = Math.floor(Math.random() * mazeState.walls.length);
-                        mazeState.walls.splice(idx, 1);
-                    }
-                    showToast('🌀 СТЕНЫ РАЗРУШАЮТСЯ! Будь осторожен!', '#6c5ce7');
-                }
-            }, MAZE_BREAK_TIME);
-        }
-        
-        // Небольшая задержка для стабилизации камеры
-        setTimeout(() => {
-            if (running && player && player.segs && player.segs.length > 0) {
-                camX = player.segs[0].x - W / 2;
-                camY = player.segs[0].y - H / 2;
-            }
-        }, 150);
-        
-        console.log(`✅ Игра запущена в режиме: ${currentGameMode.toUpperCase()}`);
-    });
-}
-
-// Вспомогательная функция для инициализации режима Maze
-function initMazeMode() {
-    const walls = generateMazeWalls();
-    const spawn = findSafeMazeSpawn(walls);
-    const angle = Math.random() * Math.PI * 2;
-    
-    const playerSegs = [];
-    for (let i = 0; i < MIN_LEN; i++) {
-        playerSegs.push({
-            x: spawn.x - Math.cos(angle) * i * 14,
-            y: spawn.y - Math.sin(angle) * i * 14
-        });
-    }
-    
-    const startM = getStartMass();
-    const me = {
-        x: spawn.x, y: spawn.y,
-        name: pname,
-        skinId: selSkin,
-        angle: angle,
-        tAngle: angle,
-        speed: 2.8,
-        boosting: false,
-        alive: true,
-        length: startM,
-        score: startM,
-        segs: playerSegs,
-        isMe: true,
-        _growBuf: 0,
-        foodEaten: 0,
-        _deathHandled: false
-    };
-    
-    // Создаем ботов с поддержкой доминантов
-    const usedNames = [...BOT_NAMES].sort(() => Math.random() - 0.5).slice(0, MAZE_BOTS_COUNT);
-    const bots = usedNames.map((n, i) => {
-        const sp = findSafeMazeSpawn(walls);
-        const bot = mkBotAt(sp.x, sp.y, n, i % 3);
-        bot.isDominant = Math.random() < 0.2;
-        bot._dominantMode = false;
-        bot._spinDirection = Math.random() < 0.5 ? 1 : -1;
-        bot._updateCounter = 0;
-        return bot;
-    });
-    
-    // Создаем еду
-    const foods = [];
-    for (let i = 0; i < MAZE_FOOD_COUNT; i++) {
-        let f = mkMazeFood();
-        let attempts = 0;
-        while (checkMazeWallCollisionDirect(f.x, f.y, f.r, walls) && attempts < 10) {
-            f = mkMazeFood();
-            attempts++;
-        }
-        foods.push(f);
-    }
-    
-    mazeState = { walls, foods, bots, player: me };
-    offlineState = mazeState;
-    
-    return { spawnX: spawn.x, spawnY: spawn.y };
-}
-
-// Вспомогательная функция для инициализации режима Battle Royale
-function initBattleRoyaleMode() {
-    const result = initOffline();
-    
-    // Увеличиваем количество ботов до 20
-    if (offlineState && offlineState.bots) {
-        const currentBotCount = offlineState.bots.length;
-        if (currentBotCount < 20) {
-            const additionalBots = 20 - currentBotCount;
-            const usedNames = [...BOT_NAMES].sort(() => Math.random() - 0.5);
-            for (let i = 0; i < additionalBots; i++) {
-                const name = usedNames[i % usedNames.length];
-                const bot = mkBot(name, i % 3);
-                bot.isDominant = Math.random() < 0.15;
-                offlineState.bots.push(bot);
-            }
-        }
-    }
-    
-    return result;
-}
+function startOffline(){gameMode='offline';if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}mazeState=null;serverWorld=null;_prevWorld=null;playIrisOpen(()=>{const{spawnX,spawnY}=initOffline();camX=spawnX-W/2;camY=spawnY-H/2;player=offlineState.player;document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.cssText='';});document.getElementById('gearBtn').style.display='none';document.getElementById('hud').style.display='block';document.querySelector('.coins-fixed').style.display='none';document.querySelector('.crystals-fixed').style.display='none';document.getElementById('clanBtn').style.display='none';document.getElementById('xpBarWrap').style.display='none';document.getElementById('bestMassWidget').style.display='none';document.getElementById('achBtn').style.display='none';document.getElementById('achPanel').classList.remove('open');const _sbOff=document.getElementById('serverPickBtn');if(_sbOff)_sbOff.style.display='none';achOpen=false;autopilotMode=false;document.getElementById('apBtn').classList.remove('active');running=true;surviveTimer=0;lastSurviveTick=performance.now();_xpFoodCounter=0;_foodCoinCounter=0;if(isMobile())showJoystick(true);hideGameButtons();offlineTickInterval=setInterval(offlineTick,33);trackAch('games',1);
 // Фикс для горизонтального режима — теперь player уже есть!
-    setTimeout(() => {
-        if (running && player && player.segs && player.segs.length > 0) {
-            camX = player.segs[0].x - W / 2;
-            camY = player.segs[0].y - H / 2;
-        }
-    }, 150);
+setTimeout(()=>{if(running&&player&&player.segs&&player.segs.length>0){camX=player.segs[0].x-W/2;camY=player.segs[0].y-H/2;}},150);},null);}
 // ══════ РЕЖИМ ЛАБИРИНТ ══════
-// Константы для режимов
-const MAZE_BOTS_COUNT = 8;
-const MAZE_FOOD_COUNT = 400;
-const MAZE_BREAK_TIME = 90000; // 90 секунд
-const MAZE_CELL = 160;
-const MAZE_WALL_W = 28;
-  
+const MAZE_BOTS_COUNT=8;
+const MAZE_FOOD_COUNT=400;
+const MAZE_CELL=160;
+const MAZE_WALL_W=28;
+const MAZE_BREAK_TIME=90000;
+
 function mkMazeFood(){return mkOfflineFood();}
 
 function generateMazeWalls() {
@@ -3290,32 +3008,8 @@ function updHUD() {
   }
 }
   
-function drawMM() {
+function drawMM(){
   mctx.clearRect(0,0,108,108);
-  mctx.fillStyle='rgba(0,0,0,0.6)';
-  mctx.fillRect(0,0,108,108);
-
-  // --- ДОБАВЛЯЕМ ОТРИСОВКУ ЗОНЫ НА РАДАР ---
-  if (gameMode === 'br') {
-    const sc = 108 / WORLD; // Коэффициент масштаба
-    const offset = (WORLD - brZoneSize) / 2;
-    
-    // Рисуем красную область зоны на миникарте
-    mctx.strokeStyle = '#ff4e4e';
-    mctx.lineWidth = 2;
-    mctx.strokeRect(offset * sc, offset * sc, brZoneSize * sc, brZoneSize * sc);
-    
-    // Закрашиваем то, что ВНЕ зоны, тёмно-красным
-    mctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
-    // Лево
-    mctx.fillRect(0, 0, offset * sc, 108);
-    // Право
-    mctx.fillRect((offset + brZoneSize) * sc, 0, (108 - (offset + brZoneSize) * sc), 108);
-    // Верх
-    mctx.fillRect(offset * sc, 0, brZoneSize * sc, offset * sc);
-    // Низ
-    mctx.fillRect(offset * sc, (offset + brZoneSize) * sc, brZoneSize * sc, (108 - (offset + brZoneSize) * sc));
-  }
   
   // Фон миникарты (тёмный)
   mctx.fillStyle='rgba(0,0,0,0.6)';
@@ -3565,30 +3259,6 @@ function draw(cx,cy){
     drawParticles();
     return;
   }
-  if (gameMode === 'br') {
-    const offset = (WORLD - brZoneSize) / 2;
-    
-    // 1. Отрисовка красной "опасной" области за краями зоны
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.15)';
-    // Верхняя часть
-    ctx.fillRect(-cx, -cy, WORLD, offset);
-    // Нижняя часть
-    ctx.fillRect(-cx, offset + brZoneSize - cy, WORLD, offset);
-    // Левая часть
-    ctx.fillRect(-cx, offset - cy, offset, brZoneSize);
-    // Правая часть
-    ctx.fillRect(offset + brZoneSize - cx, offset - cy, offset, brZoneSize);
-
-    // 2. Отрисовка самой границы (яркая линия)
-    ctx.strokeStyle = '#ff4e4e';
-    ctx.lineWidth = 15;
-    ctx.lineJoin = "round";
-    
-    // Делаем линию пунктирной для красоты
-    ctx.setLineDash([30, 20]); 
-    ctx.strokeRect(offset - cx, offset - cy, brZoneSize, brZoneSize);
-    ctx.setLineDash([]); // Сбрасываем пунктир для остальной отрисовки
-}
   if(gameMode==='maze'){drawWalls(cx,cy);}
   if(serverWorld){drawFoodList(serverWorld.foods||[],cx,cy);for(const p of(serverWorld.players||[]))drawServerSnake(p,cx,cy);}
 }
@@ -3609,28 +3279,6 @@ document.getElementById('mazeBtn').onclick=()=>{
   if(running) return;
   pname=document.getElementById('nameInput').value.trim()||'Player';
   startMazeMode();
-};
-document.getElementById('brBtn').onclick = () => {
-    if (running) return;
-    pname = document.getElementById('nameInput').value.trim() || 'Player';
-    
-    // СБРОС ПАРАМЕТРОВ ПЕРЕД СТАРТОМ
-    gameMode = 'br';
-    brZoneSize = WORLD; // Ставим 4000
-    brLastShrink = Date.now(); // Засекаем время старта
-    
-    startOffline(); 
-
-    if (offlineState) {
-        offlineState.bots = [];
-        for(let i = 0; i < 20; i++) {
-            offlineState.bots.push(mkBot(BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)]));
-        }
-        for(let i = 0; i < 2000; i++) {
-            offlineState.foods.push(mkOfflineFood());
-        }
-    }
-    showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
 };
 document.getElementById('restartBtn').onclick=()=>{if(gameMode==='offline'){startOffline();}else if(gameMode==='maze'){startMazeMode();}else{if(ws&&ws.readyState===WebSocket.OPEN){running=false;serverWorld=null;_prevWorld=null;showLoading(t('respawn'));ws.send(JSON.stringify({type:'respawn'}));}else connectWS();}};
 document.getElementById('menuBackBtn').onclick=()=>{if(offlineTickInterval){clearInterval(offlineTickInterval);offlineTickInterval=null;}if(mazeBreakTimeout){clearTimeout(mazeBreakTimeout);mazeBreakTimeout=null;}if(ws){try{ws.close();}catch(e){}ws=null;}wsConnecting=false;serverWorld=null;_prevWorld=null;running=false;offlineState=null;mazeState=null;showMenu();};
@@ -4175,6 +3823,10 @@ window.addEventListener('load',()=>{
   
   const dailyBtn = document.getElementById('dailyRewardsBtn');
   if (dailyBtn) dailyBtn.onclick = openDailyRewards;
+  
+  // ══════ СИСТЕМА ID — ВСТАВЬ СЮДА! ══════
+  initPlayerIdSystem();
+});
   
 // Live обновление ника
 document.getElementById('nameInput').addEventListener('input', () => {
@@ -5564,99 +5216,97 @@ const FIRST_LOAD_TIPS = [
   }, 350);
 })();
 
-// Добавьте недостающие определения
+// ══════ ЕЖЕДНЕВНЫЕ НАГРАДЫ ══════
 const DAILY_REWARDS = [
-  { day: 1, coins: 500, crystals: 0, message: '500 монет' },
-  { day: 2, coins: 800, crystals: 0, message: '800 монет' },
-  { day: 3, coins: 1000, crystals: 5, message: '1000 монет + 5 кристаллов' },
-  { day: 4, coins: 1500, crystals: 0, message: '1500 монет' },
-  { day: 5, coins: 2000, crystals: 10, message: '2000 монет + 10 кристаллов' },
-  { day: 6, coins: 3000, crystals: 0, message: '3000 монет' },
-  { day: 7, coins: 5000, crystals: 50, message: '5000 монет + 50 кристаллов + легендарный скин!' }
+    { day: 1, coins: 100, crystals: 0, message: '+100 монет' },
+    { day: 2, coins: 200, crystals: 0, message: '+200 монет' },
+    { day: 3, coins: 0, crystals: 5, message: '+5 кристаллов' },
+    { day: 4, coins: 300, crystals: 0, message: '+300 монет' },
+    { day: 5, coins: 0, crystals: 10, message: '+10 кристаллов' },
+    { day: 6, coins: 500, crystals: 0, message: '+500 монет' },
+    { day: 7, coins: 0, crystals: 50, message: '+50 КРИСТАЛЛОВ + СКИН!' }
 ];
 
-// Добавьте roundRect
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-    if (w < 2 * r) r = w / 2;
-    if (h < 2 * r) r = h / 2;
-    this.moveTo(x+r, y);
-    this.lineTo(x+w-r, y);
-    this.quadraticCurveTo(x+w, y, x+w, y+r);
-    this.lineTo(x+w, y+h-r);
-    this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    this.lineTo(x+r, y+h);
-    this.quadraticCurveTo(x, y+h, x, y+h-r);
-    this.lineTo(x, y+r);
-    this.quadraticCurveTo(x, y, x+r, y);
-    return this;
-  };
-}
-
-// Привязка кнопки наград
-const dRBtn = document.getElementById('dailyRewardsBtn');
-if(dRBtn) dRBtn.onclick = openDailyRewards;
-
-// --- ИСПРАВЛЕННАЯ ЛОГИКА КАРУСЕЛИ ---
-function changeMode(direction) {
-    const wrapper = document.getElementById('modeWrapper');
-    if (!wrapper) return;
-    if (typeof currentModeIndex === 'undefined') window.currentModeIndex = 0;
-
-    currentModeIndex += direction;
-    if (currentModeIndex >= 4) currentModeIndex = 0;
-    if (currentModeIndex < 0) currentModeIndex = 3;
-
-    const newOffset = currentModeIndex * -220;
-    wrapper.style.transform = `translateX(${newOffset}px)`;
-}
-
-// Финальный запуск всех систем
-window.addEventListener('load', () => {
-    console.log("DevourX Ready!");
+function checkDailyReward() {
+    const today = new Date().toISOString().slice(0,10);
+    const lastClaim = localStorage.getItem('dvx_last_claim');
+    if (lastClaim === today) return;
     
-    const pBtn = document.getElementById('playBtn');
-    if (pBtn) {
-        pBtn.addEventListener('click', () => {
-            window.currentModeIndex = 0;
-            const wrp = document.getElementById('modeWrapper');
-            if(wrp) wrp.style.transform = 'translateX(0px)';
-        });
+    let streak = parseInt(localStorage.getItem('dvx_streak') || '0');
+    const lastDate = localStorage.getItem('dvx_last_streak_date');
+    if (lastDate && lastDate !== yesterday()) streak = 0;
+    streak = (streak % 7) + 1;
+    
+    const reward = DAILY_REWARDS[streak - 1];
+    if (reward.coins > 0) { essence += reward.coins; syncEss(); }
+    if (reward.crystals > 0) { crystals += reward.crystals; syncCrystals(); }
+    
+    if (streak === 7) {
+        const legendarySkin = SKINS_DATA.find(s => s.rarity === 'legendary' && !s.owned);
+        if (legendarySkin) {
+            legendarySkin.owned = true;
+            saveSkins();
+            showToast(`🎁 ДЕНЬ 7! Скин ${legendarySkin.key}!`, '#f9ca24');
+        } else {
+            crystals += 100;
+            syncCrystals();
+            showToast(`🎁 ДЕНЬ 7! 100 кристаллов!`, '#f9ca24');
+        }
+    } else {
+        showToast(`🎁 ДЕНЬ ${streak}! ${reward.message}`, '#a29bfe');
     }
+    
+    localStorage.setItem('dvx_last_claim', today);
+    localStorage.setItem('dvx_streak', streak);
+    localStorage.setItem('dvx_last_streak_date', today);
+}
 
-    const bBtn = document.getElementById('brBtn');
-    if (bBtn) {
-        bBtn.onclick = () => {
-            if (window.running) return;
-            window.gameMode = 'br';
-            window.brZoneSize = 4000;
-            window.brLastShrink = Date.now();
-            
-            if(typeof startOffline === 'function') {
-                startOffline();
-            }
-            
-            setTimeout(() => {
-                const p = window.player || window.me || (window.offlineState && window.offlineState.player);
-                if (window.running && p && p.segs && p.segs.length > 0) {
-                    window.camX = p.segs[0].x - window.innerWidth / 2;
-                    window.camY = p.segs[0].y - window.innerHeight / 2;
-                }
-            }, 150);
-            
-            if(typeof showToast === 'function') {
-                showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
-            }
-        };
-    }
-});
+function yesterday() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().slice(0,10);
+}
 
-/** * СУПЕР-ЗАПЛАТКА
- * Если ошибка не исчезает, значит где-то в районе 2000-4000 строк 
- * осталась открытая скобка. Эти три штуки ниже принудительно их закроют.
- */
-} catch(e) {} } } 
+function openDailyRewards() {
+    const streak = parseInt(localStorage.getItem('dvx_streak') || '0');
+    const canClaim = localStorage.getItem('dvx_last_claim') !== new Date().toISOString().slice(0,10);
+    let msg = `📅 Твой стрик: ${streak}/7 дней\n\n`;
+    DAILY_REWARDS.forEach(r => {
+        const isClaimed = streak >= r.day;
+        msg += `${isClaimed ? '✅' : '🔸'} День ${r.day}: ${r.coins > 0 ? r.coins+'💰' : ''} ${r.crystals > 0 ? r.crystals+'💎' : ''}\n`;
+    });
+    if (canClaim && streak < 7) msg += `\n🎁 Забери награду ${streak+1}-го дня!`;
+    alert(msg);
+}
 
+  // Добавляем стили для анимации наград (если их нет)
+const dailyStyle = document.createElement('style');
+dailyStyle.textContent = `
+  @keyframes popupIn {
+    from { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
+    to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  }
+`;
+if (!document.querySelector('#dailyStyle')) {
+  dailyStyle.id = 'dailyStyle';
+  document.head.appendChild(dailyStyle);
+}
+  
+document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
+// document.head.appendChild(styleSheet); // УДАЛЕНО — переменная не определена
+
+  // ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
+function hideGameButtons() {
+    const chatBtn = document.getElementById('globalChatBtn');
+    const dailyBtn = document.getElementById('dailyRewardsBtn');
+    if (chatBtn) chatBtn.style.display = 'none';
+}
+
+function showGameButtons() {
+    const chatBtn = document.getElementById('globalChatBtn');
+    const dailyBtn = document.getElementById('dailyRewardsBtn');
+    if (chatBtn) chatBtn.style.display = 'flex';
+}
 </script>
 </body>
 </html>
