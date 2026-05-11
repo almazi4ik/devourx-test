@@ -1973,12 +1973,28 @@ function initParticles(){
 function drawLeaf(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,-size);ctx.bezierCurveTo(size*0.8,-size*0.5,size*0.8,size*0.5,0,size);ctx.bezierCurveTo(-size*0.8,size*0.5,-size*0.8,-size*0.5,0,-size);ctx.fill();ctx.beginPath();ctx.moveTo(0,-size*0.8);ctx.lineTo(0,size*0.8);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=0.7;ctx.stroke();ctx.restore();}
 function drawStar(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,b=a+Math.PI/5;i===0?ctx.moveTo(Math.cos(a)*size,Math.sin(a)*size):ctx.lineTo(Math.cos(a)*size,Math.sin(a)*size);ctx.lineTo(Math.cos(b)*size*0.4,Math.sin(b)*size*0.4);}ctx.closePath();ctx.fill();ctx.restore();}
 
+// --- ИСПРАВЛЕННЫЙ ЦИКЛ ОБНОВЛЕНИЯ ЧАСТИЦ (Листья) ---
 function updateParticles(){
-  for(let i=particles.length-1;i>=0;i--){
-    const p=particles[i];p.wobblePhase+=p.wobbleSpeed;
-    if(p.shape==='bubble'){p.x+=p.drift+Math.sin(p.wobblePhase)*p.wobbleAmp;p.y+=p.speed;if(p.y<-p.size-10)particles.splice(i,1,mkParticle(false));}
-    else if(p.shape==='star_dot'){p.x+=p.drift;p.y+=p.speed;if(p.y>H+10)particles.splice(i,1,mkParticle(true));}
-    else{p.x+=p.drift+Math.sin(p.wobblePhase)*p.wobbleAmp;p.y+=p.speed;p.angle+=p.spin;if(p.y>H+30)particles.splice(i,1,mkParticle(true));}
+  // Добавляем проверку: если игра запущена, частицы в меню не обновляем
+  if (running) return; 
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.wobblePhase += p.wobbleSpeed;
+    
+    // Снижаем скорость движения листьев в 2 раза
+    const speedMultiplier = 0.5; 
+    
+    if (p.shape === 'bubble') {
+      p.x += (p.drift + Math.sin(p.wobblePhase) * p.wobbleAmp) * speedMultiplier;
+      p.y += p.speed * speedMultiplier;
+      if (p.y < -p.size - 10) particles.splice(i, 1, mkParticle(false));
+    } else {
+      p.x += (p.drift + Math.sin(p.wobblePhase) * p.wobbleAmp) * speedMultiplier;
+      p.y += p.speed * speedMultiplier;
+      p.angle += p.spin * speedMultiplier;
+      if (p.y > H + 30) particles.splice(i, 1, mkParticle(true));
+    }
   }
 }
 
