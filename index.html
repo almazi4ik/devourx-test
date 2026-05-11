@@ -5636,7 +5636,6 @@ window.addEventListener('load', () => {
                 startOffline();
             }
             
-            // Фикс камеры через 150мс
             setTimeout(() => {
                 const p = window.player || window.me || (window.offlineState && window.offlineState.player);
                 if (window.running && p && p.segs && p.segs.length > 0) {
@@ -5650,7 +5649,9 @@ window.addEventListener('load', () => {
             }
         };
     }
-}); 
+});
+
+} } } 
 </script>
 </body>
 </html>
