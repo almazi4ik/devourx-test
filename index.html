@@ -5302,34 +5302,24 @@ if (document.getElementById('dailyRewardsBtn')) {
 // ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
 function hideGameButtons() {
     const chatBtn = document.getElementById('globalChatBtn');
-    const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'none';
 }
-
 function showGameButtons() {
     const chatBtn = document.getElementById('globalChatBtn');
-    const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
 }
 
-// --- ЛОГИКА ИНТЕРПОЛЯЦИИ ДЛЯ 60 FPS ---
+// --- СУПЕР-ПЛАВНОСТЬ 60 FPS ---
 const RENDER_DELAY = 100; 
-
 function getInterpolatedWorld() {
     if (!serverWorld || !_prevWorld) return serverWorld;
-    const now = performance.now();
-    const renderTime = now - RENDER_DELAY;
-    const serverTickRate = 66; 
-    let t = (renderTime - _worldRecvTime) / serverTickRate;
-    t = Math.max(0, Math.min(1.2, t)); 
-
+    const renderTime = performance.now() - RENDER_DELAY;
+    const serverTickRate = 66; // 15 FPS на сервере
+    let t = Math.max(0, Math.min(1.2, (renderTime - _worldRecvTime) / serverTickRate));
     const interpPlayers = serverWorld.players.map(p => {
         const prevSegs = _prevWorld._segsMap[p.name];
         if (!prevSegs || prevSegs.length !== p.segs.length) return p;
-        return {
-            ...p,
-            segs: interpSegs(prevSegs, p.segs, Math.min(t, 1))
-        };
+        return { ...p, segs: interpSegs(prevSegs, p.segs, Math.min(t, 1)) };
     });
     return { ...serverWorld, players: interpPlayers };
 }
@@ -5342,14 +5332,10 @@ function loop(ts) {
         if (gameMode === 'maze') drawWalls(camX, camY);
         if (worldToDraw) {
             drawFoodList(worldToDraw.foods || [], camX, camY);
-            for (const p of (worldToDraw.players || [])) {
-                drawServerSnake(p, camX, camY);
-            }
+            for (const p of (worldToDraw.players || [])) drawServerSnake(p, camX, camY);
         }
         drawMM();
-    } else {
-        draw(camX, camY);
-    }
+    } else { draw(camX, camY); }
     requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -5358,15 +5344,14 @@ function initPlayerIdSystem() {
     const idVal = document.getElementById('accPlayerIdValue');
     if (idVal) idVal.textContent = _playerId;
 }
-
 function copyPlayerId() {
-    navigator.clipboard.writeText(_playerId).then(() => {
-        showToast('ID скопирован! 📋', '#a29bfe');
-    });
+    navigator.clipboard.writeText(_playerId).then(() => showToast('ID скопирован! 📋', '#a29bfe'));
 }
 
-// ФИНАЛЬНОЕ ЗАКРЫТИЕ (если выше все было ок, это может выдать ошибку, но мы ее поймаем)
-try { }); } catch(e) {}
+/** * ВНИМАНИЕ: Если после этого будет ошибка Unexpected token '}', 
+ * просто удали ОДНУ скобку } ниже перед </script>.
+ */
+} } 
 </script>
 </body>
 </html>
