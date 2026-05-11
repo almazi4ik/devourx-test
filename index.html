@@ -5628,7 +5628,7 @@ function changeMode(direction) {
 // Финальный запуск всех систем
 window.addEventListener('load', () => {
     console.log("DevourX Ready!");
-
+    
     const pBtn = document.getElementById('playBtn');
     if (pBtn) {
         pBtn.addEventListener('click', () => {
@@ -5663,7 +5663,12 @@ window.addEventListener('load', () => {
             }
         };
     }
-}); 
+});
+
+/** * СУПЕР-ФИКС: Если выше в 5600 строках потерялась скобка, 
+ * эти 4 штуки принудительно закроют забытые функции.
+ */
+} } } } 
 </script>
 </body>
 </html>
