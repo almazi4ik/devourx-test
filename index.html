@@ -5615,7 +5615,6 @@ function changeMode(direction) {
 window.addEventListener('load', () => {
     console.log("DevourX Ready!");
     
-    // Обработка кнопки обычного старта
     const pBtn = document.getElementById('playBtn');
     if (pBtn) {
         pBtn.addEventListener('click', () => {
@@ -5625,7 +5624,6 @@ window.addEventListener('load', () => {
         });
     }
 
-    // Обработка кнопки Battle Royale (Голодные Игры)
     const bBtn = document.getElementById('brBtn');
     if (bBtn) {
         bBtn.onclick = () => {
@@ -5634,12 +5632,12 @@ window.addEventListener('load', () => {
             window.brZoneSize = 4000;
             window.brLastShrink = Date.now();
             
-            // Запускаем оффлайн режим
-            if(typeof startOffline === 'function') startOffline();
+            if(typeof startOffline === 'function') {
+                startOffline();
+            }
             
-            // Фикс камеры: центрируем на игроке через 150мс после старта
+            // Фикс камеры через 150мс
             setTimeout(() => {
-                // Проверяем и me, и player, и offlineState
                 const p = window.player || window.me || (window.offlineState && window.offlineState.player);
                 if (window.running && p && p.segs && p.segs.length > 0) {
                     window.camX = p.segs[0].x - window.innerWidth / 2;
@@ -5647,7 +5645,7 @@ window.addEventListener('load', () => {
                 }
             }, 150);
             
-            if (typeof showToast === 'function') {
+            if(typeof showToast === 'function') {
                 showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
             }
         };
