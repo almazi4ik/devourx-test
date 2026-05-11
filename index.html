@@ -5611,55 +5611,59 @@ function changeMode(direction) {
     wrapper.style.transform = `translateX(${newOffset}px)`;
 }
 
-// Финальный запуск всех систем
-try {
-    window.addEventListener('load', () => {
-        console.log("DevourX Ready!");
+// --- ИСПРАВЛЕННАЯ ЛОГИКА КАРУСЕЛИ ---
+function changeMode(direction) {
+    const wrapper = document.getElementById('modeWrapper');
+    if (!wrapper) return;
+    if (typeof currentModeIndex === 'undefined') window.currentModeIndex = 0;
 
-        const pBtn = document.getElementById('playBtn');
-        if (pBtn) {
-            pBtn.addEventListener('click', () => {
-                window.currentModeIndex = 0;
-                const wrp = document.getElementById('modeWrapper');
-                if(wrp) wrp.style.transform = 'translateX(0px)';
-            });
-        }
+    currentModeIndex += direction;
+    if (currentModeIndex >= 4) currentModeIndex = 0;
+    if (currentModeIndex < 0) currentModeIndex = 3;
 
-        const bBtn = document.getElementById('brBtn');
-        if (bBtn) {
-            bBtn.onclick = () => {
-                if (window.running) return;
-                window.gameMode = 'br';
-                window.brZoneSize = 4000;
-                window.brLastShrink = Date.now();
-                
-                if(typeof startOffline === 'function') {
-                    startOffline();
-                }
-                
-                setTimeout(() => {
-                    const p = window.player || window.me || (window.offlineState && window.offlineState.player);
-                    if (window.running && p && p.segs && p.segs.length > 0) {
-                        window.camX = p.segs[0].x - window.innerWidth / 2;
-                        window.camY = p.segs[0].y - window.innerHeight / 2;
-                    }
-                }, 150);
-                
-                if(typeof showToast === 'function') {
-                    showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
-                }
-            };
-        }
-    });
-} catch(e) { 
-    console.error("Ошибка в финальном блоке инициализации:", e); 
+    const newOffset = currentModeIndex * -220;
+    wrapper.style.transform = `translateX(${newOffset}px)`;
 }
 
-/** * НИЖЕ — ЗАКРЫВАЮЩИЕ СКОБКИ ДЛЯ ВСЕГО ФАЙЛА 
- * Если выше по коду (в функциях кланов, чата или тика) 
- * потерялась скобка, эти три штуки должны их закрыть.
- */
-} } } 
+// Финальный запуск всех систем
+window.addEventListener('load', () => {
+    console.log("DevourX Ready!");
+
+    const pBtn = document.getElementById('playBtn');
+    if (pBtn) {
+        pBtn.addEventListener('click', () => {
+            window.currentModeIndex = 0;
+            const wrp = document.getElementById('modeWrapper');
+            if(wrp) wrp.style.transform = 'translateX(0px)';
+        });
+    }
+
+    const bBtn = document.getElementById('brBtn');
+    if (bBtn) {
+        bBtn.onclick = () => {
+            if (window.running) return;
+            window.gameMode = 'br';
+            window.brZoneSize = 4000;
+            window.brLastShrink = Date.now();
+            
+            if(typeof startOffline === 'function') {
+                startOffline();
+            }
+            
+            setTimeout(() => {
+                const p = window.player || window.me || (window.offlineState && window.offlineState.player);
+                if (window.running && p && p.segs && p.segs.length > 0) {
+                    window.camX = p.segs[0].x - window.innerWidth / 2;
+                    window.camY = p.segs[0].y - window.innerHeight / 2;
+                }
+            }, 150);
+            
+            if(typeof showToast === 'function') {
+                showToast('🚀 ГОЛОДНЫЕ ИГРЫ НАЧАЛИСЬ!', '#ff4e4e');
+            }
+        };
+    }
+}); 
 </script>
 </body>
 </html>
