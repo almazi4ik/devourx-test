@@ -898,6 +898,33 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   z-index: 999 !important;
   position: fixed !important;
 }
+
+  .carousel-arrow {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(162, 155, 254, 0.4);
+    color: #a29bfe;
+    font-size: 24px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.carousel-arrow:hover {
+    background: #a29bfe;
+    color: white;
+    box-shadow: 0 0 15px rgba(162, 155, 254, 0.5);
+    transform: scale(1.1);
+}
+
+.carousel-arrow:active {
+    transform: scale(0.9);
+}
 </style>
   <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
