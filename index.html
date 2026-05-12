@@ -1973,28 +1973,12 @@ function initParticles(){
 function drawLeaf(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(0,-size);ctx.bezierCurveTo(size*0.8,-size*0.5,size*0.8,size*0.5,0,size);ctx.bezierCurveTo(-size*0.8,size*0.5,-size*0.8,-size*0.5,0,-size);ctx.fill();ctx.beginPath();ctx.moveTo(0,-size*0.8);ctx.lineTo(0,size*0.8);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=0.7;ctx.stroke();ctx.restore();}
 function drawStar(ctx,x,y,size,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,b=a+Math.PI/5;i===0?ctx.moveTo(Math.cos(a)*size,Math.sin(a)*size):ctx.lineTo(Math.cos(a)*size,Math.sin(a)*size);ctx.lineTo(Math.cos(b)*size*0.4,Math.sin(b)*size*0.4);}ctx.closePath();ctx.fill();ctx.restore();}
 
-// --- ИСПРАВЛЕННЫЙ ЦИКЛ ОБНОВЛЕНИЯ ЧАСТИЦ (Листья) ---
 function updateParticles(){
-  // Добавляем проверку: если игра запущена, частицы в меню не обновляем
-  if (running) return; 
-
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.wobblePhase += p.wobbleSpeed;
-    
-    // Снижаем скорость движения листьев в 2 раза
-    const speedMultiplier = 0.5; 
-    
-    if (p.shape === 'bubble') {
-      p.x += (p.drift + Math.sin(p.wobblePhase) * p.wobbleAmp) * speedMultiplier;
-      p.y += p.speed * speedMultiplier;
-      if (p.y < -p.size - 10) particles.splice(i, 1, mkParticle(false));
-    } else {
-      p.x += (p.drift + Math.sin(p.wobblePhase) * p.wobbleAmp) * speedMultiplier;
-      p.y += p.speed * speedMultiplier;
-      p.angle += p.spin * speedMultiplier;
-      if (p.y > H + 30) particles.splice(i, 1, mkParticle(true));
-    }
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.wobblePhase+=p.wobbleSpeed;
+    if(p.shape==='bubble'){p.x+=p.drift+Math.sin(p.wobblePhase)*p.wobbleAmp;p.y+=p.speed;if(p.y<-p.size-10)particles.splice(i,1,mkParticle(false));}
+    else if(p.shape==='star_dot'){p.x+=p.drift;p.y+=p.speed;if(p.y>H+10)particles.splice(i,1,mkParticle(true));}
+    else{p.x+=p.drift+Math.sin(p.wobblePhase)*p.wobbleAmp;p.y+=p.speed;p.angle+=p.spin;if(p.y>H+30)particles.splice(i,1,mkParticle(true));}
   }
 }
 
@@ -5295,7 +5279,7 @@ function openDailyRewards() {
     alert(msg);
 }
 
-// Добавляем стили для анимации наград
+  // Добавляем стили для анимации наград (если их нет)
 const dailyStyle = document.createElement('style');
 dailyStyle.textContent = `
   @keyframes popupIn {
@@ -5308,101 +5292,20 @@ if (!document.querySelector('#dailyStyle')) {
   document.head.appendChild(dailyStyle);
 }
   
-if (document.getElementById('dailyRewardsBtn')) {
-  document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
-}
+document.getElementById('dailyRewardsBtn').onclick = openDailyRewards;
+// document.head.appendChild(styleSheet); // УДАЛЕНО — переменная не определена
 
-// ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
+  // ══════ УПРАВЛЕНИЕ КНОПКАМИ В ИГРЕ ══════
 function hideGameButtons() {
     const chatBtn = document.getElementById('globalChatBtn');
+    const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'none';
 }
+
 function showGameButtons() {
     const chatBtn = document.getElementById('globalChatBtn');
+    const dailyBtn = document.getElementById('dailyRewardsBtn');
     if (chatBtn) chatBtn.style.display = 'flex';
-}
-
-// --- СУПЕР-ПЛАВНОСТЬ 60 FPS (FINAL FIX) ---
-const RENDER_DELAY = 100; // Задержка в 1.5 - 2 тика сервера идеальна
-
-function getInterpolatedWorld() {
-    // Если данных мало — отдаем что есть
-    if (!serverWorld || !_prevWorld) return serverWorld;
-
-    // Рассчитываем реальное время, которое мы хотим нарисовать
-    const now = performance.now();
-    const renderTime = now - RENDER_DELAY;
-
-    // Считаем время между двумя последними пакетами (в идеале 66мс)
-    // Если _lastPacketGap не определен, ставим 66 как дефолт
-    const serverTickRate = (serverWorld.timestamp - _prevWorld.timestamp) || 66;
-
-    // Коэффициент интерполяции t (от 0 до 1)
-    // Вычитаем время получения последнего пакета из текущего времени отрисовки
-    let t = (renderTime - _worldRecvTime) / serverTickRate;
-
-    // КРИТИЧЕСКИ ВАЖНО: 
-    // t не должен быть больше 1, иначе змейка "улетит" и потом телепортируется назад
-    t = Math.max(0, Math.min(1, t));
-
-    const interpPlayers = serverWorld.players.map(p => {
-        // Ищем эту же змейку в предыдущем пакете через мапу (ты красавчик, что сделал мапу)
-        const prevP = _prevWorld._segsMap ? _prevWorld._segsMap[p.name] : null;
-
-        // Если змейка новая или изменилась длина (съела массу/умерла) — не интерполируем этот кадр
-        if (!prevP || prevP.length !== p.segs.length) return p;
-
-        // Возвращаем игрока с плавно рассчитанными сегментами
-        return { 
-            ...p, 
-            segs: interpSegs(prevP, p.segs, t) 
-        };
-    });
-
-    return { ...serverWorld, players: interpPlayers };
-}
-
-// --- ИСПРАВЛЕННЫЙ LOOP ДЛЯ ПЛАВНОСТИ 60 FPS ---
-function loop(ts) {
-    // ВАЖНО: всегда запрашиваем следующий кадр в начале, чтобы FPS был стабильным
-    requestAnimationFrame(loop);
-
-    if (running) {
-        updHUD(); // Отправка данных на сервер (15 раз в сек внутри)
-        
-        // Получаем интерполированный мир для плавности
-        const worldToDraw = (gameMode === 'online') ? getInterpolatedWorld() : serverWorld;
-        
-        drawBackground(camX, camY);
-        if (gameMode === 'maze') drawWalls(camX, camY);
-        
-        if (worldToDraw) {
-            drawFoodList(worldToDraw.foods || [], camX, camY);
-            for (const p of (worldToDraw.players || [])) {
-                drawServerSnake(p, camX, camY);
-            }
-        }
-        drawMM();
-    } else {
-        // Главное меню: рисуем фон и медленные частицы
-        drawBackground(camX, camY);
-        updateParticles(); 
-        drawParticles();
-    }
-}
-
-// Запускаем цикл первый раз
-requestAnimationFrame(loop);
-
-function initPlayerIdSystem() {
-    const idVal = document.getElementById('accPlayerIdValue');
-    if (idVal) idVal.textContent = _playerId;
-}
-
-function copyPlayerId() {
-    navigator.clipboard.writeText(_playerId).then(() => {
-        showToast('ID скопирован! 📋', '#a29bfe');
-    });
 }
 </script>
 </body>
