@@ -5384,37 +5384,35 @@ function showGameButtons() {
 const modeOrder = ['offline', 'online', 'maze'];
 let currentModeIdx = 1; // Начинаем с ONLINE (индекс 1)
 
+const modeOrder = ['offline', 'online', 'maze'];
+let currentModeIdx = 1; // Стартуем с ONLINE
+
 function updateModeCarousel() {
+    const track = document.getElementById('modeTrack');
     const modeId = modeOrder[currentModeIdx];
     
-    // Прячем все карточки и показываем только ту, что выбрана
-    const ids = ['offlineBtn', 'onlineBtn', 'mazeBtn'];
-    ids.forEach((id, index) => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.style.display = (index === currentModeIdx) ? 'flex' : 'none';
-        }
-    });
+    // Сдвигаем трек на нужную карточку
+    const offset = -currentModeIdx * 100;
+    track.style.transform = `translateX(${offset}%)`;
 
-    // Устанавливаем глобальный режим
+    // Глобальная переменная режима
     gameMode = modeId;
 
-    // Управляем кнопкой сервера и другими игровыми кнопками
+    // Управление кнопками сервера и чата
     const serverBtn = document.getElementById('serverPickBtn');
     if (modeId === 'online') {
         if (serverBtn) serverBtn.style.display = 'flex';
-        showGameButtons(); // Показываем чат и награды в онлайне
+        if (typeof showGameButtons === 'function') showGameButtons();
     } else {
         if (serverBtn) serverBtn.style.display = 'none';
-        hideGameButtons(); // Скрываем лишнее в офлайне/лабиринте
+        if (typeof hideGameButtons === 'function') hideGameButtons();
     }
 }
 
-// Эту функцию вызывают стрелки из HTML
 function changeMode(dir) {
     currentModeIdx += dir;
     
-    // Зацикливание
+    // Циклическая прокрутка (из Лабиринта в Офлайн и наоборот)
     if (currentModeIdx < 0) currentModeIdx = modeOrder.length - 1;
     if (currentModeIdx >= modeOrder.length) currentModeIdx = 0;
     
