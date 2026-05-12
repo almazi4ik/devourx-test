@@ -899,30 +899,61 @@ body.theme-water #modeScreen, body.theme-water #loadingScreen {
   position: fixed !important;
 }
 
-  .carousel-arrow {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(162, 155, 254, 0.4);
-    color: #a29bfe;
-    font-size: 24px;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    cursor: pointer;
+.carousel-main-container {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+/* Окно, которое обрезает лишние карточки */
+.mode-view-window {
+    width: 280px; /* Ширина одной карточки */
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+/* "Рельсы", по которым едут карточки */
+.mode-btns-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Очень плавно */
+}
+
+/* Карточки больше не скрываются через display:none, они просто уезжают */
+.mode-card {
+    min-width: 280px;
+    flex-shrink: 0;
+    display: flex !important; /* Всегда flex, чтобы не ломать верстку */
+    flex-direction: column;
+    pointer-events: auto;
+}
+
+/* Те самые серые стрелки в кружочках */
+.circle-arrow {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.08); /* Светло-серый полупрозрачный */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
     transition: all 0.2s;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.carousel-arrow:hover {
-    background: #a29bfe;
+.circle-arrow:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: white;
-    box-shadow: 0 0 15px rgba(162, 155, 254, 0.5);
-    transform: scale(1.1);
+    border-color: #a29bfe;
 }
 
-.carousel-arrow:active {
+.circle-arrow:active {
     transform: scale(0.9);
 }
 </style>
