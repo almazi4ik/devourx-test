@@ -5322,18 +5322,43 @@ function showGameButtons() {
     if (chatBtn) chatBtn.style.display = 'flex';
 }
 
-// --- СУПЕР-ПЛАВНОСТЬ 60 FPS ---
-const RENDER_DELAY = 100; 
+// --- СУПЕР-ПЛАВНОСТЬ 60 FPS (FINAL FIX) ---
+const RENDER_DELAY = 100; // Задержка в 1.5 - 2 тика сервера идеальна
+
 function getInterpolatedWorld() {
+    // Если данных мало — отдаем что есть
     if (!serverWorld || !_prevWorld) return serverWorld;
-    const renderTime = performance.now() - RENDER_DELAY;
-    const serverTickRate = 66; // 15 FPS на сервере
-    let t = Math.max(0, Math.min(1.2, (renderTime - _worldRecvTime) / serverTickRate));
+
+    // Рассчитываем реальное время, которое мы хотим нарисовать
+    const now = performance.now();
+    const renderTime = now - RENDER_DELAY;
+
+    // Считаем время между двумя последними пакетами (в идеале 66мс)
+    // Если _lastPacketGap не определен, ставим 66 как дефолт
+    const serverTickRate = (serverWorld.timestamp - _prevWorld.timestamp) || 66;
+
+    // Коэффициент интерполяции t (от 0 до 1)
+    // Вычитаем время получения последнего пакета из текущего времени отрисовки
+    let t = (renderTime - _worldRecvTime) / serverTickRate;
+
+    // КРИТИЧЕСКИ ВАЖНО: 
+    // t не должен быть больше 1, иначе змейка "улетит" и потом телепортируется назад
+    t = Math.max(0, Math.min(1, t));
+
     const interpPlayers = serverWorld.players.map(p => {
-        const prevSegs = _prevWorld._segsMap[p.name];
-        if (!prevSegs || prevSegs.length !== p.segs.length) return p;
-        return { ...p, segs: interpSegs(prevSegs, p.segs, Math.min(t, 1)) };
+        // Ищем эту же змейку в предыдущем пакете через мапу (ты красавчик, что сделал мапу)
+        const prevP = _prevWorld._segsMap ? _prevWorld._segsMap[p.name] : null;
+
+        // Если змейка новая или изменилась длина (съела массу/умерла) — не интерполируем этот кадр
+        if (!prevP || prevP.length !== p.segs.length) return p;
+
+        // Возвращаем игрока с плавно рассчитанными сегментами
+        return { 
+            ...p, 
+            segs: interpSegs(prevP, p.segs, t) 
+        };
     });
+
     return { ...serverWorld, players: interpPlayers };
 }
 
